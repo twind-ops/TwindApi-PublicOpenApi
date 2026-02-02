@@ -2,18 +2,19 @@
 <html>
   <head>
     <title>TwindApi Public Docs - Access Control API</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/swagger-ui-dist/swagger-ui.css"
-    />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
   </head>
   <body>
-    <div id="swagger-ui"></div>
-    <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+    <div id="app"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script>
-      SwaggerUIBundle({
+      Scalar.createApiReference("#app", {
         url: "openapi-access-control-api.yaml",
-        dom_id: "#swagger-ui",
+        theme: "purple",
+        hideDownloadButton: false,
+        hideModels: false,
+        showSidebar: true,
       });
     </script>
   </body>
