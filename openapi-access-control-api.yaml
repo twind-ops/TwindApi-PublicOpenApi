@@ -1,0 +1,1953 @@
+# This file is auto-generated from TwindApi build process
+# DO NOT MODIFY MANUALLY
+# See: https://github.com/twind-ops/TwindApi/blob/main/.github/workflows/api.yml
+
+openapi: 3.1.0
+info:
+  title: Access Control API
+  description: |-
+    API for external systems to manage access control operations.
+
+    ## Authentication
+
+    Use the `X-Api-Key` header with your public API key.
+
+    ## Available Operations
+
+    - **Access Register**: Register entries and exits for workers and vehicles
+    - **Access Control**: Query access control status
+    - **Access Card**: Generate access cards (PDF/PNG)
+    - **Visitors**: Manage visitor records
+    - **Visit Register**: Register visitor entries and exits
+  contact:
+    name: Twind Support
+    email: support@twind.com
+  version: "1.0"
+servers:
+- url: http://127.0.0.1:8080
+  description: Generated server url
+tags:
+- name: access-control-controller
+  description: Access Control Management API
+paths:
+  /v1/companies/{companyId}/visitor/{visitorId}:
+    get:
+      tags:
+      - visitor-controller
+      operationId: getVisitor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: visitorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitorResponse"
+    put:
+      tags:
+      - visitor-controller
+      operationId: updateVisitor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: visitorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVisitorDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+  /v1/companies/{companyId}/visitor:
+    get:
+      tags:
+      - visitor-controller
+      operationId: getVisitors
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctVisitorsResponse"
+    post:
+      tags:
+      - visitor-controller
+      operationId: createVisitor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVisitorDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/visit-register:
+    get:
+      tags:
+      - visit-register-controller
+      operationId: getAllCompanyVisits
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: visitors
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: companies
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: sites
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: plateNumbers
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: onlyAtSite
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
+    post:
+      tags:
+      - visit-register-controller
+      operationId: createVisitEntry
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVisitDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-register:
+    get:
+      tags:
+      - access-register-controller
+      operationId: getAccessRegisterRecords
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceType
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: from
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: entryOnly
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: latestEntrance
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
+    post:
+      tags:
+      - access-register-controller
+      operationId: createAccessRegisterEntry
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-register/mobile:
+    post:
+      tags:
+      - access-register-controller
+      operationId: createAccessRegisterEntryMobile
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-register/legacy:
+    post:
+      tags:
+      - access-register-controller
+      operationId: createAccessRegisterEntryFromLegacy
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/visit-register/{visitRegisterId}:
+    get:
+      tags:
+      - visit-register-controller
+      operationId: getVisitDetails
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: visitRegisterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitDetailsResponse"
+    patch:
+      tags:
+      - visit-register-controller
+      operationId: updateVisitExit
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: visitRegisterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVisitExitDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-register/{accessRegisterId}:
+    patch:
+      tags:
+      - access-register-controller
+      operationId: updateAccessRegisterWithExit
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: accessRegisterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotesDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-register/{accessRegisterId}/mobile:
+    patch:
+      tags:
+      - access-register-controller
+      operationId: updateAccessRegisterWithExitMobile
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: accessRegisterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotesDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/companies/{companyId}/access-register/{accessRegisterId}/legacy:
+    patch:
+      tags:
+      - access-register-controller
+      operationId: updateAccessRegisterWithExitFromLegacy
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: accessRegisterId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateNotesDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+  /v1/companies/{companyId}/visitor/temporary-upload-url:
+    get:
+      tags:
+      - visitor-controller
+      operationId: getTemporaryUploadURL
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contentType
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: fileName
+        in: query
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+  /v1/companies/{companyId}/visitor/plate-numbers:
+    get:
+      tags:
+      - visitor-controller
+      operationId: getVisitorsPlateNumbers
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+  /v1/companies/{companyId}/visitor/companies:
+    get:
+      tags:
+      - visitor-controller
+      operationId: getVisitorsCompanies
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctCompaniesResponse"
+  /v1/companies/{companyId}/contractors/{contractorId}/access-control/{type}/{resourceId}:
+    get:
+      tags:
+      - access-card-controller
+      operationId: generateAccessCardPdf
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+  /v1/companies/{companyId}/access-register/{accessRecordId}:
+    get:
+      tags:
+      - access-register-controller
+      operationId: getAccessRegisterRecordById
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: accessRecordId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetAccessRegisterResponse"
+  /v1/companies/{companyId}/access-register/resources/{resourceId}/legacy-ids:
+    get:
+      tags:
+      - access-register-controller
+      operationId: getLegacyTwind1Ids
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/BidirectionalIdMapping"
+  /v1/companies/{companyId}/access-control/{id}:
+    get:
+      tags:
+      - access-control-controller
+      summary: Get access control status by resource
+      description: "Retrieves detailed access control status for a specific resource.\
+        \ The resource ID is a composite identifier in the format '{resourceId}-{siteId}'.\
+        \ Subcontractor data is included if the user has permission."
+      operationId: getAccessControlStatusByResource
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: "Composite resource identifier in format '{resourceId}-{siteId}'"
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Successfully retrieved access control status
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetResourceAccessControlResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetResourceAccessControlResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetResourceAccessControlResponse"
+        "404":
+          description: Resource not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetResourceAccessControlResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetResourceAccessControlResponse"
+  /v1/companies/{companyId}/access-control/as-contractor:
+    get:
+      tags:
+      - access-control-controller
+      summary: Get access control status by contractor
+      description: Retrieves paginated access control statuses for resources when
+        the company acts as a contractor. Results are filtered based on the user's
+        client company and site visibility. Subcontractor filtering (companyScope
+        and contractorIds).
+      operationId: getAccessControlStatusByContractor
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID acting as contractor
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: clientId
+        in: query
+        description: Filter by client ID. Results are automatically filtered based
+          on user's client company visibility
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        description: Filter by site ID. Results are automatically filtered based on
+          user's client site visibility
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)"
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: "Filter by status (ALLOWED, NOT_ALLOWED)"
+        required: false
+        schema:
+          type: string
+      - name: resourceId
+        in: query
+        description: Filter by specific resource ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        description: "Filter by subcontractor scope (ALL, MY_COMPANY, MY_SUBCONTRACTORS)."
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        description: Filter by specific contractor IDs.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved access control statuses
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "403":
+          description: "Access denied: insufficient permissions. This may occur when\
+            \ attempting to use subcontractor filters without proper permissions."
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+  /v1/companies/{companyId}/access-control/as-client:
+    get:
+      tags:
+      - access-control-controller
+      summary: Get access control status by client
+      description: "Retrieves paginated access control statuses for resources when\
+        \ the company acts as a client. Results are filtered based on the user's site\
+        \ visibility and can be further filtered by contractor, site, resource type,\
+        \ status, and resource ID."
+      operationId: getAccessControlStatusByClient
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID acting as client
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: query
+        description: Filter by contractor ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        description: Filter by site ID. Results are automatically filtered based on
+          user's site visibility
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)"
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        description: "Filter by status (ALLOWED, NOT_ALLOWED)"
+        required: false
+        schema:
+          type: string
+      - name: resourceId
+        in: query
+        description: Filter by specific resource ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved access control statuses
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "500":
+          description: Internal server error
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+components:
+  schemas:
+    CreateVisitorDto:
+      type: object
+      properties:
+        visitorName:
+          type: string
+          minLength: 1
+        visitorSurname:
+          type: string
+          minLength: 1
+        visitorIdentityType:
+          type: string
+          minLength: 1
+        visitorIdentity:
+          type: string
+          minLength: 1
+        visitorEmail:
+          type: string
+          format: email
+        visitorPlateNumber:
+          type: string
+          pattern: .*\S.*
+        companyName:
+          type: string
+          minLength: 1
+        companyTaxId:
+          type: string
+          minLength: 1
+        files:
+          type: array
+          items:
+            type: string
+      required:
+      - companyName
+      - companyTaxId
+      - visitorIdentity
+      - visitorIdentityType
+      - visitorName
+      - visitorSurname
+    IdValue:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+      required:
+      - id
+    CreateVisitDto:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        visitorId:
+          type: string
+          format: uuid
+        visitedPerson:
+          type: string
+          minLength: 1
+        entryAt:
+          type: string
+          format: date-time
+        entryReason:
+          type: string
+          minLength: 1
+        entryNotes:
+          type: string
+      required:
+      - entryAt
+      - entryReason
+      - siteId
+      - visitedPerson
+      - visitorId
+    RegisterDto:
+      type: object
+      properties:
+        companyId:
+          type: string
+          format: uuid
+        resourceId:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        origin:
+          type: string
+        entryNotes:
+          type: string
+        entryAt:
+          type: string
+          format: date-time
+        closeOpenEntries:
+          type: boolean
+      required:
+      - closeOpenEntries
+      - companyId
+      - entryAt
+      - origin
+      - resourceId
+      - siteId
+    UpdateVisitExitDto:
+      type: object
+      properties:
+        exitAt:
+          type: string
+          format: date-time
+        exitNotes:
+          type: string
+      required:
+      - exitAt
+    UpdateNotesDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        origin:
+          type: string
+        exitNotes:
+          type: string
+        exitAt:
+          type: string
+          format: date-time
+      required:
+      - companyId
+      - exitAt
+      - id
+      - origin
+    GetDistinctVisitorsResponse:
+      type: object
+      properties:
+        visitorId:
+          type: string
+          format: uuid
+        identity:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        companyName:
+          type: string
+        companyTaxId:
+          type: string
+      required:
+      - companyName
+      - companyTaxId
+      - firstName
+      - identity
+      - lastName
+      - visitorId
+    PageData:
+      type: object
+      properties:
+        size:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+      required:
+      - number
+      - size
+      - totalElements
+      - totalPages
+    PageResponseGetDistinctVisitorsResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetDistinctVisitorsResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    GetVisitorResponse:
+      type: object
+      properties:
+        visitorId:
+          type: string
+          format: uuid
+        visitorFirstName:
+          type: string
+        visitorLastName:
+          type: string
+        visitorIdentityType:
+          type: string
+        visitorIdentity:
+          type: string
+        email:
+          type: string
+        companyName:
+          type: string
+        companyTaxId:
+          type: string
+        plateNumber:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+      required:
+      - companyName
+      - companyTaxId
+      - files
+      - visitorFirstName
+      - visitorId
+      - visitorIdentity
+      - visitorIdentityType
+      - visitorLastName
+    PageResponseString:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            type: string
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    GetDistinctCompaniesResponse:
+      type: object
+      properties:
+        taxId:
+          type: string
+        name:
+          type: string
+      required:
+      - name
+      - taxId
+    PageResponseGetDistinctCompaniesResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetDistinctCompaniesResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    CompanyResponse:
+      type: object
+      properties:
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - name
+      - taxId
+    GetCompanyVisitsResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitor:
+          $ref: "#/components/schemas/Visitor"
+        company:
+          $ref: "#/components/schemas/CompanyResponse"
+        site:
+          $ref: "#/components/schemas/Site"
+        reason:
+          type: string
+        visitedPerson:
+          type: string
+        entry:
+          $ref: "#/components/schemas/VisitMovement"
+        exit:
+          $ref: "#/components/schemas/VisitMovement"
+        timeOnSite:
+          $ref: "#/components/schemas/TimeOnSite"
+      required:
+      - company
+      - entry
+      - id
+      - reason
+      - site
+      - visitedPerson
+      - visitor
+    PageResponseGetCompanyVisitsResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetCompanyVisitsResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Site:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    TimeOnSite:
+      type: object
+      properties:
+        hours:
+          type: integer
+          format: int64
+        minutes:
+          type: integer
+          format: int64
+        seconds:
+          type: integer
+          format: int64
+        time:
+          type: string
+      required:
+      - hours
+      - minutes
+      - seconds
+      - time
+    VisitMovement:
+      type: object
+      properties:
+        at:
+          type: string
+          format: date-time
+        registeredByFirstName:
+          type: string
+        registeredByLastName:
+          type: string
+        registeredByEmail:
+          type: string
+        notes:
+          type: string
+        registeredByFullName:
+          type: string
+      required:
+      - at
+      - registeredByFirstName
+      - registeredByFullName
+      - registeredByLastName
+    Visitor:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        identityType:
+          type: string
+        idNumber:
+          type: string
+        plateNumber:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+        email:
+          type: string
+      required:
+      - firstName
+      - idNumber
+      - identityType
+      - lastName
+    GetVisitDetailsResponse:
+      type: object
+      properties:
+        visitorFirstName:
+          type: string
+        visitorLastName:
+          type: string
+        visitorIdentityType:
+          type: string
+        visitorIdentity:
+          type: string
+        email:
+          type: string
+        companyName:
+          type: string
+        companyTaxId:
+          type: string
+        plateNumber:
+          type: string
+        visitedPerson:
+          type: string
+        siteName:
+          type: string
+        entry:
+          $ref: "#/components/schemas/VisitMovement"
+        exit:
+          $ref: "#/components/schemas/VisitMovement"
+        reason:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+      required:
+      - companyName
+      - companyTaxId
+      - entry
+      - files
+      - reason
+      - siteName
+      - visitedPerson
+      - visitorFirstName
+      - visitorIdentity
+      - visitorIdentityType
+      - visitorLastName
+    AccessRegisterMovement:
+      type: object
+      properties:
+        at:
+          type: string
+          format: date-time
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - PARTIALLY_ALLOWED
+          - NOT_ALLOWED
+        origin:
+          type: string
+        registeredById:
+          type: string
+        registeredByFirstName:
+          type: string
+        registeredByLastName:
+          type: string
+        registeredByEmail:
+          type: string
+        notes:
+          type: string
+      required:
+      - at
+      - origin
+      - registeredById
+      - status
+    Employee:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          firstName:
+            type: string
+          lastName:
+            type: string
+          identity:
+            type: string
+          identityType:
+            type: string
+          displayId:
+            type: string
+          name:
+            type: string
+      required:
+      - displayId
+      - firstName
+      - id
+      - identity
+      - identityType
+      - lastName
+      - name
+    Equipment:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          name:
+            type: string
+          serialNumber:
+            type: string
+          manufacturer:
+            type: string
+          model:
+            type: string
+          displayId:
+            type: string
+      required:
+      - displayId
+      - id
+      - name
+      - serialNumber
+    GetAccessRegisterClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    GetAccessRegisterContractor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    GetAccessRegisterResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        client:
+          $ref: "#/components/schemas/GetAccessRegisterClient"
+        contractor:
+          $ref: "#/components/schemas/GetAccessRegisterContractor"
+        resource:
+          oneOf:
+          - $ref: "#/components/schemas/Employee"
+          - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Vehicle"
+        site:
+          $ref: "#/components/schemas/Site"
+        entry:
+          $ref: "#/components/schemas/AccessRegisterMovement"
+        exit:
+          $ref: "#/components/schemas/AccessRegisterMovement"
+        timeOnSite:
+          $ref: "#/components/schemas/TimeOnSite"
+      required:
+      - client
+      - contractor
+      - entry
+      - id
+      - resource
+      - site
+    PageResponseGetAccessRegisterResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetAccessRegisterResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Resource:
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        id:
+          type: string
+          format: uuid
+        photo:
+          type: string
+        type:
+          type: string
+      required:
+      - id
+      - type
+    Vehicle:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          name:
+            type: string
+          registrationPlate:
+            type: string
+          manufacturer:
+            type: string
+          model:
+            type: string
+          displayId:
+            type: string
+      required:
+      - displayId
+      - id
+      - name
+      - registrationPlate
+    BidirectionalIdMapping:
+      type: object
+      properties:
+        twind1CompanyId:
+          type: string
+          format: uuid
+        twind2CompanyId:
+          type: string
+          format: uuid
+        twind1ResourceId:
+          type: string
+          format: uuid
+        twind2ResourceId:
+          type: string
+          format: uuid
+        twind1SiteId:
+          type: string
+          format: uuid
+        twind2SiteId:
+          type: string
+          format: uuid
+    ContractAndActivityAcceptability:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        contractName:
+          type: string
+        contractDateFrom:
+          type: string
+          format: date
+        contractDateTo:
+          type: string
+          format: date
+        activityId:
+          type: string
+          format: uuid
+        activityName:
+          type: string
+        allowed:
+          type: boolean
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - NOT_ALLOWED
+          - UPCOMING_DATE
+      required:
+      - activityId
+      - activityName
+      - allowed
+      - contractId
+      - contractName
+      - status
+    GetAccessControlContractor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+        email:
+          type: string
+      required:
+      - email
+      - id
+      - name
+      - taxId
+    GetResourceAccessControlResponse:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        resource:
+          oneOf:
+          - $ref: "#/components/schemas/Employee"
+          - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Vehicle"
+        contractor:
+          $ref: "#/components/schemas/GetAccessControlContractor"
+        site:
+          $ref: "#/components/schemas/Site"
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - PARTIALLY_ALLOWED
+          - NOT_ALLOWED
+        accessControlType:
+          type: string
+          enum:
+          - PERMISSIVE
+          - RESTRICTIVE
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementIssues"
+        statusPerContractActivity:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractAndActivityAcceptability"
+      required:
+      - accessControlType
+      - clientId
+      - contractor
+      - issues
+      - resource
+      - site
+      - status
+      - statusPerContractActivity
+    RequirementIssues:
+      type: object
+      properties:
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+      required:
+      - name
+      - status
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+      required:
+      - id
+      - name
+    GetAccessControlClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    GetAccessControlResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        client:
+          $ref: "#/components/schemas/GetAccessControlClient"
+        contractor:
+          $ref: "#/components/schemas/GetAccessControlContractor"
+        resource:
+          oneOf:
+          - $ref: "#/components/schemas/Employee"
+          - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Vehicle"
+        site:
+          $ref: "#/components/schemas/Site"
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+        risks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Risk"
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - PARTIALLY_ALLOWED
+          - NOT_ALLOWED
+        endOfAccess:
+          type: string
+          format: date
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementIssues"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contract"
+      required:
+      - activities
+      - client
+      - contractor
+      - contracts
+      - id
+      - issues
+      - resource
+      - risks
+      - site
+      - status
+    PageResponseGetAccessControlResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetAccessControlResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Risk:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+
