@@ -10,3 +10,13 @@ Public OpenAPI documentation for the Twind Access Control API, published via Git
 ## 📖 Live Documentation
 
 **[https://twind-ops.github.io/TwindApi-PublicOpenApi/](https://twind-ops.github.io/TwindApi-PublicOpenApi/)**
+
+## 🚀 Local Development
+
+To preview the documentation locally, run:
+
+```bash
+npx @scalar/cli document serve openapi-access-control-api.yaml --watch
+```
+
+This will start a local server with hot-reload enabled.
