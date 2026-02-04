@@ -1466,6 +1466,10 @@ components:
           type: array
           items:
             type: string
+        fileNames:
+          type: array
+          items:
+            type: string
         email:
           type: string
       required:
@@ -1826,6 +1830,7 @@ components:
           - PENDING_UPLOAD
           - UNDER_GRACE_PERIOD
           - EXPIRED
+          - PENDING_VALIDITY
       required:
       - name
       - status
