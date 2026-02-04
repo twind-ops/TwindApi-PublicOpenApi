@@ -139,11 +139,25 @@ const guides = [
 If your guide includes images:
 
 1. Create an `/guides/assets` folder (if it doesn't exist)
-2. Place images there
-3. Reference them in your markdown:
+2. Place images there following the naming convention: `[md-filename]_[image-name].png`
+3. Reference them in your markdown
+
+**Naming Convention:**
+
+```
+[md-filename]_[image-name].extension
+```
+
+For example, if your guide is `get-api-token.md` and you have an image showing the API section:
+
+```
+get-api-token_api-section.png
+```
+
+**Reference in Markdown:**
 
 ```markdown
-![Description](/guides/assets/your-image.png)
+![API Section](/guides/assets/get-api-token_api-section.png)
 ```
 
 ---
