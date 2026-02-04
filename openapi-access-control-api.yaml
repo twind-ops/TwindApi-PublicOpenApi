@@ -1803,6 +1803,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RequirementIssues"
+        issueRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/IssueRequirement"
         statusPerContractActivity:
           type: array
           items:
@@ -1811,11 +1815,45 @@ components:
       - accessControlType
       - clientId
       - contractor
+      - issueRequirements
       - issues
       - resource
       - site
       - status
       - statusPerContractActivity
+    IssueRequirement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subjectType:
+          type: string
+        multipleInstanceRequest:
+          type: string
+        appliedTo:
+          type: string
+        statuses:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      required:
+      - appliedTo
+      - id
+      - multipleInstanceRequest
+      - name
+      - statuses
+      - subjectType
     RequirementIssues:
       type: object
       properties:
@@ -1913,6 +1951,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RequirementIssues"
+        issueRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/IssueRequirement"
         contracts:
           type: array
           items:
@@ -1923,6 +1965,7 @@ components:
       - contractor
       - contracts
       - id
+      - issueRequirements
       - issues
       - resource
       - risks
