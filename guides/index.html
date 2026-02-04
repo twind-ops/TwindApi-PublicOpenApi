@@ -237,8 +237,11 @@
       }
 
       function loadGuide(filename) {
-        fetch(filename)
-          .then((res) => res.text())
+        fetch('/guides/' + filename)
+          .then((res) => {
+            if (!res.ok) throw new Error('Not found');
+            return res.text();
+          })
           .then((md) => {
             marked.setOptions({
               highlight(code, lang) {
@@ -257,6 +260,15 @@
             document.querySelectorAll("pre code").forEach((block) => {
               hljs.highlightElement(block);
             });
+          })
+          .catch(() => {
+            document.getElementById("content").innerHTML = `
+              <div style="text-align: center; padding: 48px;">
+                <h2 style="color: #f87171;">Guide not found</h2>
+                <p style="color: #8b8b9e;">The requested guide could not be loaded.</p>
+                <a href="index.html" style="color: #a78bfa;">← Back to Guides</a>
+              </div>
+            `;
           });
       }
     </script>
