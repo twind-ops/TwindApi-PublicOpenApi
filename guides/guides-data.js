@@ -9,13 +9,5 @@ const GUIDES_DATA = [
     title: "Get API Key",
     description: "Learn how to obtain and configure your API key for authentication.",
     icon: "/assets/icon-key.svg",
-  },
-  // Add more guides here following the same structure:
-  // {
-  //   id: "unique-id",
-  //   file: "filename.md",
-  //   title: "Guide Title",
-  //   description: "Brief description of the guide.",
-  //   icon: "/assets/icon-name.svg",
-  // },
+  }
 ];

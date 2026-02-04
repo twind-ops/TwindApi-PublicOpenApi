@@ -1,52 +1,65 @@
-# How to Obtain Your API Key
+# API Authentication Guide
 
-This guide explains how to get your API key and start using the Twind Access Control API.
+This guide explains how to authenticate and use the Twind Access Control API.
 
 ## Prerequisites
 
-- An active Twind account with API access enabled
-- Admin or developer permissions in your organization
+Before you can use the API, ensure you have the following:
 
-## Getting Your API Key
+1. **A Twind account** - If you don't have one, contact [Twind Support](mailto:support@twind.com) to create your account.
+2. **Access Control API product enabled** - This product must be activated for your account. Contact [Twind Support](mailto:support@twind.com) to request activation.
 
-### Step 1: Access the Developer Settings
+> **Note:** After the Access Control API product is enabled, you may need to log out and log back in for the changes to take effect.
 
-Log in to your Twind account and navigate to **Settings > API & Integrations**.
+## Managing Your API Keys
 
-### Step 2: Generate a New API Key
+Once your account is set up and the Access Control API product is enabled, navigate to:
 
-Click on **"Generate New API Key"** and provide a descriptive name for your key (e.g., "Production Integration" or "Development Testing").
+**[https://app.twind.io/configuration/apis](https://app.twind.io/configuration/apis)**
 
-### Step 3: Copy and Store Your Key
+![TWIND API section](/guides/assets/get-api-token_api-section.png)
 
-Once generated, copy your API key immediately. For security reasons, the full key will only be displayed once.
+From this page, you can:
 
-> **Important:** Store your API key securely. Never share it publicly or commit it to version control.
+- **Create new API keys** - Generate new keys for your integrations
+- **View existing API keys** - See all your current active keys
+- **Delete API keys** - Revoke keys that are no longer needed
+
+> **Security Tip:** Store your API keys securely. Never share them publicly or commit them to version control.
 
 ## Using Your API Key
 
-Include your API key in all requests using the `X-Api-Key` header:
+To authenticate your requests, include the API key in the `X-Api-Key` HTTP header:
+
+```
+X-Api-Key: your-api-key-here
+```
+
+### Example: Basic Request with cURL
 
 ```bash
-curl -X GET "https://app.twind.io/api/v1/me" \
+curl -X GET "https://api.twind.io/v1/endpoint" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
-## Verifying Your Setup
+## Verifying Your API Key
 
-To verify your API key is working correctly, make a request to the `/v1/me` endpoint:
+To verify that your API key is correctly configured, you can make a request to the `/v1/me` endpoint. This endpoint returns information about the authenticated user.
+
+### Example: Verify Authentication
 
 ```bash
-GET /v1/me
+curl -X GET "https://api.twind.io/v1/me" \
+  -H "X-Api-Key: your-api-key-here"
 ```
 
-A successful response will return your user information and associated companies.
+A successful response indicates that your API key is valid and properly configured. You can now use this key to access all available endpoints in the Access Control API.
 
 ## Next Steps
 
-- Check out the [API Reference](#) for all available endpoints
-- Learn about common workflows in our other guides
+- Explore the [API Reference](../index.html) for all available endpoints
+- Check out other guides for common integration patterns
 
 ---
 
-*Need help? Contact support@twind.com for assistance.*
+*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
