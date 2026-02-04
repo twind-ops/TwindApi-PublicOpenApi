@@ -167,6 +167,25 @@ body {
   flex-shrink: 0;
 }
 
+.nav-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  /* Filter to make the icon appear in gray (#8b8b9e) by default */
+  filter: invert(60%) sepia(5%) saturate(500%) hue-rotate(200deg) brightness(90%) contrast(90%);
+  transition: filter 0.15s ease;
+}
+
+.nav-subitem:hover .nav-icon {
+  /* Lighter gray on hover (#b4b4c4) */
+  filter: invert(80%) sepia(5%) saturate(300%) hue-rotate(200deg) brightness(100%) contrast(90%);
+}
+
+.nav-subitem.active .nav-icon {
+  /* Purple color when active (#a78bfa) */
+  filter: invert(67%) sepia(31%) saturate(1234%) hue-rotate(213deg) brightness(101%) contrast(97%);
+}
+
 /* Content */
 .content {
   flex: 1;

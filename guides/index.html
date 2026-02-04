@@ -69,6 +69,10 @@
         gap: 10px;
       }
       .guide-card h3 svg { color: #a78bfa; }
+      .guide-icon {
+        /* Filter to make the icon appear in purple (#a78bfa) */
+        filter: invert(67%) sepia(31%) saturate(1234%) hue-rotate(213deg) brightness(101%) contrast(97%);
+      }
       .guide-card p {
         margin: 0;
         color: #8b8b9e !important;
@@ -188,7 +192,7 @@
               .map(
                 (g) => `
               <a class="guide-card" href="?file=${g.file}">
-                <h3>${g.icon} ${g.title}</h3>
+                <h3><img src="${g.icon}" width="20" height="20" alt="" class="guide-icon" /> ${g.title}</h3>
                 <p>${g.description}</p>
               </a>`
               )
