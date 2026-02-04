@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Guides - Twind API</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Markdown parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- ✅ Browser-safe Highlight.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: #0a0a0f;
+        color: #e4e4eb;
+        line-height: 1.6;
+        font-size: 15px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 48px 32px;
+      }
+
+      /* Guides List */
+      .guides-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .guides-header {
+        margin-bottom: 32px;
+      }
+
+      .guides-header h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 12px 0;
+      }
+
+      .guides-header p {
+        color: #8b8b9e;
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .guide-card {
+        background: #111118;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 24px;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s ease;
+        display: block;
+      }
+
+      .guide-card:hover {
+        border-color: rgba(139, 92, 246, 0.4);
+        background: rgba(139, 92, 246, 0.05);
+        transform: translateY(-2px);
+      }
+
+      .guide-card h3 {
+        margin: 0 0 8px 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .guide-card h3 svg {
+        color: #a78bfa;
+      }
+
+      .guide-card p {
+        margin: 0;
+        color: #8b8b9e;
+        font-size: 14px;
+      }
+
+      /* Guide Content */
+      .guide-content h1 {
+        font-size: 32px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 24px 0;
+        padding-bottom: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .guide-content h2 {
+        font-size: 24px;
+        font-weight: 600;
+        color: #e4e4eb;
+        margin: 40px 0 16px 0;
+      }
+
+      .guide-content h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #d4d4dc;
+        margin: 32px 0 12px 0;
+      }
+
+      .guide-content p {
+        margin: 0 0 16px 0;
+      }
+
+      .guide-content ul,
+      .guide-content ol {
+        margin: 0 0 16px 0;
+        padding-left: 24px;
+      }
+
+      .guide-content li {
+        margin-bottom: 8px;
+      }
+
+      .guide-content code {
+        font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+        font-size: 13px;
+        background: rgba(139, 92, 246, 0.15);
+        color: #c4b5fd;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      .guide-content pre {
+        background: #0d0d14;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 20px;
+        overflow-x: auto;
+        margin: 0 0 24px 0;
+      }
+
+      .guide-content pre code {
+        background: none;
+        padding: 0;
+        color: inherit;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .guide-content a {
+        color: #a78bfa;
+        text-decoration: none;
+      }
+
+      .guide-content a:hover {
+        text-decoration: underline;
+      }
+
+      .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #8b8b9e;
+        text-decoration: none;
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div id="content">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <script>
+      const guides = [
+        {
+          file: "get-api-token.md",
+          title: "Get API Key",
+          description: "Learn how to obtain and configure your API key for authentication.",
+          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777z"></path>
+          </svg>`,
+        },
+      ];
+
+      const params = new URLSearchParams(window.location.search);
+      const file = params.get("file");
+
+      if (!file) {
+        renderGuidesList();
+      } else {
+        loadGuide(file);
+      }
+
+      function renderGuidesList() {
+        document.getElementById("content").innerHTML = `
+          <div class="guides-header">
+            <h1>Guides</h1>
+            <p>Step-by-step tutorials to help you get started with the Twind API.</p>
+          </div>
+          <div class="guides-list">
+            ${guides
+              .map(
+                (g) => `
+              <a class="guide-card" href="?file=${g.file}">
+                <h3>${g.icon} ${g.title}</h3>
+                <p>${g.description}</p>
+              </a>`
+              )
+              .join("")}
+          </div>
+        `;
+      }
+
+      function loadGuide(filename) {
+        fetch(filename)
+          .then((res) => res.text())
+          .then((md) => {
+            marked.setOptions({
+              highlight(code, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                  return hljs.highlight(code, { language: lang }).value;
+                }
+                return hljs.highlightAuto(code).value;
+              },
+            });
+
+            document.getElementById("content").innerHTML = `
+              <a class="back-link" href="index.html">← Back to Guides</a>
+              <div class="guide-content">${marked.parse(md)}</div>
+            `;
+
+            document.querySelectorAll("pre code").forEach((block) => {
+              hljs.highlightElement(block);
+            });
+          });
+      }
+    </script>
+  </body>
+</html>

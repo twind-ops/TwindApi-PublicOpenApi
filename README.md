@@ -13,10 +13,20 @@ Public OpenAPI documentation for the Twind Access Control API, published via Git
 
 ## 🚀 Local Development
 
-To preview the documentation locally, run:
+To preview the full documentation with custom navigation and guides:
 
 ```bash
-npx @scalar/cli document serve openapi-access-control-api.yaml --watch
+npx serve .
+# or
+python3 -m http.server 3000
 ```
 
-This will start a local server with hot-reload enabled.
+Then open http://localhost:3000 in your browser.
+
+> **Note:** Do NOT use `npx @scalar/cli document serve` for local development, as it won't include the custom navbar and guides.
+
+## 📚 Guides
+
+Additional documentation and guides are available in the `/guides` folder:
+
+- [Get API Key](guides/get-api-token.md) - How to obtain and configure your API key

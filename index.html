@@ -1,21 +1,354 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>TwindApi Public Docs - Access Control API</title>
+    <title>Twind API Documentation</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <div id="app"></div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+        background: #0a0a0f;
+        color: #e4e4eb;
+        font-size: 14px;
+      }
+
+      .layout {
+        display: flex;
+        height: 100vh;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 240px;
+        min-width: 240px;
+        background: #111118;
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        transition: all 0.2s ease;
+        overflow: hidden;
+      }
+
+      .sidebar.collapsed {
+        width: 48px;
+        min-width: 48px;
+      }
+
+      .sidebar-header {
+        padding: 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .sidebar-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 15px;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .sidebar-logo svg {
+        flex-shrink: 0;
+      }
+
+      .sidebar.collapsed .sidebar-logo span {
+        display: none;
+      }
+
+      .collapse-btn {
+        background: transparent;
+        border: none;
+        color: #8b8b9e;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        flex-shrink: 0;
+      }
+
+      .collapse-btn:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      .sidebar.collapsed .collapse-btn {
+        transform: rotate(180deg);
+      }
+
+      .sidebar-nav {
+        flex: 1;
+        overflow-y: auto;
+        padding: 12px 8px;
+      }
+
+      .nav-section {
+        margin-bottom: 8px;
+      }
+
+      .nav-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #6b6b7b;
+        padding: 8px 12px 6px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidebar.collapsed .nav-section-title span {
+        display: none;
+      }
+
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: #b4b4c4;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-weight: 500;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+
+      .nav-item:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: #e4e4eb;
+      }
+
+      .nav-item.active {
+        background: rgba(139, 92, 246, 0.15);
+        color: #a78bfa;
+      }
+
+      .nav-item svg {
+        flex-shrink: 0;
+        width: 18px;
+        height: 18px;
+      }
+
+      .sidebar.collapsed .nav-item span {
+        display: none;
+      }
+
+      .nav-subitems {
+        margin-left: 20px;
+        border-left: 1px solid rgba(255, 255, 255, 0.08);
+        padding-left: 8px;
+        margin-top: 4px;
+      }
+
+      .sidebar.collapsed .nav-subitems {
+        display: none;
+      }
+
+      .nav-subitem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        color: #8b8b9e;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        font-size: 13px;
+      }
+
+      .nav-subitem:hover {
+        background: rgba(139, 92, 246, 0.08);
+        color: #b4b4c4;
+      }
+
+      .nav-subitem.active {
+        background: rgba(139, 92, 246, 0.12);
+        color: #a78bfa;
+      }
+
+      .nav-subitem svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+      }
+
+      /* Content */
+      .content {
+        flex: 1;
+        overflow: hidden;
+        background: #0a0a0f;
+      }
+
+      #api-container,
+      #guides-container {
+        width: 100%;
+        height: 100%;
+        display: none;
+      }
+
+      #api-container.visible,
+      #guides-container.visible {
+        display: block;
+      }
+
+      #guides-frame {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+            <span>Twind API</span>
+          </div>
+          <button class="collapse-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- API Reference -->
+          <a class="nav-item active" id="nav-api" onclick="showSection('api')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>API Reference</span>
+          </a>
+
+          <!-- Guides -->
+          <a class="nav-item" id="nav-guides" onclick="showSection('guides')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>Guides</span>
+          </a>
+          <div class="nav-subitems">
+            <a class="nav-subitem" id="nav-guide-api-key" onclick="showGuide('get-api-token.md')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+              </svg>
+              <span>Get API Key</span>
+            </a>
+          </div>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <div id="api-container" class="visible"></div>
+        <div id="guides-container">
+          <iframe id="guides-frame" src=""></iframe>
+        </div>
+      </main>
+    </div>
+
     <script>
-      Scalar.createApiReference("#app", {
+      // Initialize Scalar API Reference
+      Scalar.createApiReference("#api-container", {
         url: "openapi-access-control-api.yaml",
         theme: "purple",
-        hideDownloadButton: false,
-        hideModels: false,
         showSidebar: true,
+        darkMode: true,
       });
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+      }
+
+      function showSection(section) {
+        const apiContainer = document.getElementById("api-container");
+        const guidesContainer = document.getElementById("guides-container");
+        const navApi = document.getElementById("nav-api");
+        const navGuides = document.getElementById("nav-guides");
+
+        // Reset all nav items
+        document.querySelectorAll(".nav-item, .nav-subitem").forEach((el) => {
+          el.classList.remove("active");
+        });
+
+        if (section === "api") {
+          apiContainer.classList.add("visible");
+          guidesContainer.classList.remove("visible");
+          navApi.classList.add("active");
+        } else if (section === "guides") {
+          apiContainer.classList.remove("visible");
+          guidesContainer.classList.add("visible");
+          navGuides.classList.add("active");
+          // Show guides index (list of guides)
+          document.getElementById("guides-frame").src = "guides/index.html";
+        }
+      }
+
+      function showGuide(file) {
+        const apiContainer = document.getElementById("api-container");
+        const guidesContainer = document.getElementById("guides-container");
+        const navGuideApiKey = document.getElementById("nav-guide-api-key");
+
+        // Reset all nav items
+        document.querySelectorAll(".nav-item, .nav-subitem").forEach((el) => {
+          el.classList.remove("active");
+        });
+
+        apiContainer.classList.remove("visible");
+        guidesContainer.classList.add("visible");
+        navGuideApiKey.classList.add("active");
+
+        document.getElementById("guides-frame").src = `guides/index.html?file=${file}`;
+      }
+
+      // Check URL params on load
+      const urlParams = new URLSearchParams(window.location.search);
+      const guide = urlParams.get("guide");
+      if (guide) {
+        showGuide(guide);
+      }
     </script>
   </body>
 </html>
