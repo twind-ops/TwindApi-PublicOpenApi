@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="guides/guides-data.js"></script>
   </head>
 
   <body>
@@ -54,13 +55,8 @@
             </svg>
             <span>Guides</span>
           </a>
-          <div class="nav-subitems">
-            <a class="nav-subitem" id="nav-guide-api-key" onclick="showGuide('get-api-token.md')">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
-              </svg>
-              <span>Get API Key</span>
-            </a>
+          <div class="nav-subitems" id="nav-guides-subitems">
+            <!-- Generated dynamically from guides-data.js -->
           </div>
         </nav>
       </aside>
@@ -93,6 +89,22 @@
         darkMode: true,
       });
 
+      // Generate navbar subitems from guides data
+      function initNavbar() {
+        const container = document.getElementById("nav-guides-subitems");
+        container.innerHTML = GUIDES_DATA.map(
+          (guide) => `
+          <a class="nav-subitem" id="nav-guide-${guide.id}" onclick="showGuide('${guide.file}', '${guide.id}')">
+            ${guide.icon.replace(/width="20"/g, 'width="14"').replace(/height="20"/g, 'height="14"')}
+            <span>${guide.title}</span>
+          </a>
+        `
+        ).join("");
+      }
+
+      // Initialize navbar on page load
+      initNavbar();
+
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("collapsed");
       }
@@ -102,7 +114,8 @@
           el.classList.remove("active");
         });
         if (elementId) {
-          document.getElementById(elementId).classList.add("active");
+          const el = document.getElementById(elementId);
+          if (el) el.classList.add("active");
         }
       }
 
@@ -125,7 +138,7 @@
         }
       }
 
-      function showGuide(file) {
+      function showGuide(file, guideId) {
         const apiContainer = document.getElementById("api-container");
         const guidesContainer = document.getElementById("guides-container");
         const guideContentContainer = document.getElementById("guide-content-container");
@@ -134,7 +147,7 @@
         apiContainer.classList.remove("visible");
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.add("visible");
-        setActiveNav("nav-guide-api-key");
+        setActiveNav("nav-guide-" + guideId);
 
         // Show loading
         guideContent.innerHTML = '<p style="color: #8b8b9e;">Loading...</p>';

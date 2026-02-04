@@ -141,6 +141,7 @@
       .back-link:hover { color: #a78bfa !important; }
       .loading { color: #8b8b9e; }
     </style>
+    <script type="text/javascript" src="/guides/guides-data.js" onerror="console.error('Failed to load guides-data.js')"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   </head>
@@ -153,34 +154,37 @@
     </div>
 
     <script>
-      const guides = [
-        {
-          file: "get-api-token.md",
-          title: "Get API Key",
-          description: "Learn how to obtain and configure your API key for authentication.",
-          icon: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777z"></path>
-          </svg>`,
-        },
-      ];
+      // Wait for DOM to be ready
+      document.addEventListener("DOMContentLoaded", function() {
+        const params = new URLSearchParams(window.location.search);
+        const file = params.get("file");
 
-      const params = new URLSearchParams(window.location.search);
-      const file = params.get("file");
-
-      if (!file) {
-        renderGuidesList();
-      } else {
-        loadGuide(file);
-      }
+        if (!file) {
+          renderGuidesList();
+        } else {
+          loadGuide(file);
+        }
+      });
 
       function renderGuidesList() {
+        // Check if GUIDES_DATA is available
+        if (typeof GUIDES_DATA === "undefined" || !Array.isArray(GUIDES_DATA)) {
+          document.getElementById("content").innerHTML = `
+            <div class="guides-header">
+              <h1>Guides</h1>
+              <p style="color: #f87171;">Error: Could not load guides data.</p>
+            </div>
+          `;
+          console.error("GUIDES_DATA is not defined. Make sure guides-data.js is loaded.");
+          return;
+        }
         document.getElementById("content").innerHTML = `
           <div class="guides-header">
             <h1>Guides</h1>
             <p>Step-by-step tutorials to help you get started with the Twind API.</p>
           </div>
           <div class="guides-list">
-            ${guides
+            ${GUIDES_DATA
               .map(
                 (g) => `
               <a class="guide-card" href="?file=${g.file}">
