@@ -1,0 +1,174 @@
+/* Guides Page Styles */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #0a0a0f;
+  color: #e4e4eb;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+/* Guides List */
+.guides-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guides-header {
+  margin-bottom: 32px;
+}
+
+.guides-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 12px 0;
+}
+
+.guides-header p {
+  color: #8b8b9e;
+  margin: 0;
+  font-size: 16px;
+}
+
+.guide-card {
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.guide-card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.05);
+  transform: translateY(-2px);
+}
+
+.guide-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guide-card h3 svg {
+  color: #a78bfa;
+}
+
+.guide-card p {
+  margin: 0;
+  color: #8b8b9e;
+  font-size: 14px;
+}
+
+/* Guide Content */
+.guide-content h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 24px 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.guide-content h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #e4e4eb;
+  margin: 40px 0 16px 0;
+}
+
+.guide-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #d4d4dc;
+  margin: 32px 0 12px 0;
+}
+
+.guide-content p {
+  margin: 0 0 16px 0;
+}
+
+.guide-content ul,
+.guide-content ol {
+  margin: 0 0 16px 0;
+  padding-left: 24px;
+}
+
+.guide-content li {
+  margin-bottom: 8px;
+}
+
+.guide-content code {
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  font-size: 13px;
+  background: rgba(139, 92, 246, 0.15);
+  color: #c4b5fd;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.guide-content pre {
+  background: #0d0d14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 20px;
+  overflow-x: auto;
+  margin: 0 0 24px 0;
+}
+
+.guide-content pre code {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.guide-content a {
+  color: #a78bfa;
+  text-decoration: none;
+}
+
+.guide-content a:hover {
+  text-decoration: underline;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #8b8b9e;
+  text-decoration: none;
+  font-size: 14px;
+  margin-bottom: 24px;
+  transition: color 0.15s ease;
+}
+
+.back-link:hover {
+  color: #a78bfa;
+}
+
+.loading {
+  color: #8b8b9e;
+}
