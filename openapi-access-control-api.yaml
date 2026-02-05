@@ -10,11 +10,6 @@ info:
 
     ## Available Operations
 
-    - **Me**: Get current user information and associated companies
-    - **Sites**: List available sites for filtering
-    - **Clients**: List client companies for filtering
-    - **My Companies**: List related companies (contractors/clients)
-    - **Assigned Resources**: List resources assigned to contracts
     - **Access Register**: Register entries and exits for workers and vehicles
     - **Access Control**: Query access control status
     - **Access Card**: Generate access cards (PDF/PNG)
@@ -25,15 +20,11 @@ info:
     email: support@twind.com
   version: "1.0"
 servers:
-- url: https://app.twind.io/api
-  description: Production server
+- url: http://127.0.0.1:8080
+  description: Generated server url
 tags:
 - name: access-control-controller
   description: Access Control Management API
-- name: site-controller
-  description: Site Management API
-- name: me-controller
-  description: Current User Information API
 paths:
   /v1/companies/{companyId}/visitor/{visitorId}:
     get:
@@ -175,9 +166,6 @@ paths:
     get:
       tags:
       - visit-register-controller
-      summary: Get all company visits
-      description: "Retrieves paginated visit records for a company. The 'sites' filter\
-        \ parameter accepts site IDs which can be obtained from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
       operationId: getAllCompanyVisits
       parameters:
       - name: companyId
@@ -259,19 +247,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Successfully retrieved visits
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
-        "403":
-          description: "Access denied: insufficient permissions"
+          description: OK
           content:
             '*/*':
               schema:
@@ -300,78 +276,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
-  /v1/companies/{companyId}/sites:
-    get:
-      tags:
-      - site-controller
-      summary: List sites
-      description: Retrieves paginated list of sites for a company. Use this endpoint
-        to obtain site IDs for filtering in other endpoints.
-      operationId: findAll
-      parameters:
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved sites list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
   /v1/companies/{companyId}/access-register:
     get:
       tags:
       - access-register-controller
-      summary: Get access register records
-      description: Retrieves paginated access register records for a company.
       operationId: getAccessRegisterRecords
       parameters:
       - name: companyId
@@ -382,23 +290,18 @@ paths:
           format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
         required: false
         schema:
           type: string
           format: uuid
       - name: resourceId
         in: query
-        description: Filter by resource ID. Obtain resource IDs from access-control
-          endpoints (resource.id field)
         required: false
         schema:
           type: string
           format: uuid
       - name: contractorId
         in: query
-        description: Filter by contractor ID. Obtain contractor IDs from access-control
-          endpoints (contractor.id field)
         required: false
         schema:
           type: string
@@ -459,19 +362,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Successfully retrieved access register records
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
-        "403":
-          description: "Access denied: insufficient permissions"
+          description: OK
           content:
             '*/*':
               schema:
@@ -550,36 +441,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
-  /v1/users/me:
-    get:
-      tags:
-      - me-controller
-      summary: Get current user information
-      description: "Retrieves detailed information about the currently authenticated\
-        \ user, including their profile, permissions, and company associations."
-      operationId: me
-      parameters:
-      - name: companyId
-        in: query
-        description: Optional company ID to get permissions for (only applicable for
-          Global Admins)
-        required: false
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved user information
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDetails"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/UserDetails"
   /v1/companies/{companyId}/visit-register/{visitRegisterId}:
     get:
       tags:
@@ -720,338 +581,6 @@ paths:
       responses:
         "200":
           description: OK
-  /v1/users/me/companies:
-    get:
-      tags:
-      - me-controller
-      summary: Get current user's companies
-      description: Retrieves the list of companies that the currently authenticated
-        user has access to.
-      operationId: meCompanies
-      responses:
-        "200":
-          description: Successfully retrieved user's companies
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserCompanyInfo"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/UserCompanyInfo"
-  /v1/companies/{id}/assigned-resources:
-    get:
-      tags:
-      - company-controller
-      summary: List assigned resources (as client)
-      description: Retrieves paginated list of resources assigned to contracts where
-        the company acts as client. Use this endpoint to obtain resource IDs for filtering
-        in access-control endpoints.
-      operationId: findAssignedResources
-      parameters:
-      - name: id
-        in: path
-        description: Client company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: Search query to filter resources by name
-        required: false
-        schema:
-          type: string
-      - name: resourceId
-        in: query
-        description: Filter by specific resource ID
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved resources list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-  /v1/companies/{id}/assigned-resources/as-contractor:
-    get:
-      tags:
-      - company-controller
-      summary: List assigned resources (as contractor)
-      description: Retrieves paginated list of resources assigned to contracts where
-        the company acts as contractor. Use this endpoint to obtain resource IDs for
-        filtering in access-control endpoints.
-      operationId: findAssignedResourcesAsContractor
-      parameters:
-      - name: id
-        in: path
-        description: Contractor company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: Search query to filter resources by name
-        required: false
-        schema:
-          type: string
-      - name: resourceId
-        in: query
-        description: Filter by specific resource ID
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: companyScope
-        in: query
-        description: "Filter by subcontractor scope (MY_COMPANY, MY_SUBCONTRACTORS,\
-          \ ALL)"
-        required: false
-        schema:
-          type: string
-          enum:
-          - ALL
-          - MY_COMPANY
-          - MY_SUBCONTRACTORS
-      - name: contractorIds
-        in: query
-        description: Filter by specific contractor IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved resources list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
-  /v1/companies/{id}/my-companies:
-    get:
-      tags:
-      - company-controller
-      summary: List related companies
-      description: Retrieves paginated list of related companies (contractors or clients).
-        Use this endpoint to obtain company IDs for filtering in other endpoints.
-      operationId: findAllContractors
-      parameters:
-      - name: id
-        in: path
-        description: Company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved companies list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
-  /v1/companies/{contractorId}/clients:
-    get:
-      tags:
-      - company-controller
-      summary: List client companies
-      description: Retrieves paginated list of client companies for a contractor.
-        Use this endpoint to obtain client IDs for filtering in access-control endpoints.
-      operationId: findClients
-      parameters:
-      - name: contractorId
-        in: path
-        description: Contractor company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: Search query to filter clients by name
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved clients list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelCompanyClientData"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelCompanyClientData"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelCompanyClientData"
   /v1/companies/{companyId}/visitor/temporary-upload-url:
     get:
       tags:
@@ -1355,16 +884,16 @@ paths:
           format: uuid
       - name: clientId
         in: query
-        description: "Filter by client ID. Results are automatically filtered based\
-          \ on user's client company visibility. Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)"
+        description: Filter by client ID. Results are automatically filtered based
+          on user's client company visibility
         required: false
         schema:
           type: string
           format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Results are automatically filtered based\
-          \ on user's client site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        description: Filter by site ID. Results are automatically filtered based on
+          user's client site visibility
         required: false
         schema:
           type: string
@@ -1383,8 +912,7 @@ paths:
           type: string
       - name: resourceId
         in: query
-        description: Filter by specific resource ID. Obtain resource IDs from the
-          response of access-control endpoints (resource.id field)
+        description: Filter by specific resource ID
         required: false
         schema:
           type: string
@@ -1401,8 +929,7 @@ paths:
           - MY_SUBCONTRACTORS
       - name: contractorIds
         in: query
-        description: Filter by specific contractor IDs. Obtain contractor IDs from
-          the response of access-control endpoints (contractor.id field)
+        description: Filter by specific contractor IDs.
         required: false
         schema:
           type: array
@@ -1480,16 +1007,15 @@ paths:
           format: uuid
       - name: contractorId
         in: query
-        description: Filter by contractor ID. Obtain contractor IDs from the response
-          of access-control endpoints (contractor.id field)
+        description: Filter by contractor ID
         required: false
         schema:
           type: string
           format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Results are automatically filtered based\
-          \ on user's site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        description: Filter by site ID. Results are automatically filtered based on
+          user's site visibility
         required: false
         schema:
           type: string
@@ -1508,8 +1034,7 @@ paths:
           type: string
       - name: resourceId
         in: query
-        description: Filter by specific resource ID. Obtain resource IDs from the
-          response of access-control endpoints (resource.id field)
+        description: Filter by specific resource ID
         required: false
         schema:
           type: string
@@ -1638,37 +1163,6 @@ components:
       - siteId
       - visitedPerson
       - visitorId
-    CreateSiteDto:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-        phonePrefix:
-          type: string
-        phone:
-          type: string
-        photo:
-          type: string
-        address:
-          $ref: "#/components/schemas/SiteAddressDto"
-      required:
-      - name
-    SiteAddressDto:
-      type: object
-      properties:
-        street:
-          type: string
-        city:
-          type: string
-        state:
-          type: string
-        county:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
     RegisterDto:
       type: object
       properties:
@@ -1697,18 +1191,6 @@ components:
       - origin
       - resourceId
       - siteId
-    UpdateUserDto:
-      type: object
-      properties:
-        firstName:
-          type: string
-        lastName:
-          type: string
-        languageId:
-          type: string
-          format: uuid
-        photo:
-          type: string
     UpdateVisitExitDto:
       type: object
       properties:
@@ -1740,417 +1222,6 @@ components:
       - exitAt
       - id
       - origin
-    AccessControlApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          apiKeySet:
-            type: array
-            items:
-              $ref: "#/components/schemas/ApiKeyDetails"
-            uniqueItems: true
-      required:
-      - apiKeySet
-    ApiKeyDetails:
-      type: object
-      properties:
-        displayName:
-          type: string
-        internalName:
-          type: string
-        name:
-          type: string
-          writeOnly: true
-        publicApiKey:
-          type: string
-          format: uuid
-      required:
-      - displayName
-      - internalName
-      - publicApiKey
-    AutomaticReviewConfig:
-      type: object
-      properties:
-        useSamePrice:
-          type: boolean
-        genericPrice:
-          type: number
-        genericCurrencyId:
-          type: string
-          format: uuid
-        requirementPrices:
-          type: array
-          items:
-            $ref: "#/components/schemas/RequirementReviewConfig"
-      required:
-      - genericCurrencyId
-      - genericPrice
-      - useSamePrice
-    BackupConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ClientPlanConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          plan:
-            type: string
-          maxSites:
-            type: integer
-            format: int32
-          maxConnections:
-            type: integer
-            format: int32
-    ContractorPlanConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          plan:
-            type: string
-            enum:
-            - PLAN_0
-            - PLAN_1
-            - PLAN_2
-            - PLAN_3
-          maxNumberOfEmployees:
-            type: integer
-            format: int32
-      required:
-      - plan
-    DocumentalManagementConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          automatic:
-            $ref: "#/components/schemas/AutomaticReviewConfig"
-          standard:
-            $ref: "#/components/schemas/ReviewConfig"
-          custom:
-            $ref: "#/components/schemas/ReviewConfig"
-      required:
-      - automatic
-      - custom
-      - standard
-    EUCategoryConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          maxConnections:
-            type: integer
-            format: int32
-    EmployeeTypeConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    InternalManagementConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    Language:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        code:
-          type: string
-      required:
-      - code
-      - id
-      - name
-    MobileAppConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ProductInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        config:
-          oneOf:
-          - $ref: "#/components/schemas/AccessControlApiConfig"
-          - $ref: "#/components/schemas/BackupConfig"
-          - $ref: "#/components/schemas/ClientPlanConfig"
-          - $ref: "#/components/schemas/ContractorPlanConfig"
-          - $ref: "#/components/schemas/DocumentalManagementConfig"
-          - $ref: "#/components/schemas/EUCategoryConfig"
-          - $ref: "#/components/schemas/EmployeeTypeConfig"
-          - $ref: "#/components/schemas/InternalManagementConfig"
-          - $ref: "#/components/schemas/MobileAppConfig"
-          - $ref: "#/components/schemas/SsoConfig"
-          - $ref: "#/components/schemas/WorkPermitsConfig"
-      required:
-      - config
-      - id
-      - name
-    ProductTypeConfig:
-      discriminator:
-        propertyName: type
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    RequirementReviewConfig:
-      type: object
-      properties:
-        requirementId:
-          type: string
-          format: uuid
-        price:
-          type: number
-        currencyId:
-          type: string
-          format: uuid
-        critical:
-          type: boolean
-          readOnly: true
-        documentType:
-          type: string
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        subjectType:
-          type: string
-          readOnly: true
-      required:
-      - requirementId
-    ReviewConfig:
-      type: object
-      properties:
-        useSamePrice:
-          type: boolean
-        approvalPrice:
-          type: number
-        approvalCurrencyId:
-          type: string
-          format: uuid
-        rejectionPrice:
-          type: number
-        rejectionCurrencyId:
-          type: string
-          format: uuid
-      required:
-      - approvalCurrencyId
-      - approvalPrice
-      - rejectionCurrencyId
-      - rejectionPrice
-      - useSamePrice
-    RoleData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - id
-      - name
-    SsoConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    UserCompanyInfo:
-      type: object
-      properties:
-        companyId:
-          type: string
-          format: uuid
-        companyName:
-          type: string
-        taxId:
-          type: string
-        logo:
-          type: string
-        products:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProductInfo"
-        invitationId:
-          type: string
-          format: uuid
-      required:
-      - companyId
-      - companyName
-      - products
-      - taxId
-    UserCompanyPermissions:
-      type: object
-      properties:
-        company:
-          $ref: "#/components/schemas/UserCompanyInfo"
-        userPermission:
-          $ref: "#/components/schemas/UserPermissionsRoles"
-        resourceVisibility:
-          type: object
-          additionalProperties:
-            type: array
-            items:
-              type: string
-              format: uuid
-            uniqueItems: true
-      required:
-      - company
-      - userPermission
-    UserDetails:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-        photo:
-          type: string
-        language:
-          $ref: "#/components/schemas/Language"
-        companiesPermissions:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserCompanyPermissions"
-        globalPermissions:
-          $ref: "#/components/schemas/UserPermissionsRoles"
-        createdAt:
-          type: string
-          format: date-time
-        lastSignIn:
-          type: string
-          format: date-time
-      required:
-      - companiesPermissions
-      - createdAt
-      - email
-      - firstName
-      - globalPermissions
-      - id
-      - language
-      - lastName
-    UserPermissionsRoles:
-      type: object
-      properties:
-        permissions:
-          type: array
-          items:
-            type: string
-        roles:
-          type: array
-          items:
-            $ref: "#/components/schemas/RoleData"
-      required:
-      - permissions
-      - roles
-    WorkPermitsConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    PageMetadata:
-      type: object
-      properties:
-        size:
-          type: integer
-          format: int64
-        number:
-          type: integer
-          format: int64
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int64
-    PagedModelResourceBasicData:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/ResourceBasicData"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
-    ResourceBasicData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        resourceType:
-          type: string
-          enum:
-          - EMPLOYEE
-          - VEHICLE
-          - EQUIPMENT
-      required:
-      - id
-      - name
-      - resourceType
-    MyCompanyDataDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        taxId:
-          type: string
-        email:
-          type: string
-        invitationId:
-          type: string
-          format: uuid
-        euCategory:
-          type: string
-        industry:
-          type: string
-      required:
-      - id
-      - name
-      - taxId
-    PagedModelMyCompanyDataDto:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/MyCompanyDataDto"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
-    CompanyClientData:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        taxId:
-          type: string
-      required:
-      - id
-      - name
-      - taxId
-    PagedModelCompanyClientData:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/CompanyClientData"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
     GetDistinctVisitorsResponse:
       type: object
       properties:
@@ -2451,42 +1522,6 @@ components:
       - visitorIdentity
       - visitorIdentityType
       - visitorLastName
-    PagedModelSiteDto:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteDto"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
-    SiteDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        companyId:
-          type: string
-          format: uuid
-        name:
-          type: string
-        phonePrefix:
-          type: string
-        phone:
-          type: string
-        photo:
-          type: string
-        address:
-          $ref: "#/components/schemas/SiteAddressDto"
-        createdAt:
-          type: string
-          format: date-time
-      required:
-      - companyId
-      - createdAt
-      - id
-      - name
     AccessRegisterMovement:
       type: object
       properties:
