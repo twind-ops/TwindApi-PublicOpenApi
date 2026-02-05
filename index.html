@@ -1,21 +1,177 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title>TwindApi Public Docs - Access Control API</title>
+    <title>Twind API Documentation</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-  </head>
-  <body>
-    <div id="app"></div>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="guides/guides-data.js"></script>
+  </head>
+
+  <body>
+    <div class="layout">
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              <path d="M2 17l10 5 10-5" />
+              <path d="M2 12l10 5 10-5" />
+            </svg>
+            <span>Twind API</span>
+          </div>
+          <button class="collapse-btn" onclick="toggleSidebar()" title="Toggle sidebar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <!-- API Reference -->
+          <a class="nav-item active" id="nav-api" onclick="showSection('api')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>API Reference</span>
+          </a>
+
+          <!-- Guides -->
+          <a class="nav-item" id="nav-guides" onclick="showSection('guides')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+            <span>Guides</span>
+          </a>
+          <div class="nav-subitems" id="nav-guides-subitems">
+            <!-- Generated dynamically from guides-data.js -->
+          </div>
+        </nav>
+      </aside>
+
+      <main class="content">
+        <div id="api-container" class="visible"></div>
+        <div id="guides-container">
+          <iframe id="guides-frame" src=""></iframe>
+        </div>
+        <div id="guide-content-container">
+          <div class="guide-wrapper">
+            <a class="back-link" href="#" onclick="showSection('guides'); return false;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+              </svg>
+              Back to Guides
+            </a>
+            <div id="guide-content" class="guide-content"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+
     <script>
-      Scalar.createApiReference("#app", {
+      // Initialize Scalar API Reference
+      Scalar.createApiReference("#api-container", {
         url: "openapi-access-control-api.yaml",
         theme: "purple",
-        hideDownloadButton: false,
-        hideModels: false,
         showSidebar: true,
+        darkMode: true,
       });
+
+      // Generate navbar subitems from guides data
+      function initNavbar() {
+        const container = document.getElementById("nav-guides-subitems");
+        container.innerHTML = GUIDES_DATA.map(
+          (guide) => `
+          <a class="nav-subitem" id="nav-guide-${guide.id}" onclick="showGuide('${guide.file}', '${guide.id}')">
+            <img src="${guide.icon}" width="14" height="14" alt="" class="nav-icon" />
+            <span>${guide.title}</span>
+          </a>
+        `
+        ).join("");
+      }
+
+      // Initialize navbar on page load
+      initNavbar();
+
+      function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+      }
+
+      function setActiveNav(elementId) {
+        document.querySelectorAll(".nav-item, .nav-subitem").forEach((el) => {
+          el.classList.remove("active");
+        });
+        if (elementId) {
+          const el = document.getElementById(elementId);
+          if (el) el.classList.add("active");
+        }
+      }
+
+      function showSection(section) {
+        const apiContainer = document.getElementById("api-container");
+        const guidesContainer = document.getElementById("guides-container");
+        const guideContentContainer = document.getElementById("guide-content-container");
+
+        apiContainer.classList.remove("visible");
+        guidesContainer.classList.remove("visible");
+        guideContentContainer.classList.remove("visible");
+
+        if (section === "api") {
+          apiContainer.classList.add("visible");
+          setActiveNav("nav-api");
+        } else if (section === "guides") {
+          guidesContainer.classList.add("visible");
+          setActiveNav("nav-guides");
+          document.getElementById("guides-frame").src = "guides/index.html";
+        }
+      }
+
+      function showGuide(file, guideId) {
+        const apiContainer = document.getElementById("api-container");
+        const guidesContainer = document.getElementById("guides-container");
+        const guideContentContainer = document.getElementById("guide-content-container");
+        const guideContent = document.getElementById("guide-content");
+
+        apiContainer.classList.remove("visible");
+        guidesContainer.classList.remove("visible");
+        guideContentContainer.classList.add("visible");
+        setActiveNav("nav-guide-" + guideId);
+
+        // Show loading
+        guideContent.innerHTML = '<p style="color: #8b8b9e;">Loading...</p>';
+
+        // Fetch and render markdown
+        fetch('/guides/' + file)
+          .then((res) => {
+            if (!res.ok) throw new Error('Not found');
+            return res.text();
+          })
+          .then((md) => {
+            guideContent.innerHTML = marked.parse(md);
+            // Apply syntax highlighting
+            document.querySelectorAll("#guide-content pre code").forEach((block) => {
+              hljs.highlightElement(block);
+            });
+          })
+          .catch(() => {
+            guideContent.innerHTML = `
+              <h2 style="color: #f87171;">Guide not found</h2>
+              <p style="color: #8b8b9e;">The requested guide could not be loaded.</p>
+            `;
+          });
+      }
     </script>
   </body>
 </html>
