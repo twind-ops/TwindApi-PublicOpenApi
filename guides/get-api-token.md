@@ -17,7 +17,7 @@ Once your account is set up and the Access Control API product is enabled, navig
 
 **[https://app.twind.io/configuration/apis](https://app.twind.io/configuration/apis)**
 
-![TWIND API section](/guides/assets/get-api-token_api-section.png)
+![TWIND API section](assets/get-api-token_api-section.png)
 
 From this page, you can:
 

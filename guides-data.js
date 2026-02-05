@@ -8,6 +8,6 @@ const GUIDES_DATA = [
     file: "get-api-token.md",
     title: "Get API Key",
     description: "Learn how to obtain and configure your API key for authentication.",
-    icon: "/assets/icon-key.svg",
+    icon: "assets/icon-key.svg",
   }
 ];

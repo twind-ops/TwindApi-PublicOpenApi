@@ -145,7 +145,7 @@
       .back-link:hover { color: #a78bfa !important; }
       .loading { color: #8b8b9e; }
     </style>
-    <script type="text/javascript" src="/guides/guides-data.js" onerror="console.error('Failed to load guides-data.js')"></script>
+    <script type="text/javascript" src="../guides-data.js" onerror="console.error('Failed to load guides-data.js')"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
   </head>
@@ -192,7 +192,7 @@
               .map(
                 (g) => `
               <a class="guide-card" href="?file=${g.file}">
-                <h3><img src="${g.icon}" width="20" height="20" alt="" class="guide-icon" /> ${g.title}</h3>
+                <h3><img src="../${g.icon}" width="20" height="20" alt="" class="guide-icon" /> ${g.title}</h3>
                 <p>${g.description}</p>
               </a>`
               )
@@ -202,7 +202,7 @@
       }
 
       function loadGuide(filename) {
-        fetch('/guides/' + filename)
+        fetch(filename)
           .then((res) => {
             if (!res.ok) throw new Error('Not found');
             return res.text();

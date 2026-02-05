@@ -15,7 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-    <script src="guides/guides-data.js"></script>
+    <script src="guides-data.js"></script>
   </head>
 
   <body>
@@ -64,7 +64,13 @@
       <main class="content">
         <div id="api-container" class="visible"></div>
         <div id="guides-container">
-          <iframe id="guides-frame" src=""></iframe>
+          <div class="guides-wrapper">
+            <div class="guides-header">
+              <h1>Guides</h1>
+              <p>Step-by-step tutorials to help you get started with the Twind API.</p>
+            </div>
+            <div id="guides-list" class="guides-list"></div>
+          </div>
         </div>
         <div id="guide-content-container">
           <div class="guide-wrapper">
@@ -134,8 +140,19 @@
         } else if (section === "guides") {
           guidesContainer.classList.add("visible");
           setActiveNav("nav-guides");
-          document.getElementById("guides-frame").src = "guides/index.html";
+          renderGuidesList();
         }
+      }
+
+      function renderGuidesList() {
+        const container = document.getElementById("guides-list");
+        container.innerHTML = GUIDES_DATA.map(
+          (guide) => `
+          <a class="guide-card" href="#" onclick="showGuide('${guide.file}', '${guide.id}'); return false;">
+            <h3><img src="${guide.icon}" width="20" height="20" alt="" class="guide-icon" /> ${guide.title}</h3>
+            <p>${guide.description}</p>
+          </a>`
+        ).join("");
       }
 
       function showGuide(file, guideId) {
@@ -153,13 +170,23 @@
         guideContent.innerHTML = '<p style="color: #8b8b9e;">Loading...</p>';
 
         // Fetch and render markdown
-        fetch('/guides/' + file)
+        fetch('guides/' + file)
           .then((res) => {
             if (!res.ok) throw new Error('Not found');
             return res.text();
           })
           .then((md) => {
-            guideContent.innerHTML = marked.parse(md);
+            // Configure marked to rewrite image paths (relative to guides folder)
+            const renderer = new marked.Renderer();
+            const originalImage = renderer.image.bind(renderer);
+            renderer.image = function(token) {
+              // Prepend 'guides/' to relative image paths
+              if (token.href && !token.href.startsWith('http') && !token.href.startsWith('/')) {
+                token.href = 'guides/' + token.href;
+              }
+              return originalImage(token);
+            };
+            guideContent.innerHTML = marked.parse(md, { renderer });
             // Apply syntax highlighting
             document.querySelectorAll("#guide-content pre code").forEach((block) => {
               hljs.highlightElement(block);
