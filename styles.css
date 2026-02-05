@@ -208,11 +208,6 @@ body {
   display: block;
 }
 
-#guides-frame {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
 
 /* Guide Content Styles */
 .guide-wrapper {
@@ -329,4 +324,79 @@ body {
 
 .back-link:hover {
   color: #a78bfa;
+}
+
+/* Guides List Styles */
+.guides-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 48px 32px;
+}
+
+.guides-header {
+  margin-bottom: 32px;
+}
+
+.guides-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 12px 0;
+}
+
+.guides-header p {
+  color: #8b8b9e;
+  margin: 0;
+  font-size: 16px;
+}
+
+.guides-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.guide-card {
+  background: #111118;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+  display: block;
+}
+
+.guide-card:hover {
+  border-color: rgba(139, 92, 246, 0.4);
+  background: rgba(139, 92, 246, 0.05);
+  transform: translateY(-2px);
+}
+
+.guide-card h3 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.guide-card p {
+  margin: 0;
+  color: #8b8b9e;
+  font-size: 14px;
+}
+
+.guide-icon {
+  /* Filter to make the icon appear in purple (#a78bfa) */
+  filter: invert(67%) sepia(31%) saturate(1234%) hue-rotate(213deg) brightness(101%) contrast(97%);
+}
+
+.guide-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin: 16px 0;
 }
