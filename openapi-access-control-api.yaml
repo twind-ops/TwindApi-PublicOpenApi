@@ -1985,6 +1985,8 @@ components:
           type: string
         industry:
           type: string
+        industryKey:
+          type: string
       required:
       - id
       - name
