@@ -500,56 +500,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
-  /v1/companies/{companyId}/access-register/mobile:
-    post:
-      tags:
-      - access-register-controller
-      operationId: createAccessRegisterEntryMobile
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RegisterDto"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/IdValue"
-  /v1/companies/{companyId}/access-register/legacy:
-    post:
-      tags:
-      - access-register-controller
-      operationId: createAccessRegisterEntryFromLegacy
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/RegisterDto"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/IdValue"
   /v1/users/me:
     get:
       tags:
@@ -666,60 +616,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
-  /v1/companies/{companyId}/access-register/{accessRegisterId}/mobile:
-    patch:
-      tags:
-      - access-register-controller
-      operationId: updateAccessRegisterWithExitMobile
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: accessRegisterId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateNotesDto"
-        required: true
-      responses:
-        "200":
-          description: OK
-  /v1/companies/{companyId}/access-register/{accessRegisterId}/legacy:
-    patch:
-      tags:
-      - access-register-controller
-      operationId: updateAccessRegisterWithExitFromLegacy
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: accessRegisterId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/UpdateNotesDto"
-        required: true
-      responses:
-        "200":
-          description: OK
   /v1/users/me/companies:
     get:
       tags:
@@ -1256,31 +1152,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetAccessRegisterResponse"
-  /v1/companies/{companyId}/access-register/resources/{resourceId}/legacy-ids:
-    get:
-      tags:
-      - access-register-controller
-      operationId: getLegacyTwind1Ids
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: resourceId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/BidirectionalIdMapping"
   /v1/companies/{companyId}/access-control/{id}:
     get:
       tags:
@@ -2665,27 +2536,6 @@ components:
       - id
       - name
       - registrationPlate
-    BidirectionalIdMapping:
-      type: object
-      properties:
-        twind1CompanyId:
-          type: string
-          format: uuid
-        twind2CompanyId:
-          type: string
-          format: uuid
-        twind1ResourceId:
-          type: string
-          format: uuid
-        twind2ResourceId:
-          type: string
-          format: uuid
-        twind1SiteId:
-          type: string
-          format: uuid
-        twind2SiteId:
-          type: string
-          format: uuid
     ContractAndActivityAcceptability:
       type: object
       properties:
