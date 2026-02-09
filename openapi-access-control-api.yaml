@@ -671,6 +671,15 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: contractorIds
+        in: query
+        description: Filter by specific contractor IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
