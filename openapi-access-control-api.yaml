@@ -1220,10 +1220,16 @@ paths:
       tags:
       - access-control-controller
       summary: Get access control status by contractor
-      description: Retrieves paginated access control statuses for resources when
-        the company acts as a contractor. Results are filtered based on the user's
-        client company and site visibility. Subcontractor filtering (companyScope
-        and contractorIds).
+      description: "\n            Retrieves paginated access control statuses for\
+        \ resources when the company acts as a contractor.\n            Results are\
+        \ filtered based on the user's client company and site visibility.\n     \
+        \       Subcontractor filtering (companyScope and contractorIds).\n\n    \
+        \        **Allowed sort fields:**\n            - `client_name` - Client company\
+        \ name\n            - `contractor_name` - Contractor company name\n      \
+        \      - `resource_name` - Resource name (employee, vehicle, or equipment)\n\
+        \            - `site_name` - Site name (default)\n            - `end_of_access`\
+        \ - End of access date\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=site_name,asc`)\n            "
       operationId: getAccessControlStatusByContractor
       parameters:
       - name: companyId
@@ -1319,6 +1325,8 @@ paths:
         required: false
         schema:
           type: array
+          default:
+          - "site_name,ASC"
           items:
             type: string
       responses:
@@ -1352,10 +1360,15 @@ paths:
       tags:
       - access-control-controller
       summary: Get access control status by client
-      description: "Retrieves paginated access control statuses for resources when\
-        \ the company acts as a client. Results are filtered based on the user's site\
-        \ visibility and can be further filtered by contractor, site, resource type,\
-        \ status, and resource ID."
+      description: "\n            Retrieves paginated access control statuses for\
+        \ resources when the company acts as a client.\n            Results are filtered\
+        \ based on the user's site visibility and can be further filtered by contractor,\
+        \ site, resource type, status, and resource ID.\n\n            **Allowed sort\
+        \ fields:**\n            - `site_name` - Site name (default)\n           \
+        \ - `contractor_name` - Contractor company name\n            - `resource_name`\
+        \ - Resource name (employee, vehicle, or equipment)\n            - `end_of_access`\
+        \ - End of access date\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=site_name,asc`)\n            "
       operationId: getAccessControlStatusByClient
       parameters:
       - name: companyId
@@ -1431,6 +1444,8 @@ paths:
         required: false
         schema:
           type: array
+          default:
+          - "site_name,ASC"
           items:
             type: string
       responses:
