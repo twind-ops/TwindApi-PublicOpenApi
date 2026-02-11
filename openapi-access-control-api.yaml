@@ -176,8 +176,15 @@ paths:
       tags:
       - visit-register-controller
       summary: Get all company visits
-      description: "Retrieves paginated visit records for a company. The 'sites' filter\
-        \ parameter accepts site IDs which can be obtained from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+      description: "\n            Retrieves paginated visit records for a company.\n\
+        \            The 'sites' filter parameter accepts site IDs which can be obtained\
+        \ from\n            [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)\n\
+        \n            **Allowed sort fields:**\n            - `visitor_name` - Visitor\
+        \ name\n            - `company_name` - Company name\n            - `resource_name`\
+        \ - Visited person name\n            - `site_name` - Site name\n         \
+        \   - `entry_at` - Entry timestamp\n            - `exit_at` - Exit timestamp\
+        \ (default, missing on top)\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=exit_at,desc`)\n            "
       operationId: getAllCompanyVisits
       parameters:
       - name: companyId
@@ -255,6 +262,8 @@ paths:
         required: false
         schema:
           type: array
+          default:
+          - "exit_at,DESC"
           items:
             type: string
       responses:
@@ -371,7 +380,13 @@ paths:
       tags:
       - access-register-controller
       summary: Get access register records
-      description: Retrieves paginated access register records for a company.
+      description: "\n            Retrieves paginated access register records for\
+        \ a company.\n\n            **Allowed sort fields:**\n            - `client_name`\
+        \ - Client company name\n            - `contractor_name` - Contractor company\
+        \ name\n            - `resource_name` - Resource name\n            - `site_name`\
+        \ - Site name\n            - `entry_at` - Entry timestamp (default)\n    \
+        \        - `exit_at` - Exit timestamp\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=entry_at,desc`)\n        "
       operationId: getAccessRegisterRecords
       parameters:
       - name: companyId
@@ -463,6 +478,8 @@ paths:
         required: false
         schema:
           type: array
+          default:
+          - "entry_at,DESC"
           items:
             type: string
       responses:
@@ -835,8 +852,12 @@ paths:
       tags:
       - company-controller
       summary: List related companies
-      description: Retrieves paginated list of related companies (contractors or clients).
-        Use this endpoint to obtain company IDs for filtering in other endpoints.
+      description: "\n            Retrieves paginated list of related companies (contractors\
+        \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
+        \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
+        \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
+        \         - `industry` - Industry key\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=name,asc`)\n            "
       operationId: findAllContractors
       parameters:
       - name: id
@@ -902,8 +923,12 @@ paths:
       tags:
       - company-controller
       summary: List related companies
-      description: Retrieves paginated list of related companies (contractors or clients).
-        Use this endpoint to obtain company IDs for filtering in other endpoints.
+      description: "\n            Retrieves paginated list of related companies (contractors\
+        \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
+        \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
+        \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
+        \         - `industry` - Industry key\n\n            **Sort format:** `?sort=field,direction`\
+        \ (e.g., `?sort=name,asc`)\n            "
       operationId: findAllContractors_1
       parameters:
       - name: id
