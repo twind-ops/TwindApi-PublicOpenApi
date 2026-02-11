@@ -1886,6 +1886,8 @@ components:
         invitationId:
           type: string
           format: uuid
+        userJourneys:
+          $ref: "#/components/schemas/UserJourneys"
       required:
       - companyId
       - companyName
@@ -1945,6 +1947,16 @@ components:
       - id
       - language
       - lastName
+    UserJourneys:
+      type: object
+      properties:
+        shouldCompleteCompanyOnboarding:
+          type: boolean
+        shouldCompleteUserOnboarding:
+          type: boolean
+      required:
+      - shouldCompleteCompanyOnboarding
+      - shouldCompleteUserOnboarding
     UserPermissionsRoles:
       type: object
       properties:
