@@ -432,6 +432,14 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: q
+        in: query
+        description: "Search query: filters by resource fields (contains, case-insensitive).\
+          \ Employee: name, surname, identity ID; Vehicle: name, plate number; Equipment:\
+          \ name, serial number."
+        required: false
+        schema:
+          type: string
       - name: page
         in: query
         description: Zero-based page index (0..N)
