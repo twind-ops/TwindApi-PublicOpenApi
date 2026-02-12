@@ -14,6 +14,9 @@ info:
     - **Sites**: List available sites for filtering
     - **Clients**: List client companies for filtering
     - **My Companies**: List related companies (contractors/clients)
+    - **Employees**: List employees for a company
+    - **Vehicles**: List vehicles for a company
+    - **Equipment**: List equipment for a company
     - **Assigned Resources**: List resources assigned to contracts
     - **Access Register**: Register entries and exits for workers and vehicles
     - **Access Control**: Query access control status
@@ -309,6 +312,82 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/vehicles:
+    get:
+      tags:
+      - vehicle-controller
+      operationId: findAll
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelVehicleResponseDto"
   /v1/companies/{companyId}/sites:
     get:
       tags:
@@ -316,7 +395,7 @@ paths:
       summary: List sites
       description: Retrieves paginated list of sites for a company. Use this endpoint
         to obtain site IDs for filtering in other endpoints.
-      operationId: findAll
+      operationId: findAll_1
       parameters:
       - name: q
         in: query
@@ -375,6 +454,154 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelSiteDto"
+  /v1/companies/{companyId}/equipment:
+    get:
+      tags:
+      - equipment-controller
+      operationId: findAll_2
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyScope
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelEquipmentResponseDto"
+  /v1/companies/{companyId}/employees:
+    get:
+      tags:
+      - employee-controller
+      operationId: findAll_3
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: clientId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelEmployeeResponseDto"
   /v1/companies/{companyId}/access-register:
     get:
       tags:
@@ -1647,6 +1874,48 @@ components:
       - siteId
       - visitedPerson
       - visitorId
+    CreateVehicleDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        registrationPlate:
+          type: string
+          minLength: 1
+        vehicleType:
+          type: string
+          format: uuid
+        manufacturer:
+          type: string
+        model:
+          type: string
+        tareWeight:
+          type: integer
+          format: int32
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
+      required:
+      - classifications
+      - name
+      - registrationPlate
+    ResourceCreateClassificationDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientResourceTypeId:
+          type: string
+          format: uuid
+      required:
+      - clientId
+      - clientResourceTypeId
     CreateSiteDto:
       type: object
       properties:
@@ -1678,6 +1947,72 @@ components:
           type: string
         country:
           type: string
+    CreateEquipmentDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        serialNumber:
+          type: string
+          minLength: 1
+        equipmentType:
+          type: string
+          format: uuid
+        manufacturer:
+          type: string
+        model:
+          type: string
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
+      required:
+      - classifications
+      - name
+      - serialNumber
+    CreateEmployeeDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        identityType:
+          type: string
+          minLength: 1
+        identity:
+          type: string
+          minLength: 1
+        countryId:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        phonePrefix:
+          type: string
+        phone:
+          type: string
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
+      required:
+      - classifications
+      - countryId
+      - firstName
+      - identity
+      - identityType
+      - lastName
     RegisterDto:
       type: object
       properties:
@@ -2473,6 +2808,82 @@ components:
       - visitorIdentity
       - visitorIdentityType
       - visitorLastName
+    PagedModelVehicleResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/VehicleResponseDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    ResourceClassificationDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientResourceTypeId:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - clientId
+      - clientResourceTypeId
+      - name
+    ResourceStandardClassificationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    VehicleResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        registrationPlate:
+          type: string
+        vehicleType:
+          $ref: "#/components/schemas/ResourceStandardClassificationDto"
+        manufacturer:
+          type: string
+        model:
+          type: string
+        tareWeight:
+          type: integer
+          format: int32
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceClassificationDto"
+          uniqueItems: true
+        createdAt:
+          type: string
+        isAssignable:
+          type: boolean
+      required:
+      - classifications
+      - companyId
+      - createdAt
+      - id
+      - isAssignable
+      - name
+      - registrationPlate
     PagedModelSiteDto:
       type: object
       properties:
@@ -2509,6 +2920,112 @@ components:
       - createdAt
       - id
       - name
+    EquipmentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        serialNumber:
+          type: string
+        equipmentType:
+          $ref: "#/components/schemas/ResourceStandardClassificationDto"
+        manufacturer:
+          type: string
+        model:
+          type: string
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceClassificationDto"
+          uniqueItems: true
+        createdAt:
+          type: string
+        isAssignable:
+          type: boolean
+      required:
+      - classifications
+      - companyId
+      - createdAt
+      - id
+      - isAssignable
+      - name
+      - serialNumber
+    PagedModelEquipmentResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/EquipmentResponseDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    EmployeeResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        identityType:
+          type: string
+        identity:
+          type: string
+        countryId:
+          type: string
+          format: uuid
+        countryName:
+          type: string
+        email:
+          type: string
+        phonePrefix:
+          type: string
+        phone:
+          type: string
+        photo:
+          type: string
+        classifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceClassificationDto"
+          uniqueItems: true
+        createdAt:
+          type: string
+        isAssignable:
+          type: boolean
+      required:
+      - classifications
+      - companyId
+      - countryId
+      - createdAt
+      - firstName
+      - id
+      - identity
+      - identityType
+      - isAssignable
+      - lastName
+    PagedModelEmployeeResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/EmployeeResponseDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
     AccessRegisterMovement:
       type: object
       properties:
