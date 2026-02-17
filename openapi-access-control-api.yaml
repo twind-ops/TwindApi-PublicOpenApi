@@ -2228,6 +2228,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
@@ -2299,6 +2300,9 @@ components:
       required:
       - id
       - name
+    SiteHierarchyConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     SsoConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
