@@ -31,6 +31,8 @@ servers:
 - url: https://app.twind.io/api
   description: Production server
 tags:
+- name: temporary-authorization-controller
+  description: Temporary authorization management API
 - name: access-control-controller
   description: Access Control Management API
 - name: site-controller
@@ -748,6 +750,166 @@ paths:
       responses:
         "200":
           description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-control/temporary-authorizations:
+    get:
+      tags:
+      - temporary-authorization-controller
+      summary: List temporary authorizations
+      description: Returns paginated temporary authorizations for the client company
+        (one row per site/resource).
+      operationId: listTemporaryAuthorizations
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        description: "Filter by status (ALLOWED, NOT_ALLOWED)"
+        required: false
+        schema:
+          type: string
+      - name: contractorId
+        in: query
+        description: Filter by contractor_id
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: dateFrom
+        in: query
+        description: Filter from date (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        description: Filter to date (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: resourceId
+        in: query
+        description: Filter by resource ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: string
+      - name: siteId
+        in: query
+        description: Filter by site ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: validityStatus
+        in: query
+        description: "Filter by validity status (SCHEDULED, ACTIVE, EXPIRED)"
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseObject"
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseObject"
+        "403":
+          description: Access denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseObject"
+    post:
+      tags:
+      - temporary-authorization-controller
+      summary: Create temporary authorization
+      description: Creates a temporary authorization for the client company. Each
+        resource in resourceIds is added for each site in siteIds (Cartesian product).
+      operationId: createTemporaryAuthorization
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemporaryAuthorizationDto"
+        required: true
+      responses:
+        "201":
+          description: Successfully created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: "Invalid request (e.g. dateTo < dateFrom, empty siteIds or\
+            \ resourceIds)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "403":
+          description: Access denied
           content:
             '*/*':
               schema:
@@ -1542,6 +1704,53 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetResourceAccessControlResponse"
+  /v1/companies/{companyId}/access-control/temporary-authorizations/{temporaryAuthorizationId}:
+    get:
+      tags:
+      - temporary-authorization-controller
+      summary: Get temporary authorization by ID
+      description: Returns a single temporary authorization for the client company.
+      operationId: getTemporaryAuthorization
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: temporaryAuthorizationId
+        in: path
+        description: Temporary authorization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                type: object
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                type: object
+        "403":
+          description: Access denied
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Temporary authorization not found
+          content:
+            '*/*':
+              schema:
+                type: object
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
@@ -2044,6 +2253,39 @@ components:
       - origin
       - resourceId
       - siteId
+    CreateTemporaryAuthorizationDto:
+      type: object
+      properties:
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          type: string
+        contractorId:
+          type: string
+          format: uuid
+        siteIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        resourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - contractorId
+      - dateFrom
+      - dateTo
+      - resourceIds
+      - siteIds
+      - status
     UpdateUserDto:
       type: object
       properties:
@@ -3362,6 +3604,17 @@ components:
       required:
       - name
       - status
+    PageResponseObject:
+      type: object
+      properties:
+        content:
+          type: array
+          items: {}
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     Activity:
       type: object
       properties:
