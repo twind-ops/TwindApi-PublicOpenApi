@@ -854,19 +854,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageResponseObject"
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
         "401":
           description: Unauthorized
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageResponseObject"
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
         "403":
           description: Access denied
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PageResponseObject"
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
     post:
       tags:
       - temporary-authorization-controller
@@ -1732,25 +1732,25 @@ paths:
           content:
             '*/*':
               schema:
-                type: object
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
         "401":
           description: Unauthorized
           content:
             '*/*':
               schema:
-                type: object
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
         "403":
           description: Access denied
           content:
             '*/*':
               schema:
-                type: object
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
         "404":
           description: Temporary authorization not found
           content:
             '*/*':
               schema:
-                type: object
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
@@ -3604,17 +3604,232 @@ components:
       required:
       - name
       - status
-    PageResponseObject:
+    GetTemporaryAuthorizationAuthorizer:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+      required:
+      - id
+    GetTemporaryAuthorizationContractor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    GetTemporaryAuthorizationEmployee:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        identityType:
+          type: string
+        idNumber:
+          type: string
+      required:
+      - firstName
+      - idNumber
+      - identityType
+      - lastName
+    GetTemporaryAuthorizationEquipment:
+      type: object
+      properties:
+        equipmentType:
+          type: string
+        serialNumber:
+          type: string
+      required:
+      - serialNumber
+    GetTemporaryAuthorizationListItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorizedBy:
+          type: string
+        clientId:
+          type: string
+          format: uuid
+        contractorId:
+          type: string
+          format: uuid
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        reason:
+          type: string
+        resourceId:
+          type: string
+          format: uuid
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+        employee:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationEmployee"
+        vehicle:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationVehicle"
+        equipment:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationEquipment"
+        contractor:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationContractor"
+        authorizer:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationAuthorizer"
+        site:
+          $ref: "#/components/schemas/Site"
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - NOT_ALLOWED
+        validityStatus:
+          type: string
+          enum:
+          - SCHEDULED
+          - ACTIVE
+          - EXPIRED
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - authorizedBy
+      - authorizer
+      - clientId
+      - contractor
+      - contractorId
+      - createdAt
+      - dateFrom
+      - dateTo
+      - id
+      - resourceId
+      - resourceType
+      - site
+      - status
+      - validityStatus
+    GetTemporaryAuthorizationVehicle:
+      type: object
+      properties:
+        vehicleType:
+          type: string
+        registrationPlate:
+          type: string
+      required:
+      - registrationPlate
+    PageResponseGetTemporaryAuthorizationListItem:
       type: object
       properties:
         content:
           type: array
-          items: {}
+          items:
+            $ref: "#/components/schemas/GetTemporaryAuthorizationListItem"
         page:
           $ref: "#/components/schemas/PageData"
       required:
       - content
       - page
+    GetTemporaryAuthorizationResourceDetail:
+      type: object
+      properties:
+        site:
+          $ref: "#/components/schemas/Site"
+        resourceId:
+          type: string
+          format: uuid
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+        employee:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationEmployee"
+        vehicle:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationVehicle"
+        equipment:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationEquipment"
+      required:
+      - resourceId
+      - resourceType
+      - site
+    GetTemporaryAuthorizationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorizedBy:
+          type: string
+        clientId:
+          type: string
+          format: uuid
+        contractorId:
+          type: string
+          format: uuid
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        reason:
+          type: string
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - NOT_ALLOWED
+        contractor:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationContractor"
+        authorizer:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationAuthorizer"
+        validityStatus:
+          type: string
+          enum:
+          - SCHEDULED
+          - ACTIVE
+          - EXPIRED
+        createdAt:
+          type: string
+          format: date-time
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetTemporaryAuthorizationResourceDetail"
+      required:
+      - authorizedBy
+      - authorizer
+      - clientId
+      - contractor
+      - contractorId
+      - createdAt
+      - dateFrom
+      - dateTo
+      - id
+      - resources
+      - status
+      - validityStatus
     Activity:
       type: object
       properties:
