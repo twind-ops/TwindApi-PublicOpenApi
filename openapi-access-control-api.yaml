@@ -1611,6 +1611,9 @@ paths:
         required: true
         schema:
           type: string
+          enum:
+          - PDF
+          - PNG
       - name: resourceId
         in: path
         required: true
