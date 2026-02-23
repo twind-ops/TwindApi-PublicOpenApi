@@ -3559,6 +3559,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ContractAndActivityAcceptability"
+        risks:
+          type: array
+          items:
+            type: string
       required:
       - accessControlType
       - clientId
@@ -3566,6 +3570,7 @@ components:
       - issueRequirements
       - issues
       - resource
+      - risks
       - site
       - status
       - statusPerContractActivity
