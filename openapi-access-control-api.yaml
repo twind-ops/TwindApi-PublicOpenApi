@@ -823,6 +823,12 @@ paths:
         required: false
         schema:
           type: string
+      - name: name
+        in: query
+        description: Filter by authorization name
+        required: false
+        schema:
+          type: string
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -2295,10 +2301,15 @@ components:
           items:
             type: string
             format: uuid
+        name:
+          type: string
+          maxLength: 200
+          minLength: 0
       required:
       - contractorId
       - dateFrom
       - dateTo
+      - name
       - resourceIds
       - siteIds
       - status
@@ -3734,6 +3745,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        name:
+          type: string
       required:
       - authorizedBy
       - authorizer
@@ -3744,6 +3757,7 @@ components:
       - dateFrom
       - dateTo
       - id
+      - name
       - resourceId
       - resourceType
       - site
@@ -3838,6 +3852,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetTemporaryAuthorizationResourceDetail"
+        name:
+          type: string
       required:
       - authorizedBy
       - authorizer
@@ -3848,6 +3864,7 @@ components:
       - dateFrom
       - dateTo
       - id
+      - name
       - resources
       - status
       - validityStatus
