@@ -3191,10 +3191,52 @@ components:
         createdAt:
           type: string
           format: date-time
+        parentId:
+          type: string
+          format: uuid
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        breadcrumb:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
       required:
+      - breadcrumb
+      - children
       - companyId
       - createdAt
       - id
+      - level
+      - name
+    SiteNodeItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+      required:
+      - id
+      - level
       - name
     EquipmentResponseDto:
       type: object
