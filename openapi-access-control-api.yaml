@@ -926,7 +926,8 @@ paths:
       - me-controller
       summary: Get current user information
       description: "Retrieves detailed information about the currently authenticated\
-        \ user, including their profile, permissions, and company associations."
+        \ user, including their profile, permissions, company associations and userSettings\
+        \ (e.g. mobile unattended mode)."
       operationId: me
       parameters:
       - name: companyId
@@ -2481,6 +2482,13 @@ components:
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    MobileSettings:
+      type: object
+      description: Mobile-specific user preferences
+      properties:
+        unattendedMode:
+          type: boolean
+          description: "When true, enables unattended mode on mobile"
     ProductInfo:
       type: object
       properties:
@@ -2624,6 +2632,8 @@ components:
       - userPermission
     UserDetails:
       type: object
+      description: "Current user information including profile, permissions, company\
+        \ associations and user settings"
       properties:
         id:
           type: string
@@ -2649,6 +2659,9 @@ components:
         lastSignIn:
           type: string
           format: date-time
+        userSettings:
+          $ref: "#/components/schemas/UserSettings"
+          description: User preferences and settings (e.g. mobile unattended mode)
       required:
       - companiesPermissions
       - createdAt
@@ -2658,6 +2671,7 @@ components:
       - id
       - language
       - lastName
+      - userSettings
     UserJourneys:
       type: object
       properties:
@@ -2682,6 +2696,13 @@ components:
       required:
       - permissions
       - roles
+    UserSettings:
+      type: object
+      description: User preferences and settings stored as JSON
+      properties:
+        mobileSettings:
+          $ref: "#/components/schemas/MobileSettings"
+          description: Settings for the mobile app
     WorkPermitsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
