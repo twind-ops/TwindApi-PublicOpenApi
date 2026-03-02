@@ -1092,6 +1092,12 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: string
       - name: contractorIds
         in: query
         description: Filter by specific contractor IDs
@@ -1177,6 +1183,12 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: string
       - name: companyScope
         in: query
         description: "Filter by subcontractor scope (MY_COMPANY, MY_SUBCONTRACTORS,\
