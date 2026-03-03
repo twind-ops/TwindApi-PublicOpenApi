@@ -3761,6 +3761,8 @@ components:
     GetTemporaryAuthorizationEquipment:
       type: object
       properties:
+        equipmentName:
+          type: string
         equipmentType:
           type: string
         serialNumber:
@@ -3845,6 +3847,8 @@ components:
     GetTemporaryAuthorizationVehicle:
       type: object
       properties:
+        vehicleName:
+          type: string
         vehicleType:
           type: string
         registrationPlate:
