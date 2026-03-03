@@ -2693,6 +2693,8 @@ components:
           type: boolean
         shouldCompleteUserOnboarding:
           type: boolean
+        marketingConsent:
+          type: boolean
       required:
       - shouldCompleteCompanyOnboarding
       - shouldCompleteUserOnboarding
