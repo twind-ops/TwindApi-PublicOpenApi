@@ -1037,6 +1037,99 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/access-control/temporary-authorizations/{temporaryAuthorizationId}:
+    get:
+      tags:
+      - temporary-authorization-controller
+      summary: Get temporary authorization by ID
+      description: Returns a single temporary authorization for the client company.
+      operationId: getTemporaryAuthorization
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: temporaryAuthorizationId
+        in: path
+        description: Temporary authorization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+        "403":
+          description: Access denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+        "404":
+          description: Temporary authorization not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+    patch:
+      tags:
+      - temporary-authorization-controller
+      summary: Update temporary authorization
+      description: Updates an existing temporary authorization for the client company.
+        Each resource in resourceIds is applied for each site in siteIds (Cartesian
+        product).
+      operationId: updateTemporaryAuthorization
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: temporaryAuthorizationId
+        in: path
+        description: Temporary authorization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTemporaryAuthorizationDto"
+        required: true
+      responses:
+        "204":
+          description: Successfully updated
+          content: {}
+        "400":
+          description: "Invalid request (e.g. dateTo < dateFrom, empty siteIds or\
+            \ resourceIds)"
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Access denied
+          content: {}
+        "404":
+          description: Temporary authorization not found
+          content: {}
   /v1/users/me/companies:
     get:
       tags:
@@ -1726,53 +1819,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetResourceAccessControlResponse"
-  /v1/companies/{companyId}/access-control/temporary-authorizations/{temporaryAuthorizationId}:
-    get:
-      tags:
-      - temporary-authorization-controller
-      summary: Get temporary authorization by ID
-      description: Returns a single temporary authorization for the client company.
-      operationId: getTemporaryAuthorization
-      parameters:
-      - name: companyId
-        in: path
-        description: Client company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: temporaryAuthorizationId
-        in: path
-        description: Temporary authorization ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
-        "401":
-          description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
-        "403":
-          description: Access denied
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
-        "404":
-          description: Temporary authorization not found
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
@@ -2371,6 +2417,50 @@ components:
       - exitAt
       - id
       - origin
+    UpdateTemporaryAuthorizationDto:
+      type: object
+      properties:
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        reason:
+          type: string
+          maxLength: 1000
+          minLength: 0
+        status:
+          type: string
+        contractorId:
+          type: string
+          format: uuid
+        siteIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        resourceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        name:
+          type: string
+          maxLength: 100
+          minLength: 0
+        authorizedBy:
+          type: string
+          minLength: 1
+      required:
+      - authorizedBy
+      - contractorId
+      - dateFrom
+      - dateTo
+      - name
+      - resourceIds
+      - siteIds
+      - status
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
