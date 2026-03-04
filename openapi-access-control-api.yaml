@@ -3538,6 +3538,8 @@ components:
             type: string
           model:
             type: string
+          subtype:
+            type: string
           displayId:
             type: string
       required:
@@ -3642,6 +3644,8 @@ components:
           manufacturer:
             type: string
           model:
+            type: string
+          subtype:
             type: string
           displayId:
             type: string
