@@ -3361,7 +3361,12 @@ components:
           - SITE
           - ZONE
           - AREA
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteHierarchyNodeDto"
       required:
+      - children
       - id
       - level
       - name
