@@ -3767,6 +3767,8 @@ components:
           type: array
           items:
             type: string
+        classification:
+          $ref: "#/components/schemas/ResourceClassification"
       required:
       - accessControlType
       - clientId
@@ -3829,6 +3831,17 @@ components:
       required:
       - name
       - status
+    ResourceClassification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     GetTemporaryAuthorizationAuthorizer:
       type: object
       properties:
