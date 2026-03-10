@@ -1370,9 +1370,23 @@ paths:
           format: uuid
       - name: q
         in: query
+        description: "Text search term, matched against company name, email, and tax\
+          \ ID. Ignored when filterById is set."
         required: false
         schema:
           type: string
+          description: "Text search term, matched against company name, email, and\
+            \ tax ID. Ignored when filterById is set."
+      - name: filterById
+        in: query
+        description: "When set, performs a point-lookup by ID and ignores the 'q'\
+          \ search parameter."
+        required: false
+        schema:
+          type: string
+          format: uuid
+          description: "When set, performs a point-lookup by ID and ignores the 'q'\
+            \ search parameter."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1441,9 +1455,23 @@ paths:
           format: uuid
       - name: q
         in: query
+        description: "Text search term, matched against company name, email, and tax\
+          \ ID. Ignored when filterById is set."
         required: false
         schema:
           type: string
+          description: "Text search term, matched against company name, email, and\
+            \ tax ID. Ignored when filterById is set."
+      - name: filterById
+        in: query
+        description: "When set, performs a point-lookup by ID and ignores the 'q'\
+          \ search parameter."
+        required: false
+        schema:
+          type: string
+          format: uuid
+          description: "When set, performs a point-lookup by ID and ignores the 'q'\
+            \ search parameter."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -2583,6 +2611,22 @@ components:
       - code
       - id
       - name
+    LevelConfig:
+      type: object
+      properties:
+        level:
+          type: integer
+          format: int32
+        enabled:
+          type: boolean
+        maxInstances:
+          type: integer
+          format: int32
+        customName:
+          type: string
+      required:
+      - enabled
+      - level
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -2687,6 +2731,14 @@ components:
     SiteHierarchyConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          levels:
+            type: array
+            items:
+              $ref: "#/components/schemas/LevelConfig"
+      required:
+      - levels
     SsoConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
