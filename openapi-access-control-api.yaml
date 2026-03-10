@@ -2637,6 +2637,10 @@ components:
         unattendedMode:
           type: boolean
           description: "When true, enables unattended mode on mobile"
+        visitsEnabled:
+          type: boolean
+          description: "When true, shows visits section in the app. Null means visits\
+            \ are enabled (default behavior)."
     ProductInfo:
       type: object
       properties:
