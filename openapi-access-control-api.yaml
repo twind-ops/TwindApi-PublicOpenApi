@@ -571,6 +571,8 @@ paths:
         required: false
         schema:
           type: array
+          default:
+          - "firstName,ASC"
           items:
             type: string
       - name: companyId
