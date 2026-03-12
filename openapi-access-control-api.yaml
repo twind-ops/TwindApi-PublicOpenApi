@@ -836,6 +836,12 @@ paths:
         required: false
         schema:
           type: string
+      - name: showDeleted
+        in: query
+        description: Include soft-deleted temporary authorizations
+        required: false
+        schema:
+          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1091,6 +1097,40 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+    delete:
+      tags:
+      - temporary-authorization-controller
+      summary: Delete temporary authorization
+      description: Soft-deletes a temporary authorization for the client company.
+      operationId: deleteTemporaryAuthorization
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: temporaryAuthorizationId
+        in: path
+        description: Temporary authorization ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successfully deleted
+          content: {}
+        "401":
+          description: Unauthorized
+          content: {}
+        "403":
+          description: Access denied
+          content: {}
+        "404":
+          description: Temporary authorization not found
+          content: {}
     patch:
       tags:
       - temporary-authorization-controller
@@ -4018,6 +4058,7 @@ components:
           - SCHEDULED
           - ACTIVE
           - EXPIRED
+          - DELETED
         createdAt:
           type: string
           format: date-time
@@ -4123,6 +4164,7 @@ components:
           - SCHEDULED
           - ACTIVE
           - EXPIRED
+          - DELETED
         createdAt:
           type: string
           format: date-time
