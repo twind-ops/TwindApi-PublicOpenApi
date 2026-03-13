@@ -2222,6 +2222,15 @@ components:
           minLength: 1
         entryNotes:
           type: string
+        entryOrigin:
+          type: string
+          description: Origin of the visit entry registration. Indicates where the
+            entry was recorded (e.g. web portal or mobile app). Optional; defaults
+            to WEB when omitted.
+          enum:
+          - WEB
+          - APP
+          example: WEB
       required:
       - entryAt
       - entryReason
@@ -2471,6 +2480,15 @@ components:
           format: date-time
         exitNotes:
           type: string
+        exitOrigin:
+          type: string
+          description: Origin of the visit exit registration. Indicates where the
+            exit was recorded (e.g. web portal or mobile app). Optional; defaults
+            to WEB when omitted.
+          enum:
+          - WEB
+          - APP
+          example: WEB
       required:
       - exitAt
     UpdateNotesDto:
@@ -3236,6 +3254,11 @@ components:
           type: string
         notes:
           type: string
+        origin:
+          type: string
+          enum:
+          - WEB
+          - APP
         registeredByFullName:
           type: string
       required:
