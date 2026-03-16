@@ -2406,6 +2406,17 @@ components:
           format: uuid
         origin:
           type: string
+          enum:
+          - WEB
+          - APP
+          - APP_LOCAL
+          - MANUAL
+          - MOBILE
+          - QR_CODE
+          - NFC
+          - FACE_RECOGNITION
+          - KIOSK
+          - LEGACY_IMPORT
         entryNotes:
           type: string
         entryAt:
@@ -2502,6 +2513,17 @@ components:
           format: uuid
         origin:
           type: string
+          enum:
+          - WEB
+          - APP
+          - APP_LOCAL
+          - MANUAL
+          - MOBILE
+          - QR_CODE
+          - NFC
+          - FACE_RECOGNITION
+          - KIOSK
+          - LEGACY_IMPORT
         exitNotes:
           type: string
         exitAt:
@@ -3638,6 +3660,17 @@ components:
           - NOT_ALLOWED
         origin:
           type: string
+          enum:
+          - WEB
+          - APP
+          - APP_LOCAL
+          - MANUAL
+          - MOBILE
+          - QR_CODE
+          - NFC
+          - FACE_RECOGNITION
+          - KIOSK
+          - LEGACY_IMPORT
         registeredById:
           type: string
         registeredByFirstName:
