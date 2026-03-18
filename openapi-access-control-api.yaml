@@ -3681,6 +3681,8 @@ components:
           type: string
         notes:
           type: string
+        temporaryAuthorization:
+          $ref: "#/components/schemas/TemporaryAuthorizationSummary"
       required:
       - at
       - origin
@@ -3818,6 +3820,36 @@ components:
       required:
       - id
       - type
+    TemporaryAuthorizationSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorizedBy:
+          type: string
+        reason:
+          type: string
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - PARTIALLY_ALLOWED
+          - NOT_ALLOWED
+      required:
+      - dateFrom
+      - dateTo
+      - id
+      - name
+      - status
     Vehicle:
       allOf:
       - $ref: "#/components/schemas/Resource"
@@ -4010,36 +4042,6 @@ components:
       required:
       - id
       - name
-    TemporaryAuthorizationSummary:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        authorizedBy:
-          type: string
-        reason:
-          type: string
-        name:
-          type: string
-        dateFrom:
-          type: string
-          format: date
-        dateTo:
-          type: string
-          format: date
-        status:
-          type: string
-          enum:
-          - ALLOWED
-          - PARTIALLY_ALLOWED
-          - NOT_ALLOWED
-      required:
-      - dateFrom
-      - dateTo
-      - id
-      - name
-      - status
     GetTemporaryAuthorizationAuthorizer:
       type: object
       properties:
