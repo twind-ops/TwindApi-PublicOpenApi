@@ -3935,6 +3935,8 @@ components:
             type: string
         classification:
           $ref: "#/components/schemas/ResourceClassification"
+        temporaryAuthorization:
+          $ref: "#/components/schemas/TemporaryAuthorizationSummary"
       required:
       - accessControlType
       - clientId
@@ -4008,6 +4010,36 @@ components:
       required:
       - id
       - name
+    TemporaryAuthorizationSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        authorizedBy:
+          type: string
+        reason:
+          type: string
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - PARTIALLY_ALLOWED
+          - NOT_ALLOWED
+      required:
+      - dateFrom
+      - dateTo
+      - id
+      - name
+      - status
     GetTemporaryAuthorizationAuthorizer:
       type: object
       properties:
@@ -4109,6 +4141,7 @@ components:
           type: string
           enum:
           - ALLOWED
+          - PARTIALLY_ALLOWED
           - NOT_ALLOWED
         validityStatus:
           type: string
@@ -4211,6 +4244,7 @@ components:
           type: string
           enum:
           - ALLOWED
+          - PARTIALLY_ALLOWED
           - NOT_ALLOWED
         contractor:
           $ref: "#/components/schemas/GetTemporaryAuthorizationContractor"
@@ -4333,6 +4367,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Contract"
+        temporaryAuthorization:
+          $ref: "#/components/schemas/TemporaryAuthorizationSummary"
       required:
       - activities
       - client
