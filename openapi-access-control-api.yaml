@@ -2823,8 +2823,41 @@ components:
           maxNumberOfEmployees:
             type: integer
             format: int32
+          trials:
+            type: array
+            items:
+              $ref: "#/components/schemas/ContractorPlanTrial"
+          effectivePlan:
+            type: string
+            enum:
+            - PLAN_0
+            - PLAN_1
+            - PLAN_2
+            - PLAN_3
       required:
+      - effectivePlan
       - plan
+      - trials
+    ContractorPlanTrial:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum:
+          - PLAN_0
+          - PLAN_1
+          - PLAN_2
+          - PLAN_3
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+      required:
+      - endDate
+      - plan
+      - startDate
     DocumentalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
