@@ -779,71 +779,94 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: status
+      - name: authorizationIds
+        in: query
+        description: Filter by authorization group IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: statuses
         in: query
         description: "Filter by status (ALLOWED, NOT_ALLOWED)"
         required: false
         schema:
-          type: string
-      - name: contractorId
+          type: array
+          items:
+            type: string
+      - name: contractorIds
         in: query
-        description: Filter by contractor_id
+        description: Filter by contractor IDs
         required: false
         schema:
-          type: string
-          format: uuid
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: dateFrom
         in: query
-        description: Filter from date (inclusive)
+        description: "Filter from date (inclusive, overlap semantics)"
         required: false
         schema:
           type: string
           format: date
       - name: dateTo
         in: query
-        description: Filter to date (inclusive)
+        description: "Filter to date (inclusive, overlap semantics)"
         required: false
         schema:
           type: string
           format: date
-      - name: resourceId
+      - name: resourceIds
         in: query
-        description: Filter by resource ID
+        description: Filter by resource IDs
         required: false
         schema:
-          type: string
-          format: uuid
-      - name: resourceType
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: resourceTypes
         in: query
-        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        description: "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)"
         required: false
         schema:
-          type: string
-      - name: siteId
+          type: array
+          items:
+            type: string
+      - name: siteIds
         in: query
-        description: Filter by site ID
+        description: Filter by site IDs
         required: false
         schema:
-          type: string
-          format: uuid
-      - name: validityStatus
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: validityStatuses
         in: query
-        description: "Filter by validity status (SCHEDULED, ACTIVE, EXPIRED)"
+        description: "Filter by validity status (SCHEDULED, ACTIVE, EXPIRED, DELETED)"
         required: false
         schema:
-          type: string
+          type: array
+          items:
+            type: string
+      - name: authorizerIds
+        in: query
+        description: Filter by authorizer user IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: name
         in: query
-        description: Filter by authorization name
+        description: Filter by authorization name (partial match)
         required: false
         schema:
           type: string
-      - name: showDeleted
-        in: query
-        description: Include soft-deleted temporary authorizations
-        required: false
-        schema:
-          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1229,20 +1252,41 @@ paths:
           type: string
       - name: resourceId
         in: query
-        description: Filter by specific resource ID
+        description: Filter by a single resource ID. Combined with resourceIds using
+          OR — the result is the union of both.
         required: false
         schema:
           type: string
           format: uuid
       - name: resourceType
         in: query
-        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated:\
+          \ use resourceTypes instead. If both resourceType and resourceTypes are\
+          \ provided, they are combined using OR."
         required: false
         schema:
           type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: contractorIds
         in: query
         description: Filter by specific contractor IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by multiple resource IDs. Combined with resourceId using
+          OR — the result is the union of both.
         required: false
         schema:
           type: array
@@ -1320,17 +1364,28 @@ paths:
           type: string
       - name: resourceId
         in: query
-        description: Filter by specific resource ID
+        description: Filter by a single resource ID. Combined with resourceIds using
+          OR — the result is the union of both.
         required: false
         schema:
           type: string
           format: uuid
       - name: resourceType
         in: query
-        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated:\
+          \ use resourceTypes instead. If both resourceType and resourceTypes are\
+          \ provided, they are combined using OR."
         required: false
         schema:
           type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: companyScope
         in: query
         description: "Filter by subcontractor scope (MY_COMPANY, MY_SUBCONTRACTORS,\
@@ -1345,6 +1400,16 @@ paths:
       - name: contractorIds
         in: query
         description: Filter by specific contractor IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by multiple resource IDs. Combined with resourceId using
+          OR — the result is the union of both.
         required: false
         schema:
           type: array
@@ -1436,6 +1501,20 @@ paths:
           format: uuid
           description: "When set, performs a point-lookup by ID and ignores the 'q'\
             \ search parameter."
+      - name: filterByIds
+        in: query
+        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+          \ is ignored. If combined with filterById, filterById is ignored."
+        required: false
+        schema:
+          type: array
+          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+            \ is ignored. If combined with filterById, filterById is ignored."
+          items:
+            type: string
+            format: uuid
+            description: "When set, performs a batch lookup by IDs. The 'q' search\
+              \ parameter is ignored. If combined with filterById, filterById is ignored."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1521,6 +1600,20 @@ paths:
           format: uuid
           description: "When set, performs a point-lookup by ID and ignores the 'q'\
             \ search parameter."
+      - name: filterByIds
+        in: query
+        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+          \ is ignored. If combined with filterById, filterById is ignored."
+        required: false
+        schema:
+          type: array
+          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+            \ is ignored. If combined with filterById, filterById is ignored."
+          items:
+            type: string
+            format: uuid
+            description: "When set, performs a batch lookup by IDs. The 'q' search\
+              \ parameter is ignored. If combined with filterById, filterById is ignored."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1896,6 +1989,81 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetResourceAccessControlResponse"
+  /v1/companies/{companyId}/access-control/temporary-authorizations/names:
+    get:
+      tags:
+      - temporary-authorization-controller
+      summary: Search authorization names
+      description: "Returns authorization groups matching the search term, for use\
+        \ in filter dropdowns. Multiple groups may share the same name."
+      operationId: getTemporaryAuthorizationNames
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Search term (partial name match)
+        required: false
+        schema:
+          type: string
+      - name: ids
+        in: query
+        description: Return specific authorization IDs regardless of search term
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
+        "403":
+          description: Access denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
@@ -4282,6 +4450,29 @@ components:
       - resources
       - status
       - validityStatus
+    GetTemporaryAuthorizationNameItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseGetTemporaryAuthorizationNameItem:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetTemporaryAuthorizationNameItem"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     Activity:
       type: object
       properties:
