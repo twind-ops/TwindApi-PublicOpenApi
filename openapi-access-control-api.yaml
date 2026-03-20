@@ -190,8 +190,9 @@ paths:
         \   - `entry_at` - Entry timestamp\n            - `exit_at` - Exit timestamp\
         \ (default, missing on top)\n\n            **Sort format:** `?sort=field,direction`\
         \ (e.g., `?sort=exit_at,desc`)\n\n            **Search:** Use `q` to filter\
-        \ by visitor name or identity number (case insensitive, partial match).\n\
-        \            "
+        \ by visitor name, identity number (national ID, passport, SSN, etc.), or\
+        \ vehicle registration plate (case insensitive, partial match).\n        \
+        \    "
       operationId: getAllCompanyVisits
       parameters:
       - name: companyId
