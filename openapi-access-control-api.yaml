@@ -1472,8 +1472,9 @@ paths:
         \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
         \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
         \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
-        \         - `industry` - Industry key\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=name,asc`)\n            "
+        \         - `industry` - Industry key\n            - `email` - Company email\n\
+        \n            **Sort format:** `?sort=field,direction` (e.g., `?sort=name,asc`)\n\
+        \            "
       operationId: findAllContractors
       parameters:
       - name: id
@@ -1571,8 +1572,9 @@ paths:
         \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
         \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
         \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
-        \         - `industry` - Industry key\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=name,asc`)\n            "
+        \         - `industry` - Industry key\n            - `email` - Company email\n\
+        \n            **Sort format:** `?sort=field,direction` (e.g., `?sort=name,asc`)\n\
+        \            "
       operationId: findAllContractors_1
       parameters:
       - name: id
