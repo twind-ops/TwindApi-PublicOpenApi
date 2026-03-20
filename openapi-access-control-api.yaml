@@ -4029,6 +4029,8 @@ components:
           format: uuid
         authorizedBy:
           type: string
+        authorizerName:
+          type: string
         reason:
           type: string
         name:
