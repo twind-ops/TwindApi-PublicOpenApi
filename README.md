@@ -28,7 +28,7 @@ This repository serves as the public-facing documentation for the Twind Access C
 
 The documentation is published via GitHub Pages:
 
-**[https://twind-ops.github.io/TwindApi-PublicOpenApi/](https://twind-ops.github.io/TwindApi-PublicOpenApi/)**
+**[https://api-doc.twind.io/](https://api-doc.twind.io/)**
 
 ---
 
