@@ -3022,6 +3022,7 @@ components:
           format: uuid
         name:
           type: string
+          $ref: "#/components/schemas/RoleName"
       required:
       - id
       - name
@@ -3144,6 +3145,7 @@ components:
           type: array
           items:
             type: string
+            $ref: "#/components/schemas/Permission"
         roles:
           type: array
           items:
