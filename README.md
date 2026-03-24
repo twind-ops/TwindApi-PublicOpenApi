@@ -1,14 +1,14 @@
-# Twind Access Control API - Public Documentation
+# Twind Public API - Documentation
 
 ![API Documentation](https://img.shields.io/badge/API-Documentation-blue?style=flat-square&logo=swagger)
 ![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen?style=flat-square&logo=github)
 ![Scalar](https://img.shields.io/badge/Powered%20by-Scalar-purple?style=flat-square)
 
-Public documentation for the Twind Access Control API. This repository contains the OpenAPI specification and supplementary guides for developers integrating with the Twind platform.
+Public documentation for the Twind Public API. This repository contains the OpenAPI specification and supplementary guides for developers integrating with the Twind platform.
 
 ## About This Project
 
-This repository serves as the public-facing documentation for the Twind Access Control API. It includes:
+This repository serves as the public-facing documentation for the Twind Public API. It includes:
 
 - **OpenAPI Specification**: Machine-readable API definition in YAML format
 - **Interactive API Reference**: Powered by Scalar for exploring endpoints
@@ -18,7 +18,7 @@ This repository serves as the public-facing documentation for the Twind Access C
 
 ## Important Notice
 
-> **DO NOT MODIFY `openapi-access-control-api.yaml` MANUALLY**
+> **DO NOT MODIFY `openapi-public-api.yaml` MANUALLY**
 >
 > The OpenAPI specification is generated automatically from [TwindApi](https://github.com/twind-ops/TwindApi). Any manual changes will be overwritten on the next deployment.
 
@@ -168,7 +168,7 @@ get-api-token_api-section.png
 TwindApi-PublicOpenApi/
 ├── index.html                      # Main documentation page
 ├── styles.css                      # Main page styles
-├── openapi-access-control-api.yaml # OpenAPI spec (auto-generated)
+├── openapi-public-api.yaml         # OpenAPI spec (auto-generated)
 ├── README.md                       # This file
 └── guides/
     ├── index.html                  # Guides listing page

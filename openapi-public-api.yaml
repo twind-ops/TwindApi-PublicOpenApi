@@ -10,19 +10,9 @@ info:
 
     ## Available Operations
 
-    - **Me**: Get current user information and associated companies
-    - **Sites**: List available sites for filtering
-    - **Clients**: List client companies for filtering
-    - **My Companies**: List related companies (contractors/clients)
-    - **Employees**: List employees for a company
-    - **Vehicles**: List vehicles for a company
-    - **Equipment**: List equipment for a company
-    - **Assigned Resources**: List resources assigned to contracts
-    - **Access Register**: Register entries and exits for workers and vehicles
-    - **Access Control**: Query access control status
-    - **Access Card**: Generate access cards (PDF/PNG)
-    - **Visitors**: Manage visitor records
-    - **Visit Register**: Register visitor entries and exits
+    - **My company**: Current user, companies for the API key, and related companies (`my-companies`)
+    - **Requirements**: Requirement instances (client and contractor views), exports, detail, audits, and related reads under `requirement-instances`
+    - **Access control**: Sites, clients, contractors, employees, vehicles, equipment, assigned resources, access register, access control, access cards, visitors, and visit register
   contact:
     name: Twind Support
     email: support@twind.com
@@ -31,19 +21,19 @@ servers:
 - url: https://app.twind.io/api
   description: Production server
 tags:
-- name: temporary-authorization-controller
-  description: Temporary authorization management API
-- name: access-control-controller
-  description: Access Control Management API
-- name: site-controller
-  description: Site Management API
-- name: me-controller
-  description: Current User Information API
+- name: My company
+  description: Current user context and company relationships for the API key.
+- name: Requirements
+  description: "Contractual requirement instances: listings as client or contractor,\
+    \ detail, export, and audit trails."
+- name: Access control
+  description: "Access control workflows: catalogs, register, visitors, contracts,\
+    \ and resources."
 paths:
   /v1/companies/{companyId}/visitor/{visitorId}:
     get:
       tags:
-      - visitor-controller
+      - Access control
       operationId: getVisitor
       parameters:
       - name: companyId
@@ -67,7 +57,7 @@ paths:
                 $ref: "#/components/schemas/GetVisitorResponse"
     put:
       tags:
-      - visitor-controller
+      - Access control
       operationId: updateVisitor
       parameters:
       - name: companyId
@@ -99,7 +89,7 @@ paths:
   /v1/companies/{companyId}/visitor:
     get:
       tags:
-      - visitor-controller
+      - Access control
       operationId: getVisitors
       parameters:
       - name: companyId
@@ -154,7 +144,7 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetDistinctVisitorsResponse"
     post:
       tags:
-      - visitor-controller
+      - Access control
       operationId: createVisitor
       parameters:
       - name: companyId
@@ -179,7 +169,7 @@ paths:
   /v1/companies/{companyId}/visit-register:
     get:
       tags:
-      - visit-register-controller
+      - Access control
       summary: Get all company visits
       description: "\n            Retrieves paginated visit records for a company.\n\
         \            The 'sites' filter parameter accepts site IDs which can be obtained\
@@ -300,7 +290,7 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
     post:
       tags:
-      - visit-register-controller
+      - Access control
       operationId: createVisitEntry
       parameters:
       - name: companyId
@@ -325,7 +315,7 @@ paths:
   /v1/companies/{companyId}/vehicles:
     get:
       tags:
-      - vehicle-controller
+      - Access control
       operationId: findAll
       parameters:
       - name: q
@@ -401,7 +391,7 @@ paths:
   /v1/companies/{companyId}/sites:
     get:
       tags:
-      - site-controller
+      - Access control
       summary: List sites
       description: Retrieves paginated list of sites for a company. Use this endpoint
         to obtain site IDs for filtering in other endpoints.
@@ -467,7 +457,7 @@ paths:
   /v1/companies/{companyId}/equipment:
     get:
       tags:
-      - equipment-controller
+      - Access control
       operationId: findAll_2
       parameters:
       - name: q
@@ -535,7 +525,7 @@ paths:
   /v1/companies/{companyId}/employees:
     get:
       tags:
-      - employee-controller
+      - Access control
       operationId: findAll_3
       parameters:
       - name: q
@@ -617,7 +607,7 @@ paths:
   /v1/companies/{companyId}/access-register:
     get:
       tags:
-      - access-register-controller
+      - Access control
       summary: Get access register records
       description: "\n            Retrieves paginated access register records for\
         \ a company.\n\n            **Allowed sort fields:**\n            - `client_name`\
@@ -742,7 +732,7 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
     post:
       tags:
-      - access-register-controller
+      - Access control
       operationId: createAccessRegisterEntry
       parameters:
       - name: companyId
@@ -767,7 +757,7 @@ paths:
   /v1/companies/{companyId}/access-control/temporary-authorizations:
     get:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: List temporary authorizations
       description: Returns paginated temporary authorizations for the client company
         (one row per site/resource).
@@ -914,7 +904,7 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
     post:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Create temporary authorization
       description: Creates a temporary authorization for the client company. Each
         resource in resourceIds is added for each site in siteIds (Cartesian product).
@@ -962,7 +952,7 @@ paths:
   /v1/users/me:
     get:
       tags:
-      - me-controller
+      - My company
       summary: Get current user information
       description: "Retrieves detailed information about the currently authenticated\
         \ user, including their profile, permissions, company associations and userSettings\
@@ -993,7 +983,7 @@ paths:
   /v1/companies/{companyId}/visit-register/{visitRegisterId}:
     get:
       tags:
-      - visit-register-controller
+      - Access control
       operationId: getVisitDetails
       parameters:
       - name: companyId
@@ -1017,7 +1007,7 @@ paths:
                 $ref: "#/components/schemas/GetVisitDetailsResponse"
     patch:
       tags:
-      - visit-register-controller
+      - Access control
       operationId: updateVisitExit
       parameters:
       - name: companyId
@@ -1048,7 +1038,7 @@ paths:
   /v1/companies/{companyId}/access-register/{accessRegisterId}:
     patch:
       tags:
-      - access-register-controller
+      - Access control
       operationId: updateAccessRegisterWithExit
       parameters:
       - name: companyId
@@ -1079,7 +1069,7 @@ paths:
   /v1/companies/{companyId}/access-control/temporary-authorizations/{temporaryAuthorizationId}:
     get:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Get temporary authorization by ID
       description: Returns a single temporary authorization for the client company.
       operationId: getTemporaryAuthorization
@@ -1125,7 +1115,7 @@ paths:
                 $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
     delete:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Delete temporary authorization
       description: Soft-deletes a temporary authorization for the client company.
       operationId: deleteTemporaryAuthorization
@@ -1159,7 +1149,7 @@ paths:
           content: {}
     patch:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Update temporary authorization
       description: Updates an existing temporary authorization for the client company.
         Each resource in resourceIds is applied for each site in siteIds (Cartesian
@@ -1206,7 +1196,7 @@ paths:
   /v1/users/me/companies:
     get:
       tags:
-      - me-controller
+      - My company
       summary: Get current user's companies
       description: Retrieves the list of companies that the currently authenticated
         user has access to.
@@ -1231,7 +1221,7 @@ paths:
   /v1/companies/{id}/assigned-resources:
     get:
       tags:
-      - company-controller
+      - Access control
       summary: List assigned resources (as client)
       description: Retrieves paginated list of resources assigned to contracts where
         the company acts as client. Use this endpoint to obtain resource IDs for filtering
@@ -1343,7 +1333,7 @@ paths:
   /v1/companies/{id}/assigned-resources/as-contractor:
     get:
       tags:
-      - company-controller
+      - Access control
       summary: List assigned resources (as contractor)
       description: Retrieves paginated list of resources assigned to contracts where
         the company acts as contractor. Use this endpoint to obtain resource IDs for
@@ -1466,7 +1456,7 @@ paths:
   /v1/companies/{id}/my-companies:
     get:
       tags:
-      - company-controller
+      - My company
       summary: List related companies
       description: "\n            Retrieves paginated list of related companies (contractors\
         \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
@@ -1566,7 +1556,7 @@ paths:
   /v1/companies/{id}/all-contractors:
     get:
       tags:
-      - company-controller
+      - Access control
       summary: List related companies
       description: "\n            Retrieves paginated list of related companies (contractors\
         \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
@@ -1666,7 +1656,7 @@ paths:
   /v1/companies/{contractorId}/clients:
     get:
       tags:
-      - company-controller
+      - Access control
       summary: List client companies
       description: Retrieves paginated list of client companies for a contractor.
         Use this endpoint to obtain client IDs for filtering in access-control endpoints.
@@ -1734,7 +1724,7 @@ paths:
   /v1/companies/{companyId}/visitor/temporary-upload-url:
     get:
       tags:
-      - visitor-controller
+      - Access control
       operationId: getTemporaryUploadURL
       parameters:
       - name: companyId
@@ -1764,7 +1754,7 @@ paths:
   /v1/companies/{companyId}/visitor/plate-numbers:
     get:
       tags:
-      - visitor-controller
+      - Access control
       operationId: getVisitorsPlateNumbers
       parameters:
       - name: companyId
@@ -1820,7 +1810,7 @@ paths:
   /v1/companies/{companyId}/visitor/companies:
     get:
       tags:
-      - visitor-controller
+      - Access control
       operationId: getVisitorsCompanies
       parameters:
       - name: companyId
@@ -1873,10 +1863,698 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetDistinctCompaniesResponse"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}:
+    get:
+      tags:
+      - Requirements
+      operationId: getRequirementDetails
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetRequirementInstanceDetails"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}/retroactive-matches:
+    get:
+      tags:
+      - Requirements
+      summary: Get retroactive single-submission matches for a requirement instance
+      description: Returns prior requirement instances for the same resource and document
+        type that have approved or pending evidence still valid relative to the target
+        contract.
+      operationId: getRetroactiveMatches
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SingleSubmissionDto"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}/matches:
+    get:
+      tags:
+      - Requirements
+      operationId: getMatchingRequirementInstances
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SingleSubmissionDto"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}/logs:
+    get:
+      tags:
+      - Requirements
+      operationId: instanceLogs
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseInstanceAudit"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}/eligible-resources:
+    get:
+      tags:
+      - Requirements
+      operationId: getEligibleResourcesForChildRequirements
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetEligibleResourcesForChildRequirementsResponse"
+  /v1/companies/{companyId}/requirement-instances/requirements/as-contractor:
+    get:
+      tags:
+      - Requirements
+      operationId: findRequirementsForContractor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractorRequirementSummary"
+  /v1/companies/{companyId}/requirement-instances/as-contractor:
+    get:
+      tags:
+      - Requirements
+      summary: Get requirement instances as contractor
+      description: "Returns paginated requirement instances for a contractor company.\n\
+        \n            **Allowed sort fields:**\n            - `client_name` - Client\
+        \ company name\n            - `subject_name` - Resource name (employee full\
+        \ name, vehicle, or equipment)\n            - `requirement_name` - Requirement\
+        \ name\n            - `contract_date_from` - Minimum contract start date\n\
+        \            - `evidence_expiration` - Minimum tolerance date (expiration\
+        \ + grace period)\n            - `created_at` - Instance creation date (default)\n\
+        \n            **Sort format:** Use query parameter `sort=field,direction`\
+        \ (e.g., `?sort=client_name,asc`)\n            "
+      operationId: getPendingRequirementsAsContractor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requirementId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: requirementName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: clientId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: activityId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: excludeStatus
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: onlyCompanyRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyCriticalRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyAgreementRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyExpiringInFifteenDays
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyWithGDRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: companyScope
+        in: query
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "created_at,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseRequirementInstanceAsContractor"
+  /v1/companies/{companyId}/requirement-instances/as-client:
+    get:
+      tags:
+      - Requirements
+      summary: Get requirement instances as client
+      description: "Returns paginated requirement instances for a client company.\n\
+        \n            **Allowed sort fields:**\n            - `contractor_name` -\
+        \ Contractor company name\n            - `subject_name` - Resource name (employee\
+        \ full name, vehicle, or equipment)\n            - `requirement_name` - Requirement\
+        \ name\n            - `evidence_expiration` - Minimum tolerance date (expiration\
+        \ + grace period)\n            - `date_of_issue` - Evidence date of issue\n\
+        \            - `evidence_upload_date` - Evidence upload date\n           \
+        \ - `created_at` - Instance creation date (default)\n\n            **Sort\
+        \ format:** Use query parameter `sort=field,direction` (e.g., `?sort=contractor_name,asc`)\n\
+        \            "
+      operationId: getPendingRequirementsAsCustomer
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requirementId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: activityId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: excludeStatus
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: onlyCompanyRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyCriticalRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyAgreementRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: fromStartDate
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "created_at,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseRequirementInstanceAsClient"
+  /v1/companies/{companyId}/requirement-instances/as-client/export:
+    get:
+      tags:
+      - Requirements
+      summary: Export requirement instances as client
+      description: Returns paginated requirement instances in a flat format optimized
+        for Excel export. Uses the same filters and sorting as the listing endpoint.
+      operationId: exportRequirementInstancesAsClient
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requirementId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: activityId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: excludeStatus
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+      - name: onlyCompanyRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyCriticalRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: onlyAgreementRequirements
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: fromStartDate
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 5000
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "created_at,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseRequirementInstanceExportRow"
   /v1/companies/{companyId}/contractors/{contractorId}/access-control/{type}/{resourceId}:
     get:
       tags:
-      - access-card-controller
+      - Access control
       operationId: generateAccessCardPdf
       parameters:
       - name: companyId
@@ -1916,7 +2594,7 @@ paths:
   /v1/companies/{companyId}/access-register/{accessRecordId}:
     get:
       tags:
-      - access-register-controller
+      - Access control
       operationId: getAccessRegisterRecordById
       parameters:
       - name: companyId
@@ -1941,7 +2619,7 @@ paths:
   /v1/companies/{companyId}/access-control/{id}:
     get:
       tags:
-      - access-control-controller
+      - Access control
       summary: Get access control status by resource
       description: "Retrieves detailed access control status for a specific resource.\
         \ The resource ID is a composite identifier in the format '{resourceId}-{siteId}'.\
@@ -1995,7 +2673,7 @@ paths:
   /v1/companies/{companyId}/access-control/temporary-authorizations/names:
     get:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Search authorization names
       description: "Returns authorization groups matching the search term, for use\
         \ in filter dropdowns. Multiple groups may share the same name."
@@ -2070,7 +2748,7 @@ paths:
   /v1/companies/{companyId}/access-control/temporary-authorizations/authorizers:
     get:
       tags:
-      - temporary-authorization-controller
+      - Access control
       summary: Search authorizers for temporary authorizations
       description: "Returns users who can authorize temporary authorizations (ClientAdmin\
         \ or TemporaryAuthorizationManager role), for use in filter dropdowns."
@@ -2142,7 +2820,7 @@ paths:
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
-      - access-control-controller
+      - Access control
       summary: Get access control status by contractor
       description: "\n            Retrieves paginated access control statuses for\
         \ resources when the company acts as a contractor.\n            Results are\
@@ -2282,7 +2960,7 @@ paths:
   /v1/companies/{companyId}/access-control/as-client:
     get:
       tags:
-      - access-control-controller
+      - Access control
       summary: Get access control status by client
       description: "\n            Retrieves paginated access control statuses for\
         \ resources when the company acts as a client.\n            Results are filtered\
@@ -3818,6 +4496,967 @@ components:
       - id
       - level
       - name
+    Applicability:
+      type: object
+      properties:
+        contract:
+          $ref: "#/components/schemas/RequirementContractInfo"
+        site:
+          $ref: "#/components/schemas/IdNameInfo"
+        activity:
+          $ref: "#/components/schemas/IdNameInfo"
+        resource:
+          $ref: "#/components/schemas/ResourceInfo"
+      required:
+      - activity
+      - contract
+      - site
+    CompanyInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    EvidenceDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        reason:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+        dateOfIssue:
+          type: string
+          format: date
+        expiration:
+          type: string
+          format: date
+        doesNotApply:
+          type: boolean
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        revisedAt:
+          type: string
+          format: date-time
+        expiredAt:
+          type: string
+          format: date-time
+      required:
+      - createdAt
+      - files
+      - id
+      - status
+    GetRequirementInstanceDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        requirement:
+          $ref: "#/components/schemas/RequirementDetails"
+        evidence:
+          $ref: "#/components/schemas/EvidenceDetails"
+        contractor:
+          $ref: "#/components/schemas/CompanyInfo"
+        client:
+          $ref: "#/components/schemas/CompanyInfo"
+        subject:
+          $ref: "#/components/schemas/RequirementSubjectData"
+        lastReviewedEvidence:
+          type: string
+          format: uuid
+        lastEvidence:
+          type: string
+          format: uuid
+        relatedRequirementInstance:
+          type: string
+          format: uuid
+        applicability:
+          type: array
+          items:
+            $ref: "#/components/schemas/Applicability"
+        createdAt:
+          type: string
+          format: date-time
+        isGDEnabled:
+          type: boolean
+        euCategory:
+          type: string
+          enum:
+          - NATIONAL_COMPANY
+          - EU_COMPANY
+          - NON_EU_COMPANY
+      required:
+      - applicability
+      - client
+      - contractor
+      - createdAt
+      - id
+      - isGDEnabled
+      - requirement
+    IdAndName:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+      required:
+      - id
+      - name
+    IdNameInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    RequirementContractInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        managerId:
+          type: string
+        managerName:
+          type: string
+        managerEmail:
+          type: string
+      required:
+      - id
+      - managerEmail
+      - managerId
+      - managerName
+      - name
+    RequirementDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subject:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+        multipleRequestInstance:
+          type: string
+          enum:
+          - NONE
+          - SITE_SPECIFIC
+          - CONTRACT_SPECIFIC
+        appliedTo:
+          type: string
+          enum:
+          - ALL_CONTRACTORS
+          - ONLY_PRINCIPAL_CONTRACTORS
+          - ONLY_SUBCONTRACTORS
+        description:
+          type: string
+        evidenceType:
+          type: string
+          enum:
+          - UPLOAD
+          - AGREEMENT
+        isCritical:
+          type: boolean
+        enableDoesNotApply:
+          type: boolean
+        expirationType:
+          type: string
+          enum:
+          - NONE
+          - PERIODIC
+          - SPECIFIC_DATE
+        periodicStartFirstDayOfMonth:
+          type: boolean
+        periodicity:
+          type: integer
+          format: int32
+        periodicityType:
+          type: string
+        periodicSpecificDate:
+          type: string
+          format: date
+        gracePeriod:
+          type: integer
+          format: int32
+        saveInCustody:
+          type: boolean
+        custodyTime:
+          type: integer
+          format: int32
+        custodyTimeType:
+          type: string
+        rules:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResolvedRulesCondition"
+        acceptanceCriteria:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        relatedRequirement:
+          type: string
+          format: uuid
+        templateFile:
+          type: string
+        canBeSetInFuture:
+          type: boolean
+      required:
+      - acceptanceCriteria
+      - appliedTo
+      - canBeSetInFuture
+      - createdAt
+      - enableDoesNotApply
+      - evidenceType
+      - id
+      - isCritical
+      - multipleRequestInstance
+      - name
+      - rules
+      - saveInCustody
+      - subject
+    RequirementSubjectData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+        identifier:
+          type: string
+      required:
+      - id
+      - identifier
+      - name
+      - type
+    ResolvedRulesCondition:
+      type: object
+      properties:
+        activity:
+          $ref: "#/components/schemas/IdAndName"
+        site:
+          $ref: "#/components/schemas/SiteInfo"
+        contract:
+          $ref: "#/components/schemas/IdAndName"
+        contractor:
+          $ref: "#/components/schemas/IdAndName"
+        risk:
+          $ref: "#/components/schemas/IdAndName"
+        vehicleType:
+          $ref: "#/components/schemas/IdAndName"
+        equipmentType:
+          $ref: "#/components/schemas/IdAndName"
+        employeeType:
+          $ref: "#/components/schemas/IdAndName"
+        euCategory:
+          type: string
+          enum:
+          - NATIONAL_COMPANY
+          - EU_COMPANY
+          - NON_EU_COMPANY
+    ResourceInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        risks:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdNameInfo"
+      required:
+      - id
+      - name
+      - type
+    SiteInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        breadcrumb:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
+      required:
+      - breadcrumb
+      - id
+      - level
+      - name
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/Site"
+      required:
+      - id
+      - name
+      - sites
+    MatchEntry:
+      type: object
+      properties:
+        requirementName:
+          type: string
+        requirementInstance:
+          $ref: "#/components/schemas/RequirementInstance"
+        client:
+          $ref: "#/components/schemas/Client"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contract"
+      required:
+      - client
+      - contracts
+      - requirementInstance
+      - requirementName
+    RequirementInstance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
+        dateOfIssue:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        evidenceId:
+          type: string
+          format: uuid
+      required:
+      - id
+      - status
+    SingleSubmissionDto:
+      type: object
+      properties:
+        subject:
+          $ref: "#/components/schemas/Subject"
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchEntry"
+      required:
+      - matches
+      - subject
+    Subject:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        identifierType:
+          type: string
+        identifier:
+          type: string
+      required:
+      - id
+      - name
+      - type
+    InstanceAudit:
+      type: object
+      properties:
+        eventName:
+          type: string
+        event:
+          $ref: "#/components/schemas/JsonNode"
+        createdBy:
+          $ref: "#/components/schemas/IdAndName"
+        createdAt:
+          type: string
+          format: date-time
+        createdByCompany:
+          $ref: "#/components/schemas/IdAndName"
+      required:
+      - createdAt
+      - event
+      - eventName
+    JsonNode:
+      type: object
+      properties:
+        integralNumber:
+          type: boolean
+        floatingPointNumber:
+          type: boolean
+        int:
+          type: boolean
+        long:
+          type: boolean
+        nodeType:
+          type: string
+          enum:
+          - ARRAY
+          - BINARY
+          - BOOLEAN
+          - MISSING
+          - "NULL"
+          - NUMBER
+          - OBJECT
+          - POJO
+          - STRING
+        short:
+          type: boolean
+        double:
+          type: boolean
+        bigDecimal:
+          type: boolean
+        bigInteger:
+          type: boolean
+        pojo:
+          type: boolean
+        missingNode:
+          type: boolean
+        valueNode:
+          type: boolean
+        object:
+          type: boolean
+        number:
+          type: boolean
+        textual:
+          type: boolean
+          deprecated: true
+        boolean:
+          type: boolean
+        binary:
+          type: boolean
+        container:
+          type: boolean
+        string:
+          type: boolean
+        array:
+          type: boolean
+        empty:
+          type: boolean
+        "null":
+          type: boolean
+        float:
+          type: boolean
+        embeddedValue:
+          type: boolean
+    PageResponseInstanceAudit:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstanceAudit"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Employee:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          firstName:
+            type: string
+          lastName:
+            type: string
+          identity:
+            type: string
+          identityType:
+            type: string
+          displayId:
+            type: string
+          name:
+            type: string
+      required:
+      - displayId
+      - firstName
+      - id
+      - identity
+      - identityType
+      - lastName
+      - name
+    Equipment:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          name:
+            type: string
+          serialNumber:
+            type: string
+          manufacturer:
+            type: string
+          model:
+            type: string
+          subtype:
+            type: string
+          displayId:
+            type: string
+      required:
+      - displayId
+      - id
+      - name
+      - serialNumber
+    GetEligibleResourcesForChildRequirementsResponse:
+      type: object
+      properties:
+        requirementInstanceId:
+          type: string
+          format: uuid
+        resource:
+          oneOf:
+          - $ref: "#/components/schemas/Employee"
+          - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Vehicle"
+      required:
+      - requirementInstanceId
+      - resource
+    PageResponseGetEligibleResourcesForChildRequirementsResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetEligibleResourcesForChildRequirementsResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Resource:
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        id:
+          type: string
+          format: uuid
+        photo:
+          type: string
+        type:
+          type: string
+      required:
+      - id
+      - type
+    Vehicle:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          name:
+            type: string
+          registrationPlate:
+            type: string
+          manufacturer:
+            type: string
+          model:
+            type: string
+          subtype:
+            type: string
+          displayId:
+            type: string
+      required:
+      - displayId
+      - id
+      - name
+      - registrationPlate
+    ContractorRequirementSummary:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseContractorRequirementSummary:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractorRequirementSummary"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    Activity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseRequirementInstanceAsContractor:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementInstanceAsContractor"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    RequirementClientData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    RequirementContractData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+      required:
+      - dateFrom
+      - id
+      - name
+    RequirementContractorData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    RequirementData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - UPLOAD
+          - AGREEMENT
+        critical:
+          type: boolean
+      required:
+      - critical
+      - id
+      - name
+      - type
+    RequirementEvidenceData:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
+        expiration:
+          type: string
+          format: date
+        tolerance:
+          type: string
+          format: date
+        isExpressValidation:
+          type: boolean
+        id:
+          type: string
+          format: uuid
+        dateOfIssue:
+          type: string
+          format: date
+        uploadDate:
+          type: string
+          format: date-time
+      required:
+      - status
+    RequirementInstanceAsContractor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        relatedRequirementId:
+          type: string
+          format: uuid
+        requirement:
+          $ref: "#/components/schemas/RequirementData"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementContractData"
+        client:
+          $ref: "#/components/schemas/RequirementClientData"
+        subject:
+          $ref: "#/components/schemas/RequirementSubjectData"
+        evidences:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementEvidenceData"
+        isUpcomingDate:
+          type: boolean
+        isGDEnabled:
+          type: boolean
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteAndActivities"
+        contractor:
+          $ref: "#/components/schemas/RequirementContractorData"
+      required:
+      - client
+      - contracts
+      - evidences
+      - id
+      - isGDEnabled
+      - isUpcomingDate
+      - requirement
+      - sites
+    SiteAndActivities:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/Activity"
+      required:
+      - activities
+      - id
+      - name
+    PageResponseRequirementInstanceAsClient:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementInstanceAsClient"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    RequirementInstanceAsClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        mainRequirement:
+          type: boolean
+        relatedRequirementId:
+          type: string
+          format: uuid
+        requirement:
+          $ref: "#/components/schemas/RequirementData"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementContractData"
+        contractor:
+          $ref: "#/components/schemas/RequirementContractorData"
+        subject:
+          $ref: "#/components/schemas/RequirementSubjectData"
+        evidences:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementEvidenceData"
+        isUpcomingDate:
+          type: boolean
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteAndActivities"
+      required:
+      - contractor
+      - contracts
+      - evidences
+      - id
+      - isUpcomingDate
+      - mainRequirement
+      - requirement
+      - sites
+    PageResponseRequirementInstanceExportRow:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementInstanceExportRow"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    RequirementInstanceExportRow:
+      type: object
+      properties:
+        requirementName:
+          type: string
+        requirementType:
+          type: string
+        critical:
+          type: boolean
+        contracts:
+          type: string
+        contractDatesFrom:
+          type: string
+        contractorName:
+          type: string
+        contractorTaxId:
+          type: string
+        subjectType:
+          type: string
+        subject:
+          type: string
+        status:
+          type: string
+        uploadDate:
+          type: string
+        dateOfIssue:
+          type: string
+        expirationDate:
+          type: string
+        toleranceDate:
+          type: string
+        siteAndActivities:
+          type: string
+      required:
+      - contractDatesFrom
+      - contractorName
+      - contractorTaxId
+      - contracts
+      - critical
+      - dateOfIssue
+      - expirationDate
+      - requirementName
+      - requirementType
+      - siteAndActivities
+      - status
+      - subject
+      - subjectType
+      - toleranceDate
+      - uploadDate
     EquipmentResponseDto:
       type: object
       properties:
@@ -3966,53 +5605,6 @@ components:
       - origin
       - registeredById
       - status
-    Employee:
-      allOf:
-      - $ref: "#/components/schemas/Resource"
-      - type: object
-        properties:
-          firstName:
-            type: string
-          lastName:
-            type: string
-          identity:
-            type: string
-          identityType:
-            type: string
-          displayId:
-            type: string
-          name:
-            type: string
-      required:
-      - displayId
-      - firstName
-      - id
-      - identity
-      - identityType
-      - lastName
-      - name
-    Equipment:
-      allOf:
-      - $ref: "#/components/schemas/Resource"
-      - type: object
-        properties:
-          name:
-            type: string
-          serialNumber:
-            type: string
-          manufacturer:
-            type: string
-          model:
-            type: string
-          subtype:
-            type: string
-          displayId:
-            type: string
-      required:
-      - displayId
-      - id
-      - name
-      - serialNumber
     GetAccessRegisterClient:
       type: object
       properties:
@@ -4083,21 +5675,6 @@ components:
       required:
       - content
       - page
-    Resource:
-      type: object
-      discriminator:
-        propertyName: type
-      properties:
-        id:
-          type: string
-          format: uuid
-        photo:
-          type: string
-        type:
-          type: string
-      required:
-      - id
-      - type
     TemporaryAuthorizationSummary:
       type: object
       properties:
@@ -4130,28 +5707,6 @@ components:
       - id
       - name
       - status
-    Vehicle:
-      allOf:
-      - $ref: "#/components/schemas/Resource"
-      - type: object
-        properties:
-          name:
-            type: string
-          registrationPlate:
-            type: string
-          manufacturer:
-            type: string
-          model:
-            type: string
-          subtype:
-            type: string
-          displayId:
-            type: string
-      required:
-      - displayId
-      - id
-      - name
-      - registrationPlate
     ContractAndActivityAcceptability:
       type: object
       properties:
@@ -4623,34 +6178,6 @@ components:
       - language
       - lastName
       - roleIds
-    Activity:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - id
-      - name
-    Contract:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        dateFrom:
-          type: string
-          format: date
-        dateTo:
-          type: string
-          format: date
-      required:
-      - id
-      - name
     GetAccessControlClient:
       type: object
       properties:
