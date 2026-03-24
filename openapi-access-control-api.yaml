@@ -2067,6 +2067,78 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
+  /v1/companies/{companyId}/access-control/temporary-authorizations/authorizers:
+    get:
+      tags:
+      - temporary-authorization-controller
+      summary: Search authorizers for temporary authorizations
+      description: "Returns users who can authorize temporary authorizations (ClientAdmin\
+        \ or TemporaryAuthorizationManager role), for use in filter dropdowns."
+      operationId: getAuthorizers
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Search term (partial name match)
+        required: false
+        schema:
+          type: string
+      - name: userId
+        in: query
+        description: Fetch a specific user by ID
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseUserData"
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseUserData"
+        "403":
+          description: Access denied
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseUserData"
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
@@ -4513,6 +4585,44 @@ components:
       required:
       - content
       - page
+    PageResponseUserData:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserData"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        photo:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        roleIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleData"
+      required:
+      - email
+      - firstName
+      - id
+      - language
+      - lastName
+      - roleIds
     Activity:
       type: object
       properties:
