@@ -3026,6 +3026,7 @@ components:
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
+          - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -3094,6 +3095,9 @@ components:
           readOnly: true
       required:
       - requirementId
+    RequirementsApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ReviewConfig:
       type: object
       properties:
