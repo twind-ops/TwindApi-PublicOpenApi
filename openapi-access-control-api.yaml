@@ -3025,6 +3025,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -3040,6 +3041,34 @@ components:
           type: string
       required:
       - type
+    PublicApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          apiKeySet:
+            type: array
+            items:
+              $ref: "#/components/schemas/PublicApiKeyDetails"
+            uniqueItems: true
+      required:
+      - apiKeySet
+    PublicApiKeyDetails:
+      type: object
+      properties:
+        displayName:
+          type: string
+        internalName:
+          type: string
+        name:
+          type: string
+          writeOnly: true
+        publicApiKey:
+          type: string
+      required:
+      - displayName
+      - internalName
+      - publicApiKey
     RequirementReviewConfig:
       type: object
       properties:
