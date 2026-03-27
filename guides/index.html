@@ -168,6 +168,25 @@
         } else {
           loadGuide(file);
         }
+
+        // Fallback: intercept raw .md links if rewrite did not run (e.g. parser edge cases).
+        document.addEventListener(
+          "click",
+          function (e) {
+            const a = e.target.closest("a");
+            if (!a || !a.closest(".guide-content")) return;
+            const href = a.getAttribute("href");
+            if (!href || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) return;
+            if (href.includes("..")) return;
+            const pathPart = href.split("#")[0];
+            if (!pathPart.toLowerCase().endsWith(".md")) return;
+            e.preventDefault();
+            const file = pathPart.replace(/^\.\//, "").split("/").pop();
+            const hash = href.includes("#") ? href.slice(href.indexOf("#")) : "";
+            window.location.assign("index.html?file=" + encodeURIComponent(file) + hash);
+          },
+          true
+        );
       });
 
       function renderGuidesList() {
@@ -201,6 +220,49 @@
         `;
       }
 
+      /**
+       * GitHub-style heading slugs so [text](#understanding-ids) matches ## Understanding IDs.
+       * Marked does not emit id on headings by default.
+       */
+      function addHeadingIdsToGuideContent(root) {
+        if (!root) return;
+        root.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((el) => {
+          if (el.id) return;
+          let base = el.textContent
+            .trim()
+            .toLowerCase()
+            .replace(/[^\p{L}\p{N}]+/gu, "-")
+            .replace(/^-+|-+$/g, "");
+          if (!base) base = "section";
+          let id = base;
+          let n = 0;
+          while (document.getElementById(id)) {
+            n++;
+            id = base + "-" + n;
+          }
+          el.id = id;
+        });
+      }
+
+      /**
+       * Markdown links like [x](other-guide.md) become raw file URLs in the browser.
+       * Rewrite same-folder .md links so they open in this viewer (index.html?file=...).
+       */
+      function rewriteRelativeMarkdownLinks(root) {
+        if (!root) return;
+        root.querySelectorAll("a[href]").forEach((a) => {
+          const href = a.getAttribute("href");
+          if (!href || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) return;
+          if (href.includes("..")) return;
+          const hashIndex = href.indexOf("#");
+          const pathPart = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
+          const hash = hashIndex >= 0 ? href.slice(hashIndex) : "";
+          if (!pathPart.toLowerCase().endsWith(".md")) return;
+          const file = pathPart.replace(/^\.\//, "").split("/").pop();
+          a.setAttribute("href", "index.html?file=" + encodeURIComponent(file) + hash);
+        });
+      }
+
       function loadGuide(filename) {
         fetch(filename)
           .then((res) => {
@@ -221,6 +283,10 @@
               <a class="back-link" href="index.html">← Back to Guides</a>
               <div class="guide-content">${marked.parse(md)}</div>
             `;
+
+            const guideRoot = document.querySelector(".guide-content");
+            addHeadingIdsToGuideContent(guideRoot);
+            rewriteRelativeMarkdownLinks(guideRoot);
 
             document.querySelectorAll("pre code").forEach((block) => {
               hljs.highlightElement(block);
