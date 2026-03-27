@@ -44,12 +44,12 @@ curl -X GET "https://api.twind.io/v1/endpoint" \
 
 ## Verifying Your API Key
 
-To verify that your API key is correctly configured, you can make a request to the `/v1/me` endpoint. This endpoint returns information about the authenticated user.
+To verify that your API key is correctly configured, you can make a request to the `/v1/users/me` endpoint. This endpoint returns information about the authenticated user.
 
 ### Example: Verify Authentication
 
 ```bash
-curl -X GET "https://api.twind.io/v1/me" \
+curl -X GET "https://api.twind.io/v1/users/me" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
