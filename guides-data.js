@@ -9,5 +9,19 @@ const GUIDES_DATA = [
     title: "Get API Key",
     description: "Learn how to obtain and configure your API key for authentication.",
     icon: "assets/icon-key.svg",
-  }
+  },
+  {
+    id: "evidence-upload-api",
+    file: "evidence-upload-api.md",
+    title: "Evidence Upload API",
+    description: "Learn how to upload evidence using the Twind API.",
+    icon: "assets/icon-file-upload.svg",
+  },
+  {
+    id: "visits-documentation-upload-api",
+    file: "visits-documentation-upload-api.md",
+    title: "Visits Documentation Upload API",
+    description: "Learn how to upload visits documentation using the Twind API.",
+    icon: "assets/icon-visitor.svg",
+  },
 ];
