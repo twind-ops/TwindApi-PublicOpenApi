@@ -98,6 +98,7 @@ curl -X GET \
   "url": "https://your-bucket.s3.region.amazonaws.com",
   "fields": {
     "key": "evidences/{ownerId}/{requirementInstanceId}/{yyyy-MM-dd}/certificate.pdf",
+    "Content-Type": "application/pdf",
     "policy": "…",
     "x-amz-algorithm": "AWS4-HMAC-SHA256",
     "x-amz-credential": "…",
@@ -112,6 +113,10 @@ curl -X GET \
   server builds a **`key`** under
   `evidences/{ownerId}/{requirementInstanceId}/{date}`.
 - Use the **same** `contentType` you sent to the API; the policy is tied to it.
+  When S3 conditions include `Content-Type`, it must be a **named form field**
+  **`Content-Type`** (not only the MIME type on the file part). If it is missing
+  from `fields` but the upload returns **403**, add **`Content-Type`** with that
+  same value.
 - Maximum size is enforced when the URL is generated.
 
 ## Step 2: Upload the file to object storage
@@ -128,6 +133,7 @@ Send **POST** `multipart/form-data` to **`url`**:
 ```bash
 curl -X POST "$URL_FROM_STEP_1" \
   -F "key=evidences/…/certificate.pdf" \
+  -F "Content-Type=application/pdf" \
   -F "policy=…" \
   -F "x-amz-algorithm=AWS4-HMAC-SHA256" \
   -F "x-amz-credential=…" \

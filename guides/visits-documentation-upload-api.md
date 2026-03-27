@@ -80,6 +80,7 @@ curl -X GET \
   "url": "https://your-bucket.s3.region.amazonaws.com",
   "fields": {
     "key": "visitors/{companyId}/{yyyy-MM-dd}/visitor-id.pdf",
+    "Content-Type": "application/pdf",
     "policy": "…",
     "x-amz-algorithm": "AWS4-HMAC-SHA256",
     "x-amz-credential": "…",
@@ -93,7 +94,10 @@ curl -X GET \
 - **`fields`** — Send every entry as form fields together with the file. The
   server stores objects under `visitors/{companyId}/{date}/…`.
 - Use the **same** `contentType` you sent to the API when uploading; the policy
-  is tied to it.
+  is tied to it. When S3 conditions include `Content-Type`, send it as a **named
+  form field** **`Content-Type`** (not only the MIME type on the file part). If
+  it is missing from `fields` but the upload returns **403**, add **`Content-Type`**
+  with that same value.
 
 ## Step 2: Upload the file to object storage
 
@@ -105,6 +109,7 @@ plus the file (same pattern as other presigned POST flows in Twind).
 ```bash
 curl -X POST "$URL_FROM_STEP_1" \
   -F "key=visitors/…/visitor-id.pdf" \
+  -F "Content-Type=application/pdf" \
   -F "policy=…" \
   -F "x-amz-algorithm=AWS4-HMAC-SHA256" \
   -F "x-amz-credential=…" \
