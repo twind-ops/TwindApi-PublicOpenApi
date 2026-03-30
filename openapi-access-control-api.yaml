@@ -412,6 +412,14 @@ paths:
         required: false
         schema:
           type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
