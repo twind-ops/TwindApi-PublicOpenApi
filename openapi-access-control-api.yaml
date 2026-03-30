@@ -31,8 +31,13 @@ servers:
 - url: https://app.twind.io/api
   description: Production server
 tags:
+- name: visit-register-controller
+  description: "Register visitor entry and exit and list visits for a client company.\
+    \ Complements [visitor-controller](#tag/visitor-controller) and [site-controller](#tag/site-controller)."
 - name: temporary-authorization-controller
   description: Temporary authorization management API
+- name: visitor-controller
+  description: "Visitors and supporting lists (companies, plates) for the visit register."
 - name: access-control-controller
   description: Access Control Management API
 - name: site-controller
@@ -44,23 +49,52 @@ paths:
     get:
       tags:
       - visitor-controller
+      summary: Get visitor by ID
+      description: "Returns one visitor including identity, company, and document\
+        \ URLs. Use before editing or when resolving `visitorId` for visits."
       operationId: getVisitor
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: visitorId
         in: path
+        description: Visitor ID
         required: true
         schema:
           type: string
           format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved visitor
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitorResponse"
+        "400":
+          description: "Bad request: invalid path parameters (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitorResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitorResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitorResponse"
+        "404":
+          description: Visitor not found
           content:
             '*/*':
               schema:
@@ -68,16 +102,21 @@ paths:
     put:
       tags:
       - visitor-controller
+      summary: Update a visitor
+      description: "Updates visitor details. Use [GET /v1/companies/{companyId}/visitor/{visitorId}](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/{visitorId})\
+        \ to load current values."
       operationId: updateVisitor
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: visitorId
         in: path
+        description: Visitor ID
         required: true
         schema:
           type: string
@@ -86,11 +125,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitorDto"
+              $ref: "#/components/schemas/CreateVisitorRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Visitor updated
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+        "400":
+          description: "Bad request: validation failed, missing file in storage, or\
+            \ other business rule (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+        "404":
+          description: Visitor not found
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: uuid
+        "409":
+          description: "Conflict: duplicate visitor identity or database constraint\
+            \ violation (ProblemDetail)"
           content:
             '*/*':
               schema:
@@ -100,21 +176,32 @@ paths:
     get:
       tags:
       - visitor-controller
+      summary: List distinct visitors
+      description: "\n            Paginated list of visitors for filtering and selection\
+        \ (e.g. visit register filters). Identity numbers returned here match the\
+        \ `visitors` query parameter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register).\n\
+        \n            **Related:** Sites for visits — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\n\
+        \            "
       operationId: getVisitors
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: q
         in: query
+        description: "Search by name, identity number, or plate (case insensitive,\
+          \ partial match)"
         required: false
         schema:
           type: string
       - name: selected
         in: query
+        description: Identity document numbers to list first in the page (same as
+          each row's `identity` field)
         required: false
         schema:
           type: array
@@ -147,7 +234,25 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved visitors
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctVisitorsResponse"
+        "400":
+          description: "Bad request: invalid query or pagination parameters (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctVisitorsResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctVisitorsResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
@@ -155,10 +260,16 @@ paths:
     post:
       tags:
       - visitor-controller
+      summary: Create a visitor
+      description: "\n            Creates a visitor record for the client company.\
+        \ Use the returned ID as `visitorId` when calling [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\n\
+        \n            Upload files first via [GET /v1/companies/{companyId}/visitor/temporary-upload-url](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/temporary-upload-url),\
+        \ then pass the stored object keys in `files`.\n            "
       operationId: createVisitor
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
@@ -167,11 +278,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitorDto"
+              $ref: "#/components/schemas/CreateVisitorRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Visitor created; response body contains the new visitor ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: "Bad request: validation failed, visitor has an open visit\
+            \ without exit, or file not found in storage (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "409":
+          description: "Conflict: duplicate visitor identity or database constraint\
+            \ violation (ProblemDetail)"
           content:
             '*/*':
               schema:
@@ -197,6 +334,7 @@ paths:
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
@@ -206,6 +344,8 @@ paths:
         required: false
         schema:
           type: array
+          description: Visitor identity document numbers. Values align with visitor
+            `idNumber` / identity from the visitor list API.
           items:
             type: string
       - name: companies
@@ -213,6 +353,7 @@ paths:
         required: false
         schema:
           type: array
+          description: Visitor company tax IDs (exact match list).
           items:
             type: string
       - name: sites
@@ -220,38 +361,58 @@ paths:
         required: false
         schema:
           type: array
+          description: Site UUIDs to restrict visits.
           items:
             type: string
             format: uuid
       - name: dateFrom
         in: query
+        description: "Inclusive lower bound on entry date (`YYYY-MM-DD`, entry time\
+          \ at or after start of day UTC)."
         required: false
         schema:
           type: string
           format: date
+          description: "Inclusive lower bound on entry date (`YYYY-MM-DD`, entry time\
+            \ at or after start of day UTC)."
+          example: 2026-03-01
+        example: 2026-03-01
       - name: dateTo
         in: query
+        description: "Inclusive upper bound on entry date (`YYYY-MM-DD`, entry time\
+          \ before start of the next day UTC)."
         required: false
         schema:
           type: string
           format: date
+          description: "Inclusive upper bound on entry date (`YYYY-MM-DD`, entry time\
+            \ before start of the next day UTC)."
+          example: 2026-03-31
+        example: 2026-03-31
       - name: plateNumbers
         in: query
         required: false
         schema:
           type: array
+          description: Vehicle registration plates (exact match list).
           items:
             type: string
       - name: onlyAtSite
         in: query
+        description: "When true, only visits with no exit recorded."
         required: false
         schema:
           type: boolean
+          description: "When true, only visits with no exit recorded."
       - name: q
         in: query
+        description: "Search across visitor full name, identity number, and plate\
+          \ (case-insensitive, partial match)."
         required: false
         schema:
           type: string
+          description: "Search across visitor full name, identity number, and plate\
+            \ (case-insensitive, partial match)."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -286,6 +447,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
+        "400":
+          description: "Bad request: invalid pagination, sort field, or filter parameters\
+            \ (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetCompanyVisitsResponse"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -301,10 +469,18 @@ paths:
     post:
       tags:
       - visit-register-controller
+      summary: Register a visit entry
+      description: "\n            Creates a visit entry (visitor on site). `siteId`\
+        \ must be a site the company can access; `visitorId` identifies the visitor\
+        \ record.\n\n            **Related:** Sites — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\
+        \ Visitors — [GET /v1/companies/{companyId}/visitor](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor),\
+        \ [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor).\n\
+        \            "
       operationId: createVisitEntry
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
@@ -313,11 +489,37 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitDto"
+              $ref: "#/components/schemas/CreateVisitRequest"
         required: true
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Visit entry created; response body contains the new visit register
+            ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: "Bad request: validation failed, site not valid for company,\
+            \ or visitor already has an open visit (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "404":
+          description: Visitor not found
           content:
             '*/*':
               schema:
@@ -1002,23 +1204,52 @@ paths:
     get:
       tags:
       - visit-register-controller
+      summary: Get visit details
+      description: "Returns full details for a single visit, including visitor, site,\
+        \ entry/exit, and registrants."
       operationId: getVisitDetails
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: visitRegisterId
         in: path
+        description: Visit register record ID
         required: true
         schema:
           type: string
           format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved visit details
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitDetailsResponse"
+        "400":
+          description: "Bad request: invalid parameters (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitDetailsResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitDetailsResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetVisitDetailsResponse"
+        "404":
+          description: Visit not found or not visible
           content:
             '*/*':
               schema:
@@ -1026,16 +1257,21 @@ paths:
     patch:
       tags:
       - visit-register-controller
+      summary: Register a visit exit
+      description: Records exit time and notes for an open visit. Use the visit ID
+        returned from the visit list or create-entry response.
       operationId: updateVisitExit
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: visitRegisterId
         in: path
+        description: Visit register record ID
         required: true
         schema:
           type: string
@@ -1044,11 +1280,36 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateVisitExitDto"
+              $ref: "#/components/schemas/UpdateVisitExitRequest"
         required: true
       responses:
         "200":
-          description: OK
+          description: Exit recorded; response body contains the visit register ID
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: "Bad request: validation failed, exit before entry, visit already\
+            \ exited, or exit could not be recorded (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "404":
+          description: Visit register record not found for this company
           content:
             '*/*':
               schema:
@@ -1743,27 +2004,57 @@ paths:
     get:
       tags:
       - visitor-controller
+      summary: Get presigned upload URL for visitor documents
+      description: "Returns a presigned POST URL and form fields for uploading a file\
+        \ to object storage. After upload, pass the resulting object key(s) in `files`\
+        \ on create or update visitor."
       operationId: getTemporaryUploadURL
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: contentType
         in: query
+        description: MIME type of the file to upload
         required: true
         schema:
           type: string
       - name: fileName
         in: query
+        description: Original file name
         required: true
         schema:
           type: string
       responses:
         "200":
-          description: OK
+          description: JSON with `url` and `fields` for the browser or client to POST
+            the file
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "400":
+          description: "Bad request: missing or invalid content type or file name\
+            \ (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
+        "403":
+          description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
@@ -1773,21 +2064,26 @@ paths:
     get:
       tags:
       - visitor-controller
+      summary: List distinct visitor vehicle plates
+      description: "Plate values match the `plateNumbers` filter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register)."
       operationId: getVisitorsPlateNumbers
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: q
         in: query
+        description: Search filter (partial match)
         required: false
         schema:
           type: string
       - name: selected
         in: query
+        description: Pre-selected plates to pin in results
         required: false
         schema:
           type: array
@@ -1820,7 +2116,25 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved plate numbers
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+        "400":
+          description: "Bad request: invalid query or pagination parameters (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+        "403":
+          description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
@@ -1829,21 +2143,26 @@ paths:
     get:
       tags:
       - visitor-controller
+      summary: List distinct visitor company tax IDs
+      description: "Tax IDs returned here match the `companies` filter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register)."
       operationId: getVisitorsCompanies
       parameters:
       - name: companyId
         in: path
+        description: Company ID (client)
         required: true
         schema:
           type: string
           format: uuid
       - name: q
         in: query
+        description: Search filter (partial match)
         required: false
         schema:
           type: string
       - name: selected
         in: query
+        description: Pre-selected tax IDs to pin in results
         required: false
         schema:
           type: array
@@ -1876,7 +2195,25 @@ paths:
             type: string
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved company tax IDs
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctCompaniesResponse"
+        "400":
+          description: "Bad request: invalid query or pagination parameters (ProblemDetail)"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctCompaniesResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDistinctCompaniesResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
@@ -2407,35 +2744,49 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
 components:
   schemas:
-    CreateVisitorDto:
+    CreateVisitorRequest:
       type: object
+      description: "Payload to create or update a visitor. Used by [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor)\
+        \ and [PUT /v1/companies/{companyId}/visitor/{visitorId}](#tag/visitor-controller/PUT/v1/companies/{companyId}/visitor/{visitorId})."
       properties:
         visitorName:
           type: string
+          description: Visitor given name.
           minLength: 1
         visitorSurname:
           type: string
+          description: Visitor family name.
           minLength: 1
         visitorIdentityType:
           type: string
+          description: "Type of identity document (e.g. national ID, passport)."
+          example: PASSPORT
           minLength: 1
         visitorIdentity:
           type: string
+          description: Identity document number; must be unique for active visit checks.
           minLength: 1
         visitorEmail:
           type: string
           format: email
+          description: Contact email when provided.
         visitorPlateNumber:
           type: string
+          description: Vehicle registration plate when applicable; omit or empty if
+            none.
           pattern: .*\S.*
         companyName:
           type: string
+          description: Visitor company or organization name.
           minLength: 1
         companyTaxId:
           type: string
+          description: Tax or company registration ID for the visitor organization.
           minLength: 1
         files:
           type: array
+          description: "S3 object keys for uploaded visitor documents, after uploading\
+            \ via [GET /v1/companies/{companyId}/visitor/temporary-upload-url](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/temporary-upload-url)."
           items:
             type: string
       required:
@@ -2453,26 +2804,38 @@ components:
           format: uuid
       required:
       - id
-    CreateVisitDto:
+    CreateVisitRequest:
       type: object
+      description: "Body for [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\
+        \ Registers a visitor entering a site."
       properties:
         siteId:
           type: string
           format: uuid
+          description: "Site where the visit takes place. Obtain IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)."
         visitorId:
           type: string
           format: uuid
+          description: "Visitor for this visit. Use a visitor ID from [GET /v1/companies/{companyId}/visitor](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor)\
+            \ or create one with [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor)."
         visitedPerson:
           type: string
+          description: Name of the employee or host being visited (free text as recorded
+            at entry).
           minLength: 1
         entryAt:
           type: string
           format: date-time
+          description: Date and time when the visitor entered the site (ISO-8601 offset
+            datetime).
+          example: 2026-03-30T14:30:00+00:00
         entryReason:
           type: string
+          description: Reason for the visit.
           minLength: 1
         entryNotes:
           type: string
+          description: Optional notes for the entry.
         entryOrigin:
           type: string
           description: Origin of the visit entry registration. Indicates where the
@@ -2734,14 +3097,20 @@ components:
           format: uuid
         photo:
           type: string
-    UpdateVisitExitDto:
+    UpdateVisitExitRequest:
       type: object
+      description: "Body for [PATCH /v1/companies/{companyId}/visit-register/{visitRegisterId}](#tag/visit-register-controller/PATCH/v1/companies/{companyId}/visit-register/{visitRegisterId}).\
+        \ Records visitor exit."
       properties:
         exitAt:
           type: string
           format: date-time
+          description: Date and time when the visitor left the site (ISO-8601 offset
+            datetime).
+          example: 2026-03-30T16:00:00+00:00
         exitNotes:
           type: string
+          description: Optional notes for the exit.
         exitOrigin:
           type: string
           description: Origin of the visit exit registration. Indicates where the
@@ -3501,36 +3870,49 @@ components:
       - page
     CompanyResponse:
       type: object
+      description: Visitor organization name and tax id on a visit row.
       properties:
         name:
           type: string
+          description: Company name.
         taxId:
           type: string
+          description: Company tax or registration id.
       required:
       - name
       - taxId
     GetCompanyVisitsResponse:
       type: object
+      description: One visit register record in the company visit list.
       properties:
         id:
           type: string
           format: uuid
+          description: Visit register row id.
         visitor:
           $ref: "#/components/schemas/Visitor"
+          description: Visitor details at entry time.
         company:
           $ref: "#/components/schemas/CompanyResponse"
+          description: Visitor’s company.
         site:
           $ref: "#/components/schemas/Site"
+          description: Site where the visit occurred.
         reason:
           type: string
+          description: Reason for the visit.
         visitedPerson:
           type: string
+          description: Name of the visited employee or host.
         entry:
           $ref: "#/components/schemas/VisitMovement"
+          description: Entry movement and registrar.
         exit:
           $ref: "#/components/schemas/VisitMovement"
+          description: Exit movement when the visit has ended.
         timeOnSite:
           $ref: "#/components/schemas/TimeOnSite"
+          description: Computed duration on site when entry and exit are known.
       required:
       - company
       - entry
