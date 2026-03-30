@@ -125,7 +125,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitorRequest"
+              $ref: "#/components/schemas/CreateVisitorDto"
         required: true
       responses:
         "200":
@@ -278,7 +278,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitorRequest"
+              $ref: "#/components/schemas/CreateVisitorDto"
         required: true
       responses:
         "201":
@@ -489,7 +489,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateVisitRequest"
+              $ref: "#/components/schemas/CreateVisitDto"
         required: true
       responses:
         "201":
@@ -1280,7 +1280,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/UpdateVisitExitRequest"
+              $ref: "#/components/schemas/UpdateVisitExitDto"
         required: true
       responses:
         "200":
@@ -2744,7 +2744,7 @@ paths:
                 $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
 components:
   schemas:
-    CreateVisitorRequest:
+    CreateVisitorDto:
       type: object
       description: "Payload to create or update a visitor. Used by [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor)\
         \ and [PUT /v1/companies/{companyId}/visitor/{visitorId}](#tag/visitor-controller/PUT/v1/companies/{companyId}/visitor/{visitorId})."
@@ -2804,7 +2804,7 @@ components:
           format: uuid
       required:
       - id
-    CreateVisitRequest:
+    CreateVisitDto:
       type: object
       description: "Body for [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\
         \ Registers a visitor entering a site."
@@ -3097,7 +3097,7 @@ components:
           format: uuid
         photo:
           type: string
-    UpdateVisitExitRequest:
+    UpdateVisitExitDto:
       type: object
       description: "Body for [PATCH /v1/companies/{companyId}/visit-register/{visitRegisterId}](#tag/visit-register-controller/PATCH/v1/companies/{companyId}/visit-register/{visitRegisterId}).\
         \ Records visitor exit."
