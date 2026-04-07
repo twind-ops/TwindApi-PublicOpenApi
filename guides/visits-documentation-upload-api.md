@@ -211,8 +211,8 @@ version.
   with **PATCH**
   `/v1/companies/{companyId}/visit-register/{visitRegisterId}`, using the
   **visit register record id** from the entry response or from listing visits.
-  Exit registration does not repeat **`visitorId`** in the path; it closes the
-  open visit created at entry for that same visitor.
+  Exit registration does not require `visitorId`; the `visitRegisterId` path
+  parameter alone identifies which open visit to close.
 
 ## Next Steps
 
