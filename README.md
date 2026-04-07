@@ -1,14 +1,14 @@
-# Twind Access Control API - Public Documentation
+# Twind Public API - Documentation
 
 ![API Documentation](https://img.shields.io/badge/API-Documentation-blue?style=flat-square&logo=swagger)
 ![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-brightgreen?style=flat-square&logo=github)
 ![Scalar](https://img.shields.io/badge/Powered%20by-Scalar-purple?style=flat-square)
 
-Public documentation for the Twind Access Control API. This repository contains the OpenAPI specification and supplementary guides for developers integrating with the Twind platform.
+Public documentation for the Twind **Public API** (OpenAPI springdoc group `public-api`). This repository contains the OpenAPI specification and supplementary guides for developers integrating with the Twind platform.
 
 ## About This Project
 
-This repository serves as the public-facing documentation for the Twind Access Control API. It includes:
+This repository serves as the public-facing documentation for the Twind Public API. It includes:
 
 - **OpenAPI Specification**: Machine-readable API definition in YAML format
 - **Interactive API Reference**: Powered by Scalar for exploring endpoints
@@ -20,7 +20,7 @@ This repository serves as the public-facing documentation for the Twind Access C
 
 > **DO NOT MODIFY `openapi-access-control-api.yaml` MANUALLY**
 >
-> The OpenAPI specification is generated automatically from [TwindApi](https://github.com/twind-ops/TwindApi). Any manual changes will be overwritten on the next deployment.
+> The OpenAPI specification is generated automatically from [TwindApi](https://github.com/twind-ops/TwindApi). Any manual changes will be overwritten on the next deployment. After [TwindApi#2219](https://github.com/twind-ops/TwindApi/pull/2219) ships, CI will publish **`openapi-public-api.yaml`** here instead; this repository will not carry hand-edited YAML for that transition.
 
 ---
 
@@ -168,7 +168,7 @@ get-api-token_api-section.png
 TwindApi-PublicOpenApi/
 ├── index.html                      # Main documentation page
 ├── styles.css                      # Main page styles
-├── openapi-access-control-api.yaml # OpenAPI spec (auto-generated)
+├── openapi-access-control-api.yaml # OpenAPI spec (auto-generated; filename changes with TwindApi CI)
 ├── README.md                       # This file
 └── guides/
     ├── index.html                  # Guides listing page
