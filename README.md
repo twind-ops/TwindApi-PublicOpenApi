@@ -20,7 +20,7 @@ This repository serves as the public-facing documentation for the Twind Public A
 
 > **DO NOT MODIFY `openapi-public-api.yaml` MANUALLY**
 >
-> The OpenAPI specification is generated automatically from [TwindApi](https://github.com/twind-ops/TwindApi) and published to this repo as **`openapi-public-api.yaml`**. Any manual changes will be overwritten on the next deployment. **`index.html`** loads that file for the interactive reference.
+> The OpenAPI specification is generated automatically from [TwindApi](https://github.com/twind-ops/TwindApi). Any manual changes will be overwritten on the next deployment.
 
 ---
 
