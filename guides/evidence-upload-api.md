@@ -207,6 +207,13 @@ submitting on behalf of a subcontractor.
 
 For requirements that do not use file upload:
 
+> **Paths:** File **upload registration** above uses **`/v1/cm/companies/...`**
+> (compliance-management API). **Agreement** submission below uses
+> **`/v1/companies/...`** without the **`/cm/`** segment. The two routes are
+> published on different API surfaces; this is intentional. Use the URL that
+> matches the operation—**`/v1/cm/.../evidences/upload`** after storage upload,
+> and **`/v1/.../evidences/agreement`** for agreement-only evidence.
+
 ```http
 POST /v1/companies/{companyId}/evidences/agreement
 Content-Type: application/json
