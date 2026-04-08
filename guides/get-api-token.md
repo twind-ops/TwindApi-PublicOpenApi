@@ -38,7 +38,7 @@ X-Api-Key: your-api-key-here
 ### Example: Basic Request with cURL
 
 ```bash
-curl -X GET "https://api.twind.io/v1/endpoint" \
+curl -X GET "https://app.twind.io/api/v1/endpoint" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -49,7 +49,7 @@ To verify that your API key is correctly configured, you can make a request to t
 ### Example: Verify Authentication
 
 ```bash
-curl -X GET "https://api.twind.io/v1/users/me" \
+curl -X GET "https://app.twind.io/api/v1/users/me" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
