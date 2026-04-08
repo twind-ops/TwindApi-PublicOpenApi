@@ -86,7 +86,7 @@ supports that scenario).
 
 ```bash
 curl -X GET \
-  "https://api.twind.io/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType=application/pdf&fileName=certificate.pdf" \
+  "https://app.twind.io/api/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType=application/pdf&fileName=certificate.pdf" \
   -H "Authorization: Bearer your-token-here" \
   -H "Accept: application/json"
 ```
@@ -173,7 +173,7 @@ Optional query: **`asSubcontractorId`**
 ### Example: cURL — POST register evidence
 
 ```bash
-curl -X POST "https://api.twind.io/v1/companies/{companyId}/evidences/upload" \
+curl -X POST "https://app.twind.io/api/v1/companies/{companyId}/evidences/upload" \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -223,7 +223,7 @@ Content-Type: application/json
 
 ```bash
 curl -X POST \
-  "https://api.twind.io/v1/companies/{companyId}/evidences/agreement" \
+  "https://app.twind.io/api/v1/companies/{companyId}/evidences/agreement" \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
   -d '{"requirementInstanceId": "11111111-2222-3333-4444-555555555555"}'
@@ -284,7 +284,7 @@ subject to visibility and server validation.
 
 ```bash
 curl -X POST \
-  "https://api.twind.io/v1/companies/{companyId}/evidences/{sourceEvidenceId}/matching-requirement-instances" \
+  "https://app.twind.io/api/v1/companies/{companyId}/evidences/{sourceEvidenceId}/matching-requirement-instances" \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
   -d '{"requirementInstanceIds": ["22222222-3333-4444-5555-666666666666"]}'

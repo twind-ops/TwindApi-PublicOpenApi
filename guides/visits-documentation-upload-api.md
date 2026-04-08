@@ -68,7 +68,7 @@ GET /v1/companies/{companyId}/visitor/temporary-upload-url?contentType={mime}&fi
 
 ```bash
 curl -X GET \
-  "https://api.twind.io/v1/companies/{companyId}/visitor/temporary-upload-url?contentType=application/pdf&fileName=visitor-id.pdf" \
+  "https://app.twind.io/api/v1/companies/{companyId}/visitor/temporary-upload-url?contentType=application/pdf&fileName=visitor-id.pdf" \
   -H "Authorization: Bearer your-token-here" \
   -H "Accept: application/json"
 ```
@@ -148,7 +148,7 @@ Content-Type: application/json
 
 ```bash
 curl -X POST \
-  "https://api.twind.io/v1/companies/{companyId}/visitor" \
+  "https://app.twind.io/api/v1/companies/{companyId}/visitor" \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
   -d '{
