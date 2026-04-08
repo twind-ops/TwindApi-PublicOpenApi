@@ -24,4 +24,12 @@ const GUIDES_DATA = [
     description: "Learn how to upload visits documentation using the Twind API.",
     icon: "assets/icon-visitor.svg",
   },
+  {
+    id: "requirement-upload-api",
+    file: "requirement-upload-api.md",
+    title: "Requirement Template Upload API",
+    description:
+      "Learn how to upload a requirement template file using the Twind API.",
+    icon: "assets/icon-file-upload.svg",
+  },
 ];
