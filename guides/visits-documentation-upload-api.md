@@ -202,9 +202,17 @@ version.
 
 ## Related flows
 
-- **Visit register** (entry/exit) uses the visitor id from this guide when
-  registering a visit for a person who already has a visitor profile with
-  documentation.
+- **Visit register — entry** — When you **register a visit entry** (visitor on
+  site), call **POST** `/v1/companies/{companyId}/visit-register` with
+  **`visitorId`** set to the visitor **`id`** returned from **Step 3** in this
+  guide (create or update visitor). That links the visit to the profile whose
+  documentation you uploaded.
+- **Visit register — exit** — When the visitor leaves, **register the visit exit**
+  with **PATCH**
+  `/v1/companies/{companyId}/visit-register/{visitRegisterId}`, using the
+  **visit register record id** from the entry response or from listing visits.
+  Exit registration does not require `visitorId`; the `visitRegisterId` path
+  parameter alone identifies which open visit to close.
 
 ## Next Steps
 
