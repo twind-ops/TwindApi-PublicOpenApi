@@ -103,6 +103,7 @@ curl -X GET \
   form field** **`Content-Type`** (not only the MIME type on the file part). If
   it is missing from `fields` but the upload returns **403**, add **`Content-Type`**
   with that same value.
+- Maximum size is enforced when the URL is generated.
 
 ## Step 2: Upload the file to object storage
 
@@ -179,6 +180,8 @@ curl -X POST \
 ```
 
 The **`id`** is the **requirement** record id.
+
+Unlike **`POST .../evidences/upload`**, which returns **`201 Created`**, **`POST .../companies/{companyId}/requirements`** returns **`200 OK`** with the same `{ "id": "…" }` shape. Treat **`200`** as success for requirement creation; do not expect **`201`**.
 
 ### Update requirement
 
