@@ -67,7 +67,7 @@ with the **object keys** returned from that flow.
 
 1. Request a presigned upload URL from the API.
 2. POST the file to the storage URL (multipart form) using the returned fields.
-3. **POST** `/v1/companies/{companyId}/evidences/upload` with metadata and
+3. **POST** `/v1/cm/companies/{companyId}/evidences/upload` with metadata and
    `filePaths` set to the object key(s).
 
 ## Step 1: Request a presigned upload URL
@@ -151,7 +151,7 @@ in the next step.
 ### Request — register upload
 
 ```http
-POST /v1/companies/{companyId}/evidences/upload
+POST /v1/cm/companies/{companyId}/evidences/upload
 Content-Type: application/json
 ```
 
@@ -173,7 +173,7 @@ Optional query: **`asSubcontractorId`**
 ### Example: cURL — POST register evidence
 
 ```bash
-curl -X POST "https://app.twind.io/api/v1/companies/{companyId}/evidences/upload" \
+curl -X POST "https://app.twind.io/api/v1/cm/companies/{companyId}/evidences/upload" \
   -H "Authorization: Bearer your-token-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -206,6 +206,13 @@ submitting on behalf of a subcontractor.
 ## Submit agreement evidence (no file)
 
 For requirements that do not use file upload:
+
+> **Paths:** File **upload registration** above uses **`/v1/cm/companies/...`**
+> (compliance-management API). **Agreement** submission below uses
+> **`/v1/companies/...`** without the **`/cm/`** segment. The two routes are
+> published on different API surfaces; this is intentional. Use the URL that
+> matches the operation—**`/v1/cm/.../evidences/upload`** after storage upload,
+> and **`/v1/.../evidences/agreement`** for agreement-only evidence.
 
 ```http
 POST /v1/companies/{companyId}/evidences/agreement
