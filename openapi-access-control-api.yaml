@@ -3271,6 +3271,9 @@ components:
           maxConnections:
             type: integer
             format: int32
+    CompaniesContractsApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ContractorPlanConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -3407,6 +3410,7 @@ components:
           - $ref: "#/components/schemas/AccessControlApiConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
+          - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
