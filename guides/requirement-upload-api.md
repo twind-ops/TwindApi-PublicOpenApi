@@ -107,8 +107,12 @@ curl -X GET \
 
 ## Step 2: Upload the file to object storage
 
-Send **POST** `multipart/form-data` to **`url`**, including all **`fields`**
-plus the file (same pattern as other presigned POST flows in Twind).
+Send **POST** `multipart/form-data` to **`url`**:
+
+1. Add all entries from **`fields`** as form fields (names and values as
+   returned).
+2. Add the file (often as the **`file`** field; follow your S3 client and the
+   presigned policy).
 
 ### Example: cURL — POST file to storage
 
@@ -195,6 +199,41 @@ Content-Type: application/json
 Include **`templateFile`** with the new object key, plus every field required by
 `UpdateRequirementDto` for your API version (typically the same logical shape as
 create).
+
+### Example: cURL — PUT update requirement (abbreviated body)
+
+```bash
+curl -X PUT \
+  "https://app.twind.io/api/v1/companies/{companyId}/requirements/{requirementId}" \
+  -H "Authorization: Bearer your-token-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Example requirement",
+    "subject": "EMPLOYEE",
+    "multipleInstanceRequest": "NONE",
+    "appliedTo": "ALL_CONTRACTORS",
+    "evidenceType": "UPLOAD",
+    "templateFile": "requirements/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/2025-06-15/updated-requirement-template.pdf",
+    "critical": false,
+    "enableDoesNotApply": false,
+    "expirationType": "NONE",
+    "canBeSetInFuture": false,
+    "acceptanceCriteria": ["Valid on issue date"],
+    "custody": { "enabled": false },
+    "rules": []
+  }'
+```
+
+**Response** (`200 OK`)
+
+```json
+{
+  "id": "ffffffff-ffff-ffff-ffff-ffffffffffff"
+}
+```
+
+The **`id`** is the **requirement** record id (same `{ "id": "…" }` shape as
+**create**).
 
 ## Validation and errors (overview)
 
