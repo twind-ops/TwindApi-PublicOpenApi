@@ -3419,6 +3419,7 @@ components:
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
+          - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -3488,6 +3489,9 @@ components:
       required:
       - requirementId
     RequirementsApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ResourcesApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     ReviewConfig:
