@@ -19,8 +19,11 @@ tags:
 - name: Shared
   description: "Current user, companies for the API key, and related companies (my-companies)."
 - name: Requirements
-  description: "Requirement configuration and instance reads (GET): list, detail,\
-    \ stats, client views, and requirement-instance queries."
+  description: "Requirement configuration: list and detail (client and contractor),\
+    \ create and update (rules, evidence type, template, acceptance criteria), presigned\
+    \ template upload URL, stats, name search from clients, requirement-instance reads,\
+    \ and evidence submission and review (upload URL, agreement and file submit, detail,\
+    \ approve, reject, single-submission matching)."
 - name: Access control
   description: "Employees, vehicles, equipment, assigned resources, access register,\
     \ access control, access cards, visitors, visit register, and temporary authorization."
@@ -200,6 +203,41 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+    put:
+      tags:
+      - Requirements
+      summary: Update requirement
+      description: "Replaces requirement configuration for the client company, including\
+        \ rules, custody, expiration, and acceptance criteria."
+      operationId: updateRequirement
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requirementId
+        in: path
+        description: Requirement id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateRequirementDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
   /v1/companies/{companyId}/requirements/{requirementId}/enable:
     put:
       tags:
@@ -249,6 +287,72 @@ paths:
         schema:
           type: string
           format: uuid
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /v1/companies/{companyId}/evidences/{evidenceId}/reject:
+    put:
+      tags:
+      - Requirements
+      summary: Reject evidence
+      description: Rejects a submitted evidence with optional reason and rejected
+        acceptance criteria.
+      operationId: rejectSubmission
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Evidence id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RejectSubmissionDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /v1/companies/{companyId}/evidences/{evidenceId}/approve:
+    put:
+      tags:
+      - Requirements
+      summary: Approve evidence
+      description: Approves a submitted evidence. Requires evidence review or approve
+        permission.
+      operationId: approveSubmission
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Evidence id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApproveSubmissionDto"
+        required: true
       responses:
         "200":
           description: OK
@@ -891,6 +995,96 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+    post:
+      tags:
+      - Requirements
+      summary: Create requirement
+      description: "Creates a requirement for the client company. Includes rules,\
+        \ custody, expiration, evidence type, and acceptance criteria."
+      operationId: createRequirement
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRequirementDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+  /v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances:
+    post:
+      tags:
+      - Requirements
+      summary: Link single-submission evidence to matching requirement instances
+      description: Applies the source evidence to additional requirement instances
+        allowed by single-submission rules and visibility.
+      operationId: postMatchingRequirementInstances
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Source evidence id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostMatchingRequirementInstancesDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /v1/companies/{companyId}/evidences/agreement:
+    post:
+      tags:
+      - Requirements
+      summary: Submit agreement evidence
+      description: Creates evidence for an agreement-type requirement instance (no
+        file upload).
+      operationId: createAgreementEvidence
+      parameters:
+      - name: companyId
+        in: path
+        description: Contractor or client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAgreementEvidenceDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
   /v1/companies/{companyId}/equipment:
     get:
       tags:
@@ -1531,6 +1725,68 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/evidences/{evidenceId}:
+    get:
+      tags:
+      - Requirements
+      summary: Get evidence details
+      description: Returns evidence details for the company (requirement read evidences
+        permission).
+      operationId: getEvidence
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Evidence id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/GetEvidenceDetails"
+    patch:
+      tags:
+      - Requirements
+      summary: Update evidence
+      description: Updates evidence fields such as express validation (evidence submit
+        permission).
+      operationId: updateEvidence
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Evidence id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEvidenceDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content: {}
   /v1/companies/{companyId}/access-register/{accessRegisterId}:
     patch:
       tags:
@@ -2599,6 +2855,46 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/requirements/temporary-upload-url:
+    get:
+      tags:
+      - Requirements
+      summary: Get presigned URL for requirement template upload
+      description: "Returns a presigned POST **URL** and **fields** for uploading\
+        \ a requirement template file to object storage.\n\n            Exposed as:\n\
+        \            - `GET /v1/companies/{companyId}/requirements/temporary-upload-url`\n\
+        \n            The file is stored under a dated prefix for the company before\
+        \ the requirement record references the resulting key.\n            "
+      operationId: getTemporaryUploadURL_1
+      parameters:
+      - name: companyId
+        in: path
+        description: Company that owns the requirement configuration (client company
+          in both route variants).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contentType
+        in: query
+        description: MIME type of the file to upload
+        required: true
+        schema:
+          type: string
+      - name: fileName
+        in: query
+        description: Original file name
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /v1/companies/{companyId}/requirements/from-clients/names:
     get:
       tags:
@@ -3342,6 +3638,60 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseRequirementInstanceAsClient"
+  /v1/companies/{companyId}/evidences/{evidenceId}/temporary-upload-url:
+    get:
+      tags:
+      - Requirements
+      summary: Get presigned URL for evidence file upload
+      description: "\n            Returns a presigned POST URL and form fields for\
+        \ uploading files to object storage for a requirement instance (evidence id\
+        \ in the path identifies that instance).\n\n            When **asSubcontractorId**\
+        \ is set, the caller must be allowed to submit for that subcontractor chain;\
+        \ otherwise the request is denied.\n            "
+      operationId: getTemporaryUploadURL_2
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id (acting company)
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: evidenceId
+        in: path
+        description: Requirement instance id (evidence context)
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contentType
+        in: query
+        description: MIME type of the file to upload
+        required: true
+        schema:
+          type: string
+      - name: fileName
+        in: query
+        description: Original file name
+        required: true
+        schema:
+          type: string
+      - name: asSubcontractorId
+        in: query
+        description: "When set, upload is for this subcontractor company; chain access\
+          \ is validated."
+        required: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                additionalProperties: {}
   /v1/companies/{companyId}/contractors/{contractorId}/access-control/{type}/{resourceId}:
     get:
       tags:
@@ -3917,6 +4267,45 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/cm/companies/{companyId}/evidences/upload:
+    post:
+      tags:
+      - Requirements
+      summary: Submit file evidence
+      description: "\n            Registers file evidence after uploads completed\
+        \ using the presigned URL from temporary-upload-url.\n\n            When **asSubcontractorId**\
+        \ is set, evidence is stored for that subcontractor; the caller must have\
+        \ subcontractor submit permission and chain access.\n            "
+      operationId: createUploadEvidence
+      parameters:
+      - name: companyId
+        in: path
+        description: Acting company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: asSubcontractorId
+        in: query
+        description: "When set, submit on behalf of this subcontractor company; chain\
+          \ access is validated."
+        required: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUploadEvidenceDto"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
 components:
   schemas:
     CreateVisitorDto:
@@ -4192,6 +4581,50 @@ components:
           format: uuid
       required:
       - id
+    RejectSubmissionDto:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Optional rejection reason.
+        rejectedAcceptanceCriteria:
+          type: array
+          description: "Acceptance criteria keys or labels that failed review, when\
+            \ applicable."
+          items:
+            type: string
+        issueDate:
+          type: string
+          format: date
+          description: Document date of issue used for the rejection.
+          example: 2025-03-25
+      required:
+      - issueDate
+    ApproveSubmissionDto:
+      type: object
+      properties:
+        reason:
+          type: string
+          description: Optional approval note.
+        dependantRequirementInstanceIds:
+          type: array
+          description: Other requirement instances that should be satisfied together
+            with this approval.
+          items:
+            type: string
+            format: uuid
+        issueDate:
+          type: string
+          format: date
+          description: Document date of issue for the approved evidence.
+          example: 2025-03-25
+        expirationDate:
+          type: string
+          format: date
+          description: Computed or overridden expiration date for the evidence.
+          example: 2026-03-25
+      required:
+      - issueDate
     CreateVisitDto:
       type: object
       description: "Body for [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\
@@ -4430,6 +4863,76 @@ components:
       - name
       - rules
       - subject
+    PostMatchingRequirementInstancesDto:
+      type: object
+      properties:
+        requirementInstanceIds:
+          type: array
+          description: Requirement instance ids that should receive the same single-submission
+            evidence.
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+      required:
+      - requirementInstanceIds
+    CreateUploadEvidenceDto:
+      type: object
+      properties:
+        requirementInstanceId:
+          type: string
+          format: uuid
+          description: Requirement instance id for an upload-type requirement.
+        issueDate:
+          type: string
+          format: date
+          description: Document date of issue.
+          example: 2025-03-25
+          minLength: 1
+        expirationDate:
+          type: string
+          format: date
+          description: Document expiration date when applicable.
+          example: 2026-03-25
+        filePaths:
+          type: array
+          description: Object storage keys for uploaded files (same keys returned
+            from the presigned upload flow).
+          items:
+            type: string
+          minItems: 1
+        requirementDoesNotApply:
+          type: boolean
+          description: "When true, marks the requirement as not applicable; comments\
+            \ are required in that case."
+        comments:
+          type: string
+          description: Optional note from the submitter.
+        expressValidation:
+          type: boolean
+          description: Request express validation when the client has document management
+            enabled.
+        createdAt:
+          type: string
+          format: date-time
+          description: Evidence creation time; defaults to server time when omitted.
+      required:
+      - filePaths
+      - issueDate
+      - requirementInstanceId
+    CreateAgreementEvidenceDto:
+      type: object
+      properties:
+        requirementInstanceId:
+          type: string
+          format: uuid
+          description: Requirement instance id for an agreement-type requirement.
+        createdAt:
+          type: string
+          format: date-time
+          description: Submission timestamp; defaults to server time when omitted.
+      required:
+      - requirementInstanceId
     CreateEquipmentDto:
       type: object
       properties:
@@ -4612,6 +5115,13 @@ components:
           example: WEB
       required:
       - exitAt
+    UpdateEvidenceDto:
+      type: object
+      properties:
+        expressValidation:
+          type: boolean
+          description: "When set, toggles express validation for the evidence while\
+            \ still editable."
     UpdateNotesDto:
       type: object
       properties:
@@ -7120,6 +7630,54 @@ components:
       - mainRequirement
       - requirement
       - sites
+    GetEvidenceDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        createdById:
+          type: string
+        status:
+          type: string
+        reason:
+          type: string
+        files:
+          type: array
+          items:
+            type: string
+        dateOfIssue:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        doesNotApply:
+          type: boolean
+        comment:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        revisedAt:
+          type: string
+          format: date-time
+        deletedAt:
+          type: string
+          format: date-time
+        expiredAt:
+          type: string
+          format: date-time
+        rejectedAcceptanceCriteria:
+          type: array
+          items:
+            type: string
+      required:
+      - createdAt
+      - createdById
+      - files
+      - id
+      - status
     EquipmentResponseDto:
       type: object
       properties:
