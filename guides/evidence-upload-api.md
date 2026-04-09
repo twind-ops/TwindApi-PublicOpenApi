@@ -1,8 +1,9 @@
-# Evidence Upload API Guide
+# Document Upload API Guide
 
-This guide explains how to submit **evidence** through the Twind HTTP API: file
-uploads (presigned object storage), agreement-only submissions, and optional
-**single submission** (reuse one evidence across several requirement instances).
+This guide explains how to submit **documents** through the Twind
+HTTP API: file uploads (presigned object storage), agreement-only submissions, and
+optional **single submission** (reuse one document across several requirement
+instances).
 
 ## Prerequisites
 
@@ -23,7 +24,7 @@ for a flow you expect to use.
 
 > **Note:** Path parameters named `evidenceId` are **not** always the same kind
 > of id. On the presigned-upload URL, that segment is the **requirement instance
-> id** (legacy naming). After you submit evidence, other routes use the
+> id** (legacy naming). After you submit documents, other routes use the
 > **evidence record id** returned in the response body. See
 > [Understanding IDs](#understanding-ids) below.
 
@@ -55,12 +56,12 @@ X-Api-Key: your-api-key-here
 - **`{evidenceId}`** on `GET .../evidences/{...}` (read details) — **Evidence
   record id** — returned after upload or agreement submission.
 - **`{evidenceId}`** on `POST .../evidences/{...}/matching-requirement-instances`
-  — **Evidence record id** — the source evidence you want to propagate.
+  — **Evidence record id** — the source document you want to propagate.
 
-## Upload file evidence (three steps)
+## Upload document (three steps)
 
 The API does **not** accept raw file bytes on `POST .../upload`. You upload the
-file to **object storage** using a presigned URL, then register the evidence
+file to **object storage** using a presigned URL, then register the document
 with the **object keys** returned from that flow.
 
 ### At a glance
@@ -146,7 +147,7 @@ After a successful upload, the object must exist at the **`key`** in
 **`fields.key`**. Use that string (or the full key returned) in **`filePaths`**
 in the next step.
 
-## Step 3: Register the evidence
+## Step 3: Register the document
 
 ### Request — register upload
 
@@ -170,7 +171,7 @@ Optional query: **`asSubcontractorId`**
 | `expressValidation` | No | Default false; doc management required when true. |
 | `createdAt` | No | Defaults to server time. |
 
-### Example: cURL — POST register evidence
+### Example: cURL — POST register file
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/cm/companies/{companyId}/evidences/upload" \
@@ -203,7 +204,7 @@ requirement.
 **Subcontractor:** add `?asSubcontractorId={uuid}` to the GET and POST URLs when
 submitting on behalf of a subcontractor.
 
-## Submit agreement evidence (no file)
+## Submit agreement (no file)
 
 For requirements that do not use file upload:
 
@@ -335,7 +336,7 @@ and `contracts` (with `sites`):
 
 ## Other features
 
-Review workflows (approve, reject, update evidence) use separate endpoints on
+Review workflows (approve, reject, update document) use separate endpoints on
 the same API surface after submission.
 
 ## Next Steps

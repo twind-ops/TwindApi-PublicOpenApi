@@ -11,18 +11,18 @@ const GUIDES_DATA = [
     icon: "assets/icon-key.svg",
   },
   {
-    id: "evidence-upload-api",
-    file: "evidence-upload-api.md",
-    title: "Evidence Upload API",
-    description: "Learn how to upload evidence using the Twind API.",
-    icon: "assets/icon-file-upload.svg",
-  },
-  {
     id: "visits-documentation-upload-api",
     file: "visits-documentation-upload-api.md",
     title: "Visits Documentation Upload API",
     description: "Learn how to upload visits documentation using the Twind API.",
     icon: "assets/icon-visitor.svg",
+  },
+  {
+    id: "evidence-upload-api",
+    file: "evidence-upload-api.md",
+    title: "Document Upload API",
+    description: "Learn how to upload documents as evidence using the Twind API.",
+    icon: "assets/icon-file-upload.svg",
   },
   {
     id: "requirement-upload-api",
