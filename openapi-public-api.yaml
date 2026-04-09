@@ -8540,5 +8540,6 @@ components:
         inEu:
           type: boolean
       required:
+      - code
       - id
       - name
