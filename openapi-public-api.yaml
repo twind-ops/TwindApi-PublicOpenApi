@@ -4272,11 +4272,8 @@ paths:
       tags:
       - Requirements
       summary: Submit file evidence
-      description: "\n            Registers file evidence after uploads completed\
-        \ using the presigned URL from temporary-upload-url.\n\n            When **asSubcontractorId**\
-        \ is set, evidence is stored for that subcontractor; the caller must have\
-        \ subcontractor submit permission and chain access.\n            "
-      operationId: createUploadEvidence
+      description: Registers file evidence after uploads completed using the presigned
+        URL from temporary-upload-url.
       parameters:
       - name: companyId
         in: path
@@ -4297,7 +4294,58 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/CreateUploadEvidenceDto"
+              type: object
+              properties:
+                filePaths:
+                  type: array
+                  description: Object storage keys for uploaded files (same keys returned
+                    from the presigned upload flow).
+                  items:
+                    type: string
+                  minItems: 1
+                issueDate:
+                  type: string
+                  format: date
+                  description: Document date of issue.
+                  minLength: 1
+                requirementInstanceId:
+                  type: string
+                  format: uuid
+                  description: Requirement instance id for an upload-type requirement.
+                comments:
+                  type: string
+                  description: Optional note from the submitter.
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Evidence creation time; defaults to server time when
+                    omitted.
+                expirationDate:
+                  type: string
+                  format: date
+                  description: Document expiration date when applicable.
+                expressValidation:
+                  type: boolean
+                  description: Request express validation when the client has document
+                    management enabled.
+                requirementDoesNotApply:
+                  type: boolean
+                  description: "When true, marks the requirement as not applicable;\
+                    \ comments are required in that case."
+              required:
+              - filePaths
+              - issueDate
+              - requirementInstanceId
+            example:
+              filePaths:
+              - evidences/company-1/bucket-key-1
+              issueDate: 2025-06-15
+              requirementInstanceId: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+              comments: Optional note from the submitter.
+              createdAt: 2025-06-15T12:30:00Z
+              expirationDate: 2028-06-15
+              expressValidation: true
+              requirementDoesNotApply: false
         required: true
       responses:
         "200":
@@ -4305,7 +4353,83 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/IdValue"
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                required:
+                - id
+                title: IdValue
+              example:
+                id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      servers:
+      - url: https://local.twinddev.com:2000/api
+        description: Contractor monetization API
+  /v1/cm/companies/{companyId}/evidences/express:
+    put:
+      tags:
+      - Requirements
+      summary: Update file evidence
+      description: Updates file evidence
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: access_token
+        in: cookie
+        required: false
+        schema:
+          type: string
+      - name: X-Api-Key
+        in: header
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contractorEvidenceSubmittedIds:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+            example:
+              contractorEvidenceSubmittedIds:
+              - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+                properties:
+                  successfulEvidenceIds:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+                  failedEvidenceIds:
+                    type: array
+                    items:
+                      type: string
+                      format: uuid
+              example:
+                successfulEvidenceIds:
+                - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                failedEvidenceIds:
+                - 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      servers:
+      - url: https://local.twinddev.com:2000/api
+        description: Contractor monetization API
 components:
   schemas:
     CreateVisitorDto:
