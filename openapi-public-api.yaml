@@ -17,16 +17,54 @@ servers:
   description: Production server
 tags:
 - name: Shared
-  description: "Current user, companies for the API key, and related companies (my-companies)."
-- name: Requirements
-  description: "Requirement configuration: list and detail (client and contractor),\
-    \ create and update (rules, evidence type, template, acceptance criteria), presigned\
-    \ template upload URL, stats, name search from clients, requirement-instance reads,\
-    \ and evidence submission and review (upload URL, agreement and file submit, detail,\
-    \ approve, reject, single-submission matching)."
+  description: |-
+    Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.
+
+    - **Me**: Current user and permissions for the API key
+    - **User companies**: Companies visible to the authenticated user
+    - **My companies**: Related companies (contractors/clients) for a company
+    - **Countries**: List countries
+    - **Sites**: List sites for a company
+    - **Assigned resources**: Resources assigned to contracts (client view)
+    - **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)
+    - **Clients**: Client companies for a contractor
+    - **Users**: List users for a company
 - name: Access control
-  description: "Employees, vehicles, equipment, assigned resources, access register,\
-    \ access control, access cards, visitors, visit register, and temporary authorization."
+  description: |-
+    Track people and assets on site: register access and visits, query authorization status, and issue access cards.
+
+    - **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies
+    - **Visit register**: List and create visits; read and update a visit record
+    - **Vehicles**: List vehicles for a company
+    - **Equipment**: List equipment for a company
+    - **Employees**: List employees for a company
+    - **Access register**: List and create access entries; record exit; read entry by id
+    - **Access control (status)**: Read access control row by id; list as contractor or as client
+    - **Access card**: Download access card file (PDF or PNG) for a resource
+    - **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers
+    - **Requirement enable/disable**: Enable or disable a requirement for a company
+    - **All contractors**: List all contractors for a company
+- name: Requirements
+  description: |-
+    Configure contract requirements, inspect requirement instances, and submit or review evidence against them.
+
+    - **Requirement (detail)**: Get and update a requirement configuration
+    - **Requirements (list)**: List and create requirements
+    - **Requirement template upload**: Presigned URL to upload a requirement template file
+    - **Requirement stats**: Statistics for a requirement
+    - **Requirement names**: Search requirement names from clients
+    - **Requirements with clients**: List requirements with client-side filters
+    - **Requirement instance**: Get a requirement instance
+    - **Requirement instance logs**: List change logs for an instance
+    - **Eligible resources**: List resources eligible for an instance
+    - **Requirement instances (contractor)**: List instances and contractor requirement index
+    - **Requirement instances (client)**: List instances for the client company
+    - **Evidence file upload URL**: Presigned URL for evidence file upload
+    - **Evidence agreement**: Submit agreement-type evidence
+    - **Evidence (read/update)**: Get or update an evidence record
+    - **Evidence approve**: Approve evidence
+    - **Evidence reject**: Reject evidence
+    - **Evidence matching**: Match submitted evidence to requirement instances
 paths:
   /v1/companies/{companyId}/visitor/{visitorId}:
     get:
@@ -155,11 +193,10 @@ paths:
       tags:
       - Requirements
       summary: Get requirement configuration by ID
-      description: "\n            Returns the full configuration of a requirement\
-        \ for the client company, including evidence type, rules/conditions, acceptance\
-        \ criteria, template file, expiration settings, custody, and periodic configuration.\n\
-        \n            Results are filtered based on the user's site visibility.\n\
-        \            "
+      description: "Returns the full configuration of a requirement for the client\
+        \ company, including evidence type, rules/conditions, acceptance criteria,\
+        \ template file, expiration settings, custody, and periodic configuration.\
+        \ Results are filtered based on the user's site visibility."
       operationId: findById
       parameters:
       - name: companyId
@@ -362,11 +399,10 @@ paths:
       tags:
       - Access control
       summary: List distinct visitors
-      description: "\n            Paginated list of visitors for filtering and selection\
-        \ (e.g. visit register filters). Identity numbers returned here match the\
-        \ `visitors` query parameter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register).\n\
-        \n            **Related:** Sites for visits — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\n\
-        \            "
+      description: "Paginated list of visitors for filtering and selection (e.g. visit\
+        \ register filters). Identity numbers returned here match the `visitors` query\
+        \ parameter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register).\
+        \ **Related:** Sites for visits — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)."
       operationId: getVisitors
       parameters:
       - name: companyId
@@ -446,10 +482,10 @@ paths:
       tags:
       - Access control
       summary: Create a visitor
-      description: "\n            Creates a visitor record for the client company.\
-        \ Use the returned ID as `visitorId` when calling [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\n\
-        \n            Upload files first via [GET /v1/companies/{companyId}/visitor/temporary-upload-url](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/temporary-upload-url),\
-        \ then pass the stored object keys in `files`.\n            "
+      description: "Creates a visitor record for the client company. Use the returned\
+        \ ID as `visitorId` when calling [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\
+        \ Upload files first via [GET /v1/companies/{companyId}/visitor/temporary-upload-url](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/temporary-upload-url),\
+        \ then pass the stored object keys in `files`."
       operationId: createVisitor
       parameters:
       - name: companyId
@@ -503,18 +539,14 @@ paths:
       tags:
       - Access control
       summary: Get all company visits
-      description: "\n            Retrieves paginated visit records for a company.\n\
-        \            The 'sites' filter parameter accepts site IDs which can be obtained\
-        \ from\n            [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)\n\
-        \n            **Allowed sort fields:**\n            - `visitor_name` - Visitor\
-        \ name\n            - `company_name` - Company name\n            - `resource_name`\
-        \ - Visited person name\n            - `site_name` - Site name\n         \
-        \   - `entry_at` - Entry timestamp\n            - `exit_at` - Exit timestamp\
-        \ (default, missing on top)\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=exit_at,desc`)\n\n            **Search:** Use `q` to filter\
-        \ by visitor name, identity number (national ID, passport, SSN, etc.), or\
-        \ vehicle registration plate (case insensitive, partial match).\n        \
-        \    "
+      description: "Retrieves paginated visit records for a company. The 'sites' filter\
+        \ parameter accepts site IDs which can be obtained from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\
+        \ **Allowed sort fields:** `visitor_name` (visitor name); `company_name` (company\
+        \ name); `resource_name` (visited person name); `site_name` (site name); `entry_at`\
+        \ (entry timestamp); `exit_at` (exit timestamp, default, missing on top).\
+        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=exit_at,desc`). **Search:**\
+        \ Use `q` to filter by visitor name, identity number (national ID, passport,\
+        \ SSN, etc.), or vehicle registration plate (case insensitive, partial match)."
       operationId: getAllCompanyVisits
       parameters:
       - name: companyId
@@ -655,12 +687,11 @@ paths:
       tags:
       - Access control
       summary: Register a visit entry
-      description: "\n            Creates a visit entry (visitor on site). `siteId`\
-        \ must be a site the company can access; `visitorId` identifies the visitor\
-        \ record.\n\n            **Related:** Sites — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\
+      description: "Creates a visit entry (visitor on site). `siteId` must be a site\
+        \ the company can access; `visitorId` identifies the visitor record. **Related:**\
+        \ Sites — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites).\
         \ Visitors — [GET /v1/companies/{companyId}/visitor](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor),\
-        \ [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor).\n\
-        \            "
+        \ [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor)."
       operationId: createVisitEntry
       parameters:
       - name: companyId
@@ -713,10 +744,14 @@ paths:
     get:
       tags:
       - Access control
+      summary: List vehicles
+      description: "Returns a paginated list of vehicles for the company. Supports\
+        \ optional text search (q), subcontractor scope, and contractor filters."
       operationId: findAll
       parameters:
       - name: q
         in: query
+        description: Search query (partial match on vehicle fields)
         required: false
         schema:
           type: string
@@ -749,12 +784,15 @@ paths:
             type: string
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: companyScope
         in: query
+        description: "Subcontractor scope: which contractors' vehicles to include\
+          \ (requires permission when not MY_COMPANY)"
         required: false
         schema:
           type: string
@@ -764,6 +802,7 @@ paths:
           - MY_SUBCONTRACTORS
       - name: contractorIds
         in: query
+        description: Filter to vehicles belonging to these contractor company IDs
         required: false
         schema:
           type: array
@@ -772,6 +811,7 @@ paths:
             format: uuid
       - name: selected
         in: query
+        description: Optional vehicle resource IDs
         required: false
         schema:
           type: array
@@ -780,15 +820,117 @@ paths:
             format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved list
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelVehicleResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/users:
+    get:
+      tags:
+      - Shared
+      summary: List company users
+      description: "Returns a paginated list of users for the company. Supports optional\
+        \ search (q), role filters, and selected user IDs."
+      operationId: findUsers
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Search text (partial match)
+        required: false
+        schema:
+          type: string
+      - name: role
+        in: query
+        description: Filter by a single role ID
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: roles
+        in: query
+        description: Filter by role IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: selected
+        in: query
+        description: Optional subset of user IDs to include
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseUserData"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/sites:
     get:
       tags:
-      - Access control
+      - Shared
       summary: List sites
       description: Retrieves paginated list of sites for a company. Use this endpoint
         to obtain site IDs for filtering in other endpoints.
@@ -864,12 +1006,10 @@ paths:
       tags:
       - Requirements
       summary: List requirement configurations as client
-      description: "\n            Returns paginated requirement configurations for\
-        \ the company acting as a client.\n\n            **Filters (query parameters):**\
-        \ `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`,\
-        \ `appliedTo`, `related`, `disabled`, `evidenceType`.\n\n            **Sort\
-        \ format:** Use query parameter `sort=field,direction` (e.g., `?sort=name,asc`)\n\
-        \            "
+      description: "Returns paginated requirement configurations for the company acting\
+        \ as a client. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`,\
+        \ `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`.\
+        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: findAll_2
       parameters:
       - name: companyId
@@ -1089,10 +1229,14 @@ paths:
     get:
       tags:
       - Access control
+      summary: List equipment
+      description: "Returns a paginated list of equipment for the company. Supports\
+        \ optional text search (q), subcontractor scope, and contractor filters."
       operationId: findAll_3
       parameters:
       - name: q
         in: query
+        description: Search query (partial match on equipment fields)
         required: false
         schema:
           type: string
@@ -1123,8 +1267,17 @@ paths:
           - "name,ASC"
           items:
             type: string
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
       - name: companyScope
         in: query
+        description: "Subcontractor scope: which contractors' equipment to include\
+          \ (requires permission when not MY_COMPANY)"
         required: false
         schema:
           type: string
@@ -1134,38 +1287,51 @@ paths:
           - MY_SUBCONTRACTORS
       - name: contractorIds
         in: query
+        description: Filter to equipment belonging to these contractor company IDs
         required: false
         schema:
           type: array
           items:
             type: string
             format: uuid
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved list
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelEquipmentResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/employees:
     get:
       tags:
       - Access control
+      summary: List employees
+      description: "Returns a paginated list of employees for the company. Supports\
+        \ optional text search (q), client filter, subcontractor scope, and contractor\
+        \ filters."
       operationId: findAll_4
       parameters:
       - name: q
         in: query
+        description: Search query (partial match on employee fields)
         required: false
         schema:
           type: string
       - name: clientId
         in: query
+        description: "When set, restricts results to resources for this client company"
         required: false
         schema:
           type: string
@@ -1199,12 +1365,15 @@ paths:
             type: string
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: companyScope
         in: query
+        description: "Subcontractor scope: which contractors' employees to include\
+          \ (requires permission when not MY_COMPANY)"
         required: false
         schema:
           type: string
@@ -1214,6 +1383,7 @@ paths:
           - MY_SUBCONTRACTORS
       - name: contractorIds
         in: query
+        description: Filter to employees belonging to these contractor company IDs
         required: false
         schema:
           type: array
@@ -1222,6 +1392,7 @@ paths:
             format: uuid
       - name: selected
         in: query
+        description: Optional employee resource IDs
         required: false
         schema:
           type: array
@@ -1230,27 +1401,37 @@ paths:
             format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved list
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelEmployeeResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-register:
     get:
       tags:
       - Access control
-      summary: Get access register records
-      description: "\n            Retrieves paginated access register records for\
-        \ a company.\n\n            **Allowed sort fields:**\n            - `client_name`\
-        \ - Client company name\n            - `contractor_name` - Contractor company\
-        \ name\n            - `resource_name` - Resource name\n            - `site_name`\
-        \ - Site name\n            - `entry_at` - Entry timestamp (default)\n    \
-        \        - `exit_at` - Exit timestamp\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=entry_at,desc`)\n        "
+      summary: List access register records
+      description: "Returns paginated access register records for the company. Supports\
+        \ filters (site, resource, contractor, type, date range, entry-only, latest\
+        \ entrance), text search (q), and pageable sort; default sort is entry_at\
+        \ descending. Allowed sort fields are documented on the pageable parameter."
       operationId: getAccessRegisterRecords
       parameters:
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
@@ -1280,29 +1461,34 @@ paths:
           format: uuid
       - name: resourceType
         in: query
+        description: "Filter by resource discriminator (e.g. EMPLOYEE, VEHICLE, EQUIPMENT)"
         required: false
         schema:
           type: string
       - name: from
         in: query
+        description: Filter entries with entry_at on or after this instant (inclusive)
         required: false
         schema:
           type: string
           format: date-time
       - name: to
         in: query
+        description: Filter entries with entry_at on or before this instant (inclusive)
         required: false
         schema:
           type: string
           format: date-time
       - name: entryOnly
         in: query
+        description: "When true, only entries without an exit are returned"
         required: false
         schema:
           type: boolean
           default: false
       - name: latestEntrance
         in: query
+        description: "When true, only the latest entrance per resource is returned"
         required: false
         schema:
           type: boolean
@@ -1344,7 +1530,7 @@ paths:
             type: string
       responses:
         "200":
-          description: Successfully retrieved access register records
+          description: Successfully retrieved list
           content:
             '*/*':
               schema:
@@ -1352,22 +1538,26 @@ paths:
         "401":
           description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
           description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
+                $ref: "#/components/schemas/ProblemDetail"
     post:
       tags:
       - Access control
+      summary: Create access register entry
+      description: Records a site entry for a resource (Twind 2 IDs in the request
+        body).
       operationId: createAccessRegisterEntry
       parameters:
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
@@ -1380,11 +1570,30 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: Successfully created; response body contains the new entry
+            id
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-control/temporary-authorizations:
     get:
       tags:
@@ -1522,17 +1731,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
+          description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationListItem"
+                $ref: "#/components/schemas/ProblemDetail"
     post:
       tags:
       - Access control
@@ -1565,21 +1774,21 @@ paths:
           description: "Invalid request (e.g. dateTo < dateFrom, empty siteIds or\
             \ resourceIds)"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/IdValue"
+                $ref: "#/components/schemas/ProblemDetail"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/IdValue"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
+          description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/IdValue"
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/users/me:
     get:
       tags:
@@ -1791,16 +2000,21 @@ paths:
     patch:
       tags:
       - Access control
+      summary: Record exit for access register entry
+      description: Sets exit time and notes for an open access register record (Twind
+        2 IDs).
       operationId: updateAccessRegisterWithExit
       parameters:
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: accessRegisterId
         in: path
+        description: Access register entry ID
         required: true
         schema:
           type: string
@@ -1813,11 +2027,35 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: Successfully updated; response body contains the entry id
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Access register entry not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-control/temporary-authorizations/{temporaryAuthorizationId}:
     get:
       tags:
@@ -1848,23 +2086,23 @@ paths:
               schema:
                 $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
+          description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+                $ref: "#/components/schemas/ProblemDetail"
         "404":
           description: Temporary authorization not found
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/GetTemporaryAuthorizationResponse"
+                $ref: "#/components/schemas/ProblemDetail"
     delete:
       tags:
       - Access control
@@ -1891,14 +2129,23 @@ paths:
           description: Successfully deleted
           content: {}
         "401":
-          description: Unauthorized
-          content: {}
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
-          content: {}
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "404":
           description: Temporary authorization not found
-          content: {}
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
     patch:
       tags:
       - Access control
@@ -1935,16 +2182,28 @@ paths:
         "400":
           description: "Invalid request (e.g. dateTo < dateFrom, empty siteIds or\
             \ resourceIds)"
-          content: {}
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "401":
-          description: Unauthorized
-          content: {}
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
-          content: {}
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "404":
           description: Temporary authorization not found
-          content: {}
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/users/me/companies:
     get:
       tags:
@@ -1973,7 +2232,7 @@ paths:
   /v1/companies/{id}/assigned-resources:
     get:
       tags:
-      - Access control
+      - Shared
       summary: List assigned resources (as client)
       description: Retrieves paginated list of resources assigned to contracts where
         the company acts as client. Use this endpoint to obtain resource IDs for filtering
@@ -2085,7 +2344,7 @@ paths:
   /v1/companies/{id}/assigned-resources/as-contractor:
     get:
       tags:
-      - Access control
+      - Shared
       summary: List assigned resources (as contractor)
       description: Retrieves paginated list of resources assigned to contracts where
         the company acts as contractor. Use this endpoint to obtain resource IDs for
@@ -2210,13 +2469,11 @@ paths:
       tags:
       - Shared
       summary: List related companies
-      description: "\n            Retrieves paginated list of related companies (contractors\
-        \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
-        \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
-        \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
-        \         - `industry` - Industry key\n            - `email` - Company email\n\
-        \n            **Sort format:** `?sort=field,direction` (e.g., `?sort=name,asc`)\n\
-        \            "
+      description: "Retrieves paginated list of related companies (contractors or\
+        \ clients). Use this endpoint to obtain company IDs for filtering in other\
+        \ endpoints. **Allowed sort fields:** `name` (company name, default); `taxId`\
+        \ (tax ID); `industry` (industry key); `email` (company email). **Sort format:**\
+        \ `?sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: findAllContractors
       parameters:
       - name: id
@@ -2310,13 +2567,11 @@ paths:
       tags:
       - Access control
       summary: List related companies
-      description: "\n            Retrieves paginated list of related companies (contractors\
-        \ or clients).\n            Use this endpoint to obtain company IDs for filtering\
-        \ in other endpoints.\n\n            **Allowed sort fields:**\n          \
-        \  - `name` - Company name (default)\n            - `taxId` - Tax ID\n   \
-        \         - `industry` - Industry key\n            - `email` - Company email\n\
-        \n            **Sort format:** `?sort=field,direction` (e.g., `?sort=name,asc`)\n\
-        \            "
+      description: "Retrieves paginated list of related companies (contractors or\
+        \ clients). Use this endpoint to obtain company IDs for filtering in other\
+        \ endpoints. **Allowed sort fields:** `name` (company name, default); `taxId`\
+        \ (tax ID); `industry` (industry key); `email` (company email). **Sort format:**\
+        \ `?sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: findAllContractors_1
       parameters:
       - name: id
@@ -2408,7 +2663,7 @@ paths:
   /v1/companies/{contractorId}/clients:
     get:
       tags:
-      - Access control
+      - Shared
       summary: List client companies
       description: Retrieves paginated list of client companies for a contractor.
         Use this endpoint to obtain client IDs for filtering in access-control endpoints.
@@ -2723,13 +2978,11 @@ paths:
       tags:
       - Requirements
       summary: List requirement configurations as contractor
-      description: "\n            Returns paginated requirement configurations for\
-        \ the company acting as a contractor: requirements defined by client companies\
-        \ linked to this contractor.\n\n            **Filters (query parameters):**\
-        \ `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`,\
-        \ `appliedTo`, `related`, `disabled`, `evidenceType`.\n\n            **Sort\
-        \ format:** Use query parameter `sort=field,direction` (e.g., `?sort=name,asc`)\n\
-        \            "
+      description: "Returns paginated requirement configurations for the company acting\
+        \ as a contractor: requirements defined by client companies linked to this\
+        \ contractor. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`,\
+        \ `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`.\
+        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: findAllWithClients
       parameters:
       - name: companyId
@@ -2861,10 +3114,9 @@ paths:
       - Requirements
       summary: Get presigned URL for requirement template upload
       description: "Returns a presigned POST **URL** and **fields** for uploading\
-        \ a requirement template file to object storage.\n\n            Exposed as:\n\
-        \            - `GET /v1/companies/{companyId}/requirements/temporary-upload-url`\n\
-        \n            The file is stored under a dated prefix for the company before\
-        \ the requirement record references the resulting key.\n            "
+        \ a requirement template file to object storage. Exposed as `GET /v1/companies/{companyId}/requirements/temporary-upload-url`.\
+        \ The file is stored under a dated prefix for the company before the requirement\
+        \ record references the resulting key."
       operationId: getTemporaryUploadURL_1
       parameters:
       - name: companyId
@@ -3203,15 +3455,13 @@ paths:
       tags:
       - Requirements
       summary: Get requirement instances as contractor
-      description: "Returns paginated requirement instances for a contractor company.\n\
-        \n            **Allowed sort fields:**\n            - `client_name` - Client\
-        \ company name\n            - `subject_name` - Resource name (employee full\
-        \ name, vehicle, or equipment)\n            - `requirement_name` - Requirement\
-        \ name\n            - `contract_date_from` - Minimum contract start date\n\
-        \            - `evidence_expiration` - Minimum tolerance date (expiration\
-        \ + grace period)\n            - `created_at` - Instance creation date (default)\n\
-        \n            **Sort format:** Use query parameter `sort=field,direction`\
-        \ (e.g., `?sort=client_name,asc`)\n            "
+      description: "Returns paginated requirement instances for a contractor company.\
+        \ **Allowed sort fields:** `client_name` (client company name); `subject_name`\
+        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
+        \ (requirement name); `contract_date_from` (minimum contract start date);\
+        \ `evidence_expiration` (minimum tolerance date: expiration + grace period);\
+        \ `created_at` (instance creation date, default). **Sort format:** use query\
+        \ parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
       operationId: getPendingRequirementsAsContractor
       parameters:
       - name: companyId
@@ -3437,16 +3687,13 @@ paths:
       tags:
       - Requirements
       summary: Get requirement instances as client
-      description: "Returns paginated requirement instances for a client company.\n\
-        \n            **Allowed sort fields:**\n            - `contractor_name` -\
-        \ Contractor company name\n            - `subject_name` - Resource name (employee\
-        \ full name, vehicle, or equipment)\n            - `requirement_name` - Requirement\
-        \ name\n            - `evidence_expiration` - Minimum tolerance date (expiration\
-        \ + grace period)\n            - `date_of_issue` - Evidence date of issue\n\
-        \            - `evidence_upload_date` - Evidence upload date\n           \
-        \ - `created_at` - Instance creation date (default)\n\n            **Sort\
-        \ format:** Use query parameter `sort=field,direction` (e.g., `?sort=contractor_name,asc`)\n\
-        \            "
+      description: "Returns paginated requirement instances for a client company.\
+        \ **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name`\
+        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
+        \ (requirement name); `evidence_expiration` (minimum tolerance date: expiration\
+        \ + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date`\
+        \ (evidence upload date); `created_at` (instance creation date, default).\
+        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       operationId: getPendingRequirementsAsCustomer
       parameters:
       - name: companyId
@@ -3643,11 +3890,10 @@ paths:
       tags:
       - Requirements
       summary: Get presigned URL for evidence file upload
-      description: "\n            Returns a presigned POST URL and form fields for\
-        \ uploading files to object storage for a requirement instance (evidence id\
-        \ in the path identifies that instance).\n\n            When **asSubcontractorId**\
-        \ is set, the caller must be allowed to submit for that subcontractor chain;\
-        \ otherwise the request is denied.\n            "
+      description: "Returns a presigned POST URL and form fields for uploading files\
+        \ to object storage for a requirement instance (evidence id in the path identifies\
+        \ that instance). When **asSubcontractorId** is set, the caller must be allowed\
+        \ to submit for that subcontractor chain; otherwise the request is denied."
       operationId: getTemporaryUploadURL_2
       parameters:
       - name: companyId
@@ -3696,22 +3942,29 @@ paths:
     get:
       tags:
       - Access control
+      summary: Download access card
+      description: "Returns an access card for the resource as a PDF or PNG attachment\
+        \ (Content-Disposition attachment, body is the file stream). Subcontract visibility\
+        \ follows ACCESS_CONTROL_READ_SUBCONTRACTORS when the user has that permission."
       operationId: generateAccessCardPdf
       parameters:
       - name: companyId
         in: path
+        description: Client company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: contractorId
         in: path
+        description: Contractor company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: type
         in: path
+        description: "Output format: PDF or PNG (case-insensitive path segment)"
         required: true
         schema:
           type: string
@@ -3720,43 +3973,85 @@ paths:
           - PNG
       - name: resourceId
         in: path
+        description: Contractor resource ID
         required: true
         schema:
           type: string
           format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved file
           content:
             '*/*':
               schema:
                 type: string
                 format: binary
+        "400":
+          description: Invalid type or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-register/{accessRecordId}:
     get:
       tags:
       - Access control
+      summary: Get access register entry by ID
+      description: "Returns a single access register record for the company, or 404\
+        \ if not found."
       operationId: getAccessRegisterRecordById
       parameters:
       - name: companyId
         in: path
+        description: Company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: accessRecordId
         in: path
+        description: Access register entry ID
         required: true
         schema:
           type: string
           format: uuid
       responses:
         "200":
-          description: OK
+          description: Successfully retrieved
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/GetAccessRegisterResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Access register entry not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-control/{id}:
     get:
       tags:
@@ -3875,17 +4170,17 @@ paths:
               schema:
                 $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
+          description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseGetTemporaryAuthorizationNameItem"
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-control/temporary-authorizations/authorizers:
     get:
       tags:
@@ -3947,32 +4242,30 @@ paths:
               schema:
                 $ref: "#/components/schemas/PageResponseUserData"
         "401":
-          description: Unauthorized
+          description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseUserData"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: Access denied
+          description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PageResponseUserData"
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/access-control/as-contractor:
     get:
       tags:
       - Access control
       summary: Get access control status by contractor
-      description: "\n            Retrieves paginated access control statuses for\
-        \ resources when the company acts as a contractor.\n            Results are\
-        \ filtered based on the user's client company and site visibility.\n     \
-        \       Subcontractor filtering (companyScope and contractorIds).\n\n    \
-        \        **Allowed sort fields:**\n            - `client_name` - Client company\
-        \ name\n            - `contractor_name` - Contractor company name\n      \
-        \      - `resource_name` - Resource name (employee, vehicle, or equipment)\n\
-        \            - `site_name` - Site name (default)\n            - `end_of_access`\
-        \ - End of access date\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=site_name,asc`)\n            "
+      description: "Retrieves paginated access control statuses for resources when\
+        \ the company acts as a contractor. Results are filtered based on the user's\
+        \ client company and site visibility. Subcontractor filtering (`companyScope`\
+        \ and `contractorIds`). **Allowed sort fields:** `client_name` (client company\
+        \ name); `contractor_name` (contractor company name); `resource_name` (resource\
+        \ name: employee, vehicle, or equipment); `site_name` (site name, default);\
+        \ `end_of_access` (end of access date). **Sort format:** `?sort=field,direction`\
+        \ (e.g. `?sort=site_name,asc`)."
       operationId: getAccessControlStatusByContractor
       parameters:
       - name: companyId
@@ -4103,15 +4396,13 @@ paths:
       tags:
       - Access control
       summary: Get access control status by client
-      description: "\n            Retrieves paginated access control statuses for\
-        \ resources when the company acts as a client.\n            Results are filtered\
-        \ based on the user's site visibility and can be further filtered by contractor,\
-        \ site, resource type, status, and resource ID.\n\n            **Allowed sort\
-        \ fields:**\n            - `site_name` - Site name (default)\n           \
-        \ - `contractor_name` - Contractor company name\n            - `resource_name`\
-        \ - Resource name (employee, vehicle, or equipment)\n            - `end_of_access`\
-        \ - End of access date\n\n            **Sort format:** `?sort=field,direction`\
-        \ (e.g., `?sort=site_name,asc`)\n            "
+      description: "Retrieves paginated access control statuses for resources when\
+        \ the company acts as a client. Results are filtered based on the user's site\
+        \ visibility and can be further filtered by contractor, site, resource type,\
+        \ status, and resource ID. **Allowed sort fields:** `site_name` (site name,\
+        \ default); `contractor_name` (contractor company name); `resource_name` (resource\
+        \ name: employee, vehicle, or equipment); `end_of_access` (end of access date).\
+        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
       operationId: getAccessControlStatusByClient
       parameters:
       - name: companyId
@@ -4838,6 +5129,42 @@ components:
       required:
       - clientId
       - clientResourceTypeId
+    CreateCompanyUserDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+          minLength: 1
+        lastName:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+          minLength: 1
+        languageId:
+          type: string
+          format: uuid
+        roles:
+          type: array
+          items:
+            type: string
+            format: uuid
+        photo:
+          type: string
+      required:
+      - email
+      - firstName
+      - languageId
+      - lastName
+      - roles
+    IdValueString:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+      - id
     CreateSiteDto:
       type: object
       properties:
@@ -6270,6 +6597,44 @@ components:
       - isAssignable
       - name
       - registrationPlate
+    PageResponseUserData:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserData"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    UserData:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        photo:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        roleIds:
+          type: array
+          items:
+            $ref: "#/components/schemas/RoleData"
+      required:
+      - email
+      - firstName
+      - id
+      - language
+      - lastName
+      - roleIds
     PagedModelSiteDto:
       type: object
       properties:
@@ -8489,44 +8854,6 @@ components:
       required:
       - content
       - page
-    PageResponseUserData:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserData"
-        page:
-          $ref: "#/components/schemas/PageData"
-      required:
-      - content
-      - page
-    UserData:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-        photo:
-          type: string
-        language:
-          $ref: "#/components/schemas/Language"
-        roleIds:
-          type: array
-          items:
-            $ref: "#/components/schemas/RoleData"
-      required:
-      - email
-      - firstName
-      - id
-      - language
-      - lastName
-      - roleIds
     Contract:
       type: object
       properties:
