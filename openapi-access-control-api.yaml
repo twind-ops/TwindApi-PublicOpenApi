@@ -4146,6 +4146,9 @@ components:
           format: uuid
         name:
           type: string
+        level:
+          type: integer
+          format: int32
       required:
       - id
       - name
