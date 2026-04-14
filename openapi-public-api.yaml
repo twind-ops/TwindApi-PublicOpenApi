@@ -29,13 +29,13 @@ tags:
     - **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)
     - **Clients**: Client companies for a contractor
     - **Users**: List users for a company
+    - **Vehicles**: List vehicles for a company
 - name: Access control
   description: |-
     Track people and assets on site: register access and visits, query authorization status, and issue access cards.
 
     - **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies
     - **Visit register**: List and create visits; read and update a visit record
-    - **Vehicles**: List vehicles for a company
     - **Equipment**: List equipment for a company
     - **Employees**: List employees for a company
     - **Access register**: List and create access entries; record exit; read entry by id
@@ -743,7 +743,7 @@ paths:
   /v1/companies/{companyId}/vehicles:
     get:
       tags:
-      - Access control
+      - Shared
       summary: List vehicles
       description: "Returns a paginated list of vehicles for the company. Supports\
         \ optional text search (q), subcontractor scope, and contractor filters."
