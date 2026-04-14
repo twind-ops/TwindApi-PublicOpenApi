@@ -42,7 +42,6 @@ tags:
     - **Access control (status)**: Read access control row by id; list as contractor or as client
     - **Access card**: Download access card file (PDF or PNG) for a resource
     - **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers
-    - **Requirement enable/disable**: Enable or disable a requirement for a company
     - **All contractors**: List all contractors for a company
 - name: Requirements
   description: |-
@@ -52,6 +51,7 @@ tags:
     - **Requirements (list)**: List and create requirements
     - **Requirement template upload**: Presigned URL to upload a requirement template file
     - **Requirement stats**: Statistics for a requirement
+    - **Requirement enable/disable**: Enable or disable a requirement for a company
     - **Requirement names**: Search requirement names from clients
     - **Requirements with clients**: List requirements with client-side filters
     - **Requirement instance**: Get a requirement instance
@@ -278,7 +278,7 @@ paths:
   /v1/companies/{companyId}/requirements/{requirementId}/enable:
     put:
       tags:
-      - Access control
+      - Requirements
       summary: Enable requirement
       description: Re-enables a previously disabled requirement for the client company.
       operationId: enableRequirement
@@ -304,7 +304,7 @@ paths:
   /v1/companies/{companyId}/requirements/{requirementId}/disable:
     put:
       tags:
-      - Access control
+      - Requirements
       summary: Disable requirement
       description: Soft-disables a requirement for the client company so it no longer
         generates new instances as configured.
