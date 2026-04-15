@@ -5585,31 +5585,6 @@ components:
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          apiKeySet:
-            type: array
-            items:
-              $ref: "#/components/schemas/ApiKeyDetails"
-            uniqueItems: true
-      required:
-      - apiKeySet
-    ApiKeyDetails:
-      type: object
-      properties:
-        displayName:
-          type: string
-        internalName:
-          type: string
-        name:
-          type: string
-          writeOnly: true
-        publicApiKey:
-          type: string
-      required:
-      - displayName
-      - internalName
-      - publicApiKey
     AutomaticReviewConfig:
       type: object
       properties:
@@ -5827,9 +5802,6 @@ components:
           type: string
         internalName:
           type: string
-        name:
-          type: string
-          writeOnly: true
         publicApiKey:
           type: string
       required:
