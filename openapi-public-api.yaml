@@ -3827,63 +3827,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetEligibleResourcesForChildRequirementsResponse"
-  /v1/companies/{companyId}/requirement-instances/requirements/as-contractor:
-    get:
-      tags:
-      - Requirements
-      summary: List requirement summaries as contractor
-      description: "Returns paginated requirement summaries for a contractor, showing\
-        \ which requirements have been assigned across all client companies. Can be\
-        \ filtered by a search query on requirement name."
-      operationId: findRequirementsForContractor
-      parameters:
-      - name: companyId
-        in: path
-        description: Company ID acting as contractor
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: Search query to filter requirements by name
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseContractorRequirementSummary"
   /v1/companies/{companyId}/requirement-instances/as-contractor:
     get:
       tags:
@@ -7676,29 +7619,6 @@ components:
       - id
       - name
       - registrationPlate
-    ContractorRequirementSummary:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - id
-      - name
-    PageResponseContractorRequirementSummary:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContractorRequirementSummary"
-        page:
-          $ref: "#/components/schemas/PageData"
-      required:
-      - content
-      - page
     Activity:
       type: object
       properties:
