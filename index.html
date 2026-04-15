@@ -200,6 +200,21 @@
           const href = a.getAttribute("href");
           if (!href || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) return;
           if (href.includes("..")) return;
+
+          // In-guide links to API reference operations: "#tag/..." jumps to the
+          // Scalar panel and scrolls to the operation.
+          if (href.startsWith("#tag/")) {
+            e.preventDefault();
+            e.stopPropagation();
+            showSection("api");
+            // Force Scalar to re-read the hash even if it already matches.
+            if (window.location.hash === href) {
+              window.location.hash = "";
+            }
+            window.location.hash = href;
+            return;
+          }
+
           const pathPart = href.split("#")[0];
           if (!pathPart.toLowerCase().endsWith(".md")) return;
           const file = pathPart.replace(/^\.\//, "").split("/").pop();

@@ -75,9 +75,11 @@ with the **object keys** returned from that flow.
 
 ### Request — presigned upload URL
 
-```http
-GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType={mime}&fileName={name}
-```
+<!-- markdownlint-disable-next-line MD051 -->
+[`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/requirements/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
+
+`{mime}` must be one of the accepted MIME types listed in
+[Supported content types](#supported-content-types).
 
 Optional query parameter: **`asSubcontractorId`** — use when submitting on
 behalf of another company in your subcontractor chain (when your integration
@@ -114,6 +116,8 @@ curl -X GET \
   server builds a **`key`** under
   `evidences/{ownerId}/{requirementInstanceId}/{date}`.
 - Use the **same** `contentType` you sent to the API; the policy is tied to it.
+  `contentType` must be one of the accepted MIME types — see
+  [Supported content types](#supported-content-types).
   When S3 conditions include `Content-Type`, it must be a **named form field**
   **`Content-Type`** (not only the MIME type on the file part). If it is missing
   from `fields` but the upload returns **403**, add **`Content-Type`** with that
@@ -151,10 +155,8 @@ in the next step.
 
 ### Request — register upload
 
-```http
-POST /v1/cm/companies/{companyId}/evidences/upload
-Content-Type: application/json
-```
+<!-- markdownlint-disable-next-line MD051 -->
+[`POST /v1/cm/companies/{companyId}/evidences/upload`](#tag/requirements/POST/v1/cm/companies/{companyId}/evidences/upload) (`Content-Type: application/json`)
 
 Optional query: **`asSubcontractorId`**
 
@@ -347,6 +349,33 @@ the same API surface after submission.
   response schemas.
 - Contact Twind if you need products or capabilities enabled for evidence or
   single submission.
+
+## Supported content types
+
+Pass one of the MIME types below as the `contentType` query parameter when
+requesting a presigned upload URL. The service rejects other values, and the
+same string must be echoed back as the `Content-Type` form field when uploading
+the file to object storage.
+
+| Extension | MIME type |
+| --- | --- |
+| `.pdf` | `application/pdf` |
+| `.doc` | `application/msword` |
+| `.docx` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |
+| `.ppt` | `application/vnd.ms-powerpoint` |
+| `.pptx` | `application/vnd.openxmlformats-officedocument.presentationml.presentation` |
+| `.xls` | `application/vnd.ms-excel` |
+| `.xlsx` | `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` |
+| `.xlsm` | `application/vnd.ms-excel.sheet.macroEnabled.12` |
+| `.zip` | `application/zip` |
+| `.png` | `image/png` |
+| `.jpg` / `.jpeg` | `image/jpeg` |
+| `.bmp` | `image/bmp` |
+| `.xml` | `application/xml`, `text/xml` |
+
+MIME types follow the IANA
+[Media Types registry](https://www.iana.org/assignments/media-types/media-types.xhtml),
+specified by [RFC 6838 — Media Type Specifications and Registration Procedures](https://www.rfc-editor.org/rfc/rfc6838).
 
 ---
 
