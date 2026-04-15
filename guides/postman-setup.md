@@ -15,8 +15,8 @@ This guide explains how to import the Twind API into Postman using the pre-built
 
 | File | Import URL |
 |------|------------|
-| Collection | `https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/openapi-public-api-postman-collection.json` |
-| Environment | `https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/postman-environment-twind-api.json` |
+| Collection | `https://api-doc.twind.io/twind-postman-collection.json` |
+| Environment | `https://api-doc.twind.io/postman-environment-twind-api.json` |
 
 4. Click **Import** after each URL
 
