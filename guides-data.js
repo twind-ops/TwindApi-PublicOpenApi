@@ -4,13 +4,6 @@
  */
 const GUIDES_DATA = [
   {
-    id: "postman-setup",
-    file: "postman-setup.md",
-    title: "Postman Setup",
-    description: "Import the pre-built Postman collection and environment to start making API requests in minutes.",
-    icon: "assets/icon-postman.svg",
-  },
-  {
     id: "get-api-token",
     file: "get-api-token.md",
     title: "Get API Key",
