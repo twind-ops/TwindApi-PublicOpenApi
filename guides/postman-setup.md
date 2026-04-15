@@ -15,12 +15,14 @@ This guide explains how to import the Twind API into Postman using the pre-built
 
 | File | Import URL |
 |------|------------|
-| Collection | `https://api-doc.twind.io/twind-postman-collection.json` |
-| Environment | `https://api-doc.twind.io/twind-postman-environment.json` |
+| Collection | [twind-postman-collection.json](https://api-doc.twind.io/twind-postman-collection.json) |
+| Environment | [twind-postman-environment.json](https://api-doc.twind.io/twind-postman-environment.json) |
+
+   Right-click each link and choose **Copy link address**, then paste into the Link tab.
 
 4. Click **Import** after each URL
 
-Alternatively, right-click each URL and choose **Save link as** to download the files, then import them via **Import → File**.
+Alternatively, click each link to open the file in your browser, then save it and import via **Import → File**.
 
 ## Step 2: Select the environment
 
@@ -54,13 +56,7 @@ A `200` response with your user details confirms everything is set up correctly.
 
 If you use Insomnia, Bruno, or another OpenAPI-compatible tool, you can import the spec directly — these tools organise requests by tag automatically, so no pre-built collection is needed.
 
-Import via URL:
-
-```
-https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/openapi-public-api.yaml
-```
-
-Or download the file using the **Download** button in the [API Reference](../index.html) and import it from disk.
+Import via URL directly from [api-doc.twind.io](https://api-doc.twind.io/openapi-public-api.yaml), or use the **Download** button in the [API Reference](../index.html) to save the file and import it from disk.
 
 ---
 
