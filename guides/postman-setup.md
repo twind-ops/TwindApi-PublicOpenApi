@@ -22,12 +22,12 @@ This guide explains how to import the Twind API into Postman using the pre-built
 
 Alternatively, right-click each URL and choose **Save link as** to download the files, then import them via **Import → File**.
 
-## Step 3: Select the environment
+## Step 2: Select the environment
 
 1. In the top-right corner of Postman, open the environment dropdown
 2. Select **Twind API**
 
-## Step 4: Set your API key
+## Step 3: Set your API key
 
 1. Click the **Twind API** environment name to open it
 2. In the `apiKey` row, enter your API key in the **Current value** column
@@ -35,7 +35,7 @@ Alternatively, right-click each URL and choose **Save link as** to download the 
 
 Your API key is now set for all requests in the collection.
 
-## Step 5: Send a request
+## Step 4: Send a request
 
 Open the **Shared** folder in the collection and run **Get current user information** to verify your API key is working:
 
