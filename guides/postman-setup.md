@@ -7,23 +7,20 @@ This guide explains how to import the Twind API into Postman using the pre-built
 - [Postman](https://www.postman.com/downloads/) installed
 - A Twind API key (see the [Get API Key](get-api-token.md) guide)
 
-## Step 1: Download the files
-
-Download both files below:
-
-| File | Description |
-|------|-------------|
-| [openapi-public-api-postman-collection.json](https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/openapi-public-api-postman-collection.json) | Collection with all endpoints organised by section |
-| [postman-environment-twind-api.json](https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/postman-environment-twind-api.json) | Environment with the production base URL pre-configured |
-
-Alternatively, you can paste either URL directly into Postman's **Import → Link** dialog to import without downloading.
-
-## Step 2: Import into Postman
+## Step 1: Import the files into Postman
 
 1. Open Postman
 2. Click **Import** (top left)
-3. Drag and drop both files, or click **files** and select them
-4. Click **Import**
+3. Select the **Link** tab and paste each URL below, one at a time:
+
+| File | Import URL |
+|------|------------|
+| Collection | `https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/openapi-public-api-postman-collection.json` |
+| Environment | `https://raw.githubusercontent.com/twind-ops/TwindApi-PublicOpenApi/main/postman-environment-twind-api.json` |
+
+4. Click **Import** after each URL
+
+Alternatively, right-click each URL and choose **Save link as** to download the files, then import them via **Import → File**.
 
 ## Step 3: Select the environment
 
