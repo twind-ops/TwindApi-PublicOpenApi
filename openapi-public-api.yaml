@@ -3887,16 +3887,6 @@ paths:
           type: string
           format: uuid
           description: Filter by contract id.
-      - name: siteId
-        in: query
-        description: "Filter by site id. Deprecated: use siteIds instead."
-        required: false
-        deprecated: true
-        schema:
-          type: string
-          format: uuid
-          deprecated: true
-          description: "Filter by site id. Deprecated: use siteIds instead."
       - name: siteIds
         in: query
         description: Filter by one or more site ids.
@@ -4112,16 +4102,6 @@ paths:
           type: string
           format: uuid
           description: Filter by contract id.
-      - name: siteId
-        in: query
-        description: "Filter by site id. Deprecated: use siteIds instead."
-        required: false
-        deprecated: true
-        schema:
-          type: string
-          format: uuid
-          deprecated: true
-          description: "Filter by site id. Deprecated: use siteIds instead."
       - name: siteIds
         in: query
         description: Filter by one or more site ids.
@@ -7832,13 +7812,6 @@ components:
           type: boolean
           description: True when general-duty (GD) style requirements are enabled
             for this context.
-        sites:
-          type: array
-          deprecated: true
-          description: Sites and activities where this instance applies when scoped
-            by site.
-          items:
-            $ref: "#/components/schemas/SiteAndActivities"
         contractor:
           $ref: "#/components/schemas/RequirementContractorData"
           description: Contractor row for the acting company when listing as subcontractor;
@@ -7858,26 +7831,6 @@ components:
       - isGDEnabled
       - isUpcomingDate
       - requirement
-      - sites
-    SiteAndActivities:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Site id.
-        name:
-          type: string
-          description: Site name.
-        activities:
-          type: array
-          description: Activities linked to this site for the instance.
-          items:
-            $ref: "#/components/schemas/Activity"
-      required:
-      - activities
-      - id
-      - name
     PageResponseRequirementInstanceAsClient:
       type: object
       properties:
@@ -7932,13 +7885,6 @@ components:
           type: boolean
           description: True when the next relevant date (e.g. issue or renewal) is
             still in the future.
-        sites:
-          type: array
-          deprecated: true
-          description: Sites and activities where this instance applies when scoped
-            by site.
-          items:
-            $ref: "#/components/schemas/SiteAndActivities"
         applicableEngagements:
           type: array
           description: "Engagements where this instance applies, with site hierarchy\
@@ -7954,7 +7900,6 @@ components:
       - isUpcomingDate
       - mainRequirement
       - requirement
-      - sites
     GetEvidenceDetails:
       type: object
       properties:
