@@ -11149,8 +11149,21 @@ components:
             - UNDER_GRACE_PERIOD
             - EXPIRED
             - PENDING_VALIDITY
+        evidenceStatuses:
+          type: array
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
       required:
       - appliedTo
+      - evidenceStatuses
       - id
       - multipleInstanceRequest
       - name
