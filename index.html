@@ -207,9 +207,8 @@
             e.preventDefault();
             e.stopPropagation();
             showSection("api");
-            // Force Scalar to re-read the hash even if it already matches.
             if (window.location.hash === href) {
-              window.location.hash = "";
+              history.replaceState(null, "", window.location.pathname + window.location.search);
             }
             window.location.hash = href;
             return;
