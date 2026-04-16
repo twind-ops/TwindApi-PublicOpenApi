@@ -27,13 +27,14 @@ Alternatively, click each link to open the file in your browser, then save it an
 1. In the top-right corner of Postman, open the environment dropdown
 2. Select **Twind API**
 
-## Step 3: Set your API key
+## Step 3: Set your credentials
 
 1. Click the **Twind API** environment name to open it
 2. In the `apiKey` row, enter your API key in the **Current value** column
-3. Click **Save**
+3. In the `companyId` row, enter your company ID
+4. Click **Save**
 
-Your API key is now set for all requests in the collection.
+Your credentials are now set for all requests in the collection.
 
 ## Step 4: Send a request
 
