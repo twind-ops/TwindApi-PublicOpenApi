@@ -7528,12 +7528,13 @@ components:
           description: Optional notes for the entry.
         entryOrigin:
           type: string
-          description: Origin of the visit entry registration. Indicates where the
-            entry was recorded (e.g. web portal or mobile app). Optional; defaults
-            to WEB when omitted.
+          description: "Origin of the visit entry registration. Indicates where the\
+            \ entry was recorded (e.g. web portal, mobile app or API). Optional; defaults\
+            \ to WEB when omitted."
           enum:
           - WEB
           - APP
+          - API
           example: WEB
       required:
       - entryAt
@@ -8096,6 +8097,14 @@ components:
           type: string
           maxLength: 100
           minLength: 0
+        origin:
+          type: string
+          description: Optional. Defaults to WEB when omitted. Use API or APP when
+            the authorization is created from those channels.
+          enum:
+          - APP
+          - API
+          - WEB
       required:
       - contractorId
       - dateFrom
@@ -8198,6 +8207,7 @@ components:
           enum:
           - WEB
           - APP
+          - API
           example: WEB
       required:
       - exitAt
@@ -8314,6 +8324,14 @@ components:
         authorizedBy:
           type: string
           minLength: 1
+        origin:
+          type: string
+          description: "When omitted, the authorization keeps its current origin (WEB,\
+            \ API, APP). Send explicitly to change it."
+          enum:
+          - APP
+          - API
+          - WEB
       required:
       - authorizedBy
       - contractorId
@@ -9124,6 +9142,8 @@ components:
           type: string
         registeredByEmail:
           type: string
+        registeredByApiUser:
+          type: boolean
         notes:
           type: string
         origin:
@@ -9131,6 +9151,7 @@ components:
           enum:
           - WEB
           - APP
+          - API
         registeredByFullName:
           type: string
       required:
@@ -9318,6 +9339,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/RoleData"
+        isApiUser:
+          type: boolean
       required:
       - email
       - firstName
@@ -11918,6 +11941,8 @@ components:
           type: string
         registeredByEmail:
           type: string
+        registeredByApiUser:
+          type: boolean
         notes:
           type: string
         temporaryAuthorization:
@@ -12023,6 +12048,14 @@ components:
           - ALLOWED
           - PARTIALLY_ALLOWED
           - NOT_ALLOWED
+        origin:
+          type: string
+          enum:
+          - APP
+          - API
+          - WEB
+        isAuthorizerApiUser:
+          type: boolean
       required:
       - dateFrom
       - dateTo
@@ -12199,6 +12232,8 @@ components:
           type: string
         email:
           type: string
+        isApiUser:
+          type: boolean
       required:
       - id
     GetTemporaryAuthorizationContractor:
@@ -12303,6 +12338,12 @@ components:
           format: date-time
         name:
           type: string
+        origin:
+          type: string
+          enum:
+          - APP
+          - API
+          - WEB
       required:
       - authorizedBy
       - authorizer
@@ -12314,6 +12355,7 @@ components:
       - dateTo
       - id
       - name
+      - origin
       - resourceId
       - resourceType
       - site
@@ -12414,6 +12456,12 @@ components:
             $ref: "#/components/schemas/GetTemporaryAuthorizationResourceDetail"
         name:
           type: string
+        origin:
+          type: string
+          enum:
+          - APP
+          - API
+          - WEB
       required:
       - authorizedBy
       - authorizer
@@ -12425,6 +12473,7 @@ components:
       - dateTo
       - id
       - name
+      - origin
       - resources
       - status
       - validityStatus
