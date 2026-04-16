@@ -4551,84 +4551,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{id}/contractors:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: findContractors
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: "Text search term, matched against company name, email, and tax\
-          \ ID. Ignored when filterById is set."
-        required: false
-        schema:
-          type: string
-          description: "Text search term, matched against company name, email, and\
-            \ tax ID. Ignored when filterById is set."
-      - name: filterById
-        in: query
-        description: "When set, performs a point-lookup by ID and ignores the 'q'\
-          \ search parameter."
-        required: false
-        schema:
-          type: string
-          format: uuid
-          description: "When set, performs a point-lookup by ID and ignores the 'q'\
-            \ search parameter."
-      - name: filterByIds
-        in: query
-        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-          \ is ignored. If combined with filterById, filterById is ignored."
-        required: false
-        schema:
-          type: array
-          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-            \ is ignored. If combined with filterById, filterById is ignored."
-          items:
-            type: string
-            format: uuid
-            description: "When set, performs a batch lookup by IDs. The 'q' search\
-              \ parameter is ignored. If combined with filterById, filterById is ignored."
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelCompanyBasicDataDto"
     post:
       tags:
       - Companies and contracts
@@ -5163,84 +5085,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/sites/hierarchy:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: findHierarchy
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SiteHierarchyNodeDto"
-  /v1/companies/{companyId}/sites/{id}/ancestors:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: findAncestors
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/SiteAncestorDto"
-  /v1/companies/{companyId}/sites/{id}/descendants:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: findDescendants
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/SiteHierarchyNodeDto"
   /v1/companies/{companyId}/activities:
     get:
       tags:
@@ -5480,33 +5324,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/contracts/{contractId}/requirements:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractRequirements
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ContractRequirements"
   /v1/companies/{companyId}/contracts/with-contractors:
     get:
       tags:
@@ -5639,144 +5456,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseContractData"
-  /v1/companies/{companyId}/contracts/from-contractors/names:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractNamesWhereMyCompanyIsClient
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: showSubcontracts
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: showExpired
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseString"
-  /v1/companies/{companyId}/contracts/{contractId}/details:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractById
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ContractDetails"
-  /v1/companies/{companyId}/contracts/{contractId}/dates:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractDates
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ContractAllowedDates"
-  /v1/companies/{companyId}/contracts/{contractId}/logs:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractLogs
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ContractAudit"
   /v1/companies/{companyId}/contracts/with-clients:
     get:
       tags:
@@ -5895,196 +5574,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseContractData"
-  /v1/companies/{companyId}/contracts/from-clients/names:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractNamesWhereMyCompanyIsContractor
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: showSubcontracts
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: showExpired
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseString"
-  /v1/companies/{companyId}/contracts/{contractId}/resources:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractResources
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ContractResources"
-  /v1/companies/{companyId}/contracts/{contractId}/risks:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractRisks
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetContractRisksQueryResult"
-  /v1/companies/{companyId}/contracts/{contractId}/tree:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: contractTree
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ContractTreeNode"
-  /v1/companies/{companyId}/contracts/{contractId}/external-dependencies:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: getContractExternalDependencies
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/ContractExternalDependency"
   /v1/companies/{companyId}/contracts/{contractId}/engagements:
     get:
       tags:
@@ -6181,82 +5670,72 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/contracts/{contractId}/engagements/{engagementId}/resources:
-    put:
+  /v1/companies/{companyId}/contracts/{contractId}/engagements/{engagementId}:
+    delete:
       tags:
       - Companies and contracts
-      operationId: setEngagementResources
+      summary: Delete an engagement
+      description: "Soft deletes the engagement (engagement is marked as deleted).\
+        \ Deletion is blocked if the engagement has child engagements or if it is\
+        \ the only engagement on the contract. When resources are still assigned,\
+        \ the first delete attempt returns 400 with employee, vehicle, and equipment\
+        \ counts; call again with removeAssignedResourcesConfirmed=true to unassign\
+        \ those resources and delete the engagement. After a successful delete, requirement/evidence\
+        \ data tied only to this engagement may be cleaned up asynchronously."
+      operationId: deleteContractEngagement
       parameters:
       - name: companyId
         in: path
+        description: Client company ID
         required: true
         schema:
           type: string
           format: uuid
       - name: contractId
         in: path
+        description: Contract ID
         required: true
         schema:
           type: string
           format: uuid
       - name: engagementId
         in: path
+        description: Engagement ID to delete
         required: true
         schema:
           type: string
           format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                $ref: "#/components/schemas/SetEngagementResourcesDto"
-        required: true
+      - name: removeAssignedResourcesConfirmed
+        in: query
+        description: "When true, assigned resources are removed as part of deletion\
+          \ after the client has confirmed the action."
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
-        "200":
-          description: OK
+        "204":
+          description: Deleted
           content: {}
-  /v1/companies/{companyId}/contracts/{contractId}/engagements/{engagementId}/resources/{resourceId}/risks:
-    put:
-      tags:
-      - Companies and contracts
-      operationId: setEngagementResourceRisks
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: engagementId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: resourceId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/SetEngagementResourceRisksDto"
-        required: true
-      responses:
-        "200":
-          description: OK
-          content: {}
+        "400":
+          description: "Not found, resources still assigned without confirmation,\
+            \ has child engagements, or last engagement on the contract"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: Unauthorized
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: Forbidden
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/subcontracts:
     post:
       tags:
@@ -6598,102 +6077,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetail"
         "403":
           description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/contracts/{contractId}/engagements/{engagementId}:
-    get:
-      tags:
-      - Companies and contracts
-      operationId: getEngagementResources
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: engagementId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/GetEngagementDetailsResponse"
-    delete:
-      tags:
-      - Companies and contracts
-      summary: Delete an engagement
-      description: "Soft deletes the engagement (engagement is marked as deleted).\
-        \ Deletion is blocked if the engagement has child engagements or if it is\
-        \ the only engagement on the contract. When resources are still assigned,\
-        \ the first delete attempt returns 400 with employee, vehicle, and equipment\
-        \ counts; call again with removeAssignedResourcesConfirmed=true to unassign\
-        \ those resources and delete the engagement. After a successful delete, requirement/evidence\
-        \ data tied only to this engagement may be cleaned up asynchronously."
-      operationId: deleteContractEngagement
-      parameters:
-      - name: companyId
-        in: path
-        description: Client company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: contractId
-        in: path
-        description: Contract ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: engagementId
-        in: path
-        description: Engagement ID to delete
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: removeAssignedResourcesConfirmed
-        in: query
-        description: "When true, assigned resources are removed as part of deletion\
-          \ after the client has confirmed the action."
-        required: false
-        schema:
-          type: boolean
-          default: false
-      responses:
-        "204":
-          description: Deleted
-          content: {}
-        "400":
-          description: "Not found, resources still assigned without confirmation,\
-            \ has child engagements, or last engagement on the contract"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "401":
-          description: Unauthorized
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: Forbidden
           content:
             application/problem+json:
               schema:
@@ -7162,30 +6545,6 @@ components:
           example: 2026-03-25
       required:
       - issueDate
-    SetEngagementResourcesDto:
-      type: object
-      properties:
-        resourceId:
-          type: string
-          format: uuid
-        riskIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-      required:
-      - resourceId
-      - riskIds
-    SetEngagementResourceRisksDto:
-      type: object
-      properties:
-        riskIds:
-          type: array
-          items:
-            type: string
-            format: uuid
-      required:
-      - riskIds
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -9625,17 +8984,6 @@ components:
       - id
       - level
       - name
-    SiteAncestorDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - id
-      - name
     Custody:
       type: object
       properties:
@@ -11092,312 +10440,6 @@ components:
             $ref: "#/components/schemas/EmployeeResponseDto"
         page:
           $ref: "#/components/schemas/PageMetadata"
-    Company:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        taxId:
-          type: string
-      required:
-      - id
-      - name
-      - taxId
-    ContractTreeActivity:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-      required:
-      - id
-      - name
-    ContractTreeEngagement:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        site:
-          $ref: "#/components/schemas/SiteInfo"
-        activity:
-          $ref: "#/components/schemas/ContractTreeActivity"
-        resources:
-          $ref: "#/components/schemas/ContractTreeResources"
-        approvalStatus:
-          type: string
-          enum:
-          - PENDING
-          - APPROVED
-        hasChildrenEngagements:
-          type: boolean
-        scopeSites:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteInfo"
-      required:
-      - activity
-      - hasChildrenEngagements
-      - id
-      - resources
-      - scopeSites
-      - site
-    ContractTreeManager:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-      required:
-      - email
-      - firstName
-      - id
-      - lastName
-    ContractTreeNode:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        dateFrom:
-          type: string
-          format: date
-        dateTo:
-          type: string
-          format: date
-        level:
-          type: integer
-          format: int32
-        contractor:
-          $ref: "#/components/schemas/Company"
-        selfContract:
-          type: boolean
-        anyPendingApproval:
-          type: boolean
-        manager:
-          $ref: "#/components/schemas/ContractTreeManager"
-        allowSubcontract:
-          type: boolean
-        onlyClientCanSubcontract:
-          type: boolean
-        maxSubcontractingLevel:
-          type: integer
-          format: int32
-        needsAuthorisation:
-          type: boolean
-        engagements:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContractTreeEngagement"
-        children:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContractTreeNode"
-      required:
-      - allowSubcontract
-      - anyPendingApproval
-      - children
-      - contractor
-      - dateFrom
-      - dateTo
-      - engagements
-      - id
-      - level
-      - manager
-      - name
-      - needsAuthorisation
-      - onlyClientCanSubcontract
-      - selfContract
-    ContractTreeResources:
-      type: object
-      properties:
-        employees:
-          type: integer
-          format: int32
-        vehicles:
-          type: integer
-          format: int32
-        equipments:
-          type: integer
-          format: int32
-      required:
-      - employees
-      - equipments
-      - vehicles
-    GetContractRisksQueryResult:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        description:
-          type: string
-      required:
-      - id
-      - name
-    PageResponseGetContractRisksQueryResult:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/GetContractRisksQueryResult"
-        page:
-          $ref: "#/components/schemas/PageData"
-      required:
-      - content
-      - page
-    ContractResources:
-      type: object
-      properties:
-        name:
-          type: string
-        resourceType:
-          type: string
-          enum:
-          - EMPLOYEE
-          - VEHICLE
-          - EQUIPMENT
-        requirements:
-          $ref: "#/components/schemas/ContractResourcesRequirements"
-        engagement:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContractResourcesEngagement"
-      required:
-      - engagement
-      - name
-      - requirements
-    ContractResourcesEngagement:
-      type: object
-      properties:
-        site:
-          $ref: "#/components/schemas/SiteInfo"
-        activity:
-          type: string
-        roles:
-          type: array
-          items:
-            type: string
-        scopeSites:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteInfo"
-      required:
-      - activity
-      - roles
-      - scopeSites
-      - site
-    ContractResourcesRequirements:
-      type: object
-      properties:
-        total:
-          type: integer
-          format: int32
-        approved:
-          type: integer
-          format: int32
-      required:
-      - approved
-      - total
-    ContractRequirements:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        isCritical:
-          type: boolean
-        subject:
-          type: string
-        clientId:
-          type: string
-          format: uuid
-        clientName:
-          type: string
-        clientTaxId:
-          type: string
-        contractorId:
-          type: string
-          format: uuid
-        contractorName:
-          type: string
-        contractorTaxId:
-          type: string
-        resourceName:
-          type: string
-        status:
-          type: string
-        dateOfUpload:
-          type: string
-          format: date
-        dateOfApproval:
-          type: string
-          format: date
-        startOfContract:
-          type: string
-          format: date
-        endOfAccess:
-          type: string
-          format: date
-      required:
-      - clientId
-      - clientName
-      - clientTaxId
-      - contractorId
-      - contractorName
-      - contractorTaxId
-      - id
-      - isCritical
-      - name
-      - startOfContract
-      - status
-      - subject
-    ContractAudit:
-      type: object
-      properties:
-        eventName:
-          type: string
-        event:
-          $ref: "#/components/schemas/JsonNode"
-        createdBy:
-          $ref: "#/components/schemas/IdAndName"
-        createdAt:
-          type: string
-          format: date-time
-      required:
-      - createdAt
-      - createdBy
-      - event
-      - eventName
-    ContractExternalDependency:
-      type: object
-      properties:
-        entityId:
-          type: string
-        entityType:
-          type: string
-          enum:
-          - WORK_PERMIT
-      required:
-      - entityId
-      - entityType
     ActivityInfo:
       type: object
       properties:
@@ -11609,7 +10651,7 @@ components:
       required:
       - content
       - page
-    ContractDetails:
+    Company:
       type: object
       properties:
         id:
@@ -11617,117 +10659,12 @@ components:
           format: uuid
         name:
           type: string
-        contractor:
-          $ref: "#/components/schemas/Company"
-        client:
-          $ref: "#/components/schemas/Company"
-        mainContractor:
-          $ref: "#/components/schemas/Company"
-        isSelfContract:
-          type: boolean
-        manager:
-          $ref: "#/components/schemas/Manager"
-        dateFrom:
+        taxId:
           type: string
-          format: date
-        dateTo:
-          type: string
-          format: date
-        allowSubcontracting:
-          type: boolean
-        onlyClientCanSubcontract:
-          type: boolean
-        maxSubcontractingLevel:
-          type: integer
-          format: int32
-        needsAuthorisation:
-          type: boolean
-        engagements:
-          type: array
-          items:
-            $ref: "#/components/schemas/Engagement"
-        hasSubcontracts:
-          type: boolean
       required:
-      - allowSubcontracting
-      - client
-      - contractor
-      - dateFrom
-      - dateTo
-      - engagements
-      - hasSubcontracts
       - id
-      - isSelfContract
-      - mainContractor
-      - manager
       - name
-    Engagement:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        site:
-          $ref: "#/components/schemas/SiteInfo"
-        activity:
-          $ref: "#/components/schemas/Activity"
-        resources:
-          $ref: "#/components/schemas/ResourceData"
-        hasChildren:
-          type: boolean
-        isMaxLevelReached:
-          type: boolean
-        approvalStatus:
-          type: string
-          enum:
-          - PENDING
-          - APPROVED
-        canAssignResources:
-          type: boolean
-        scopeSites:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteInfo"
-      required:
-      - activity
-      - canAssignResources
-      - hasChildren
-      - id
-      - isMaxLevelReached
-      - resources
-      - scopeSites
-      - site
-    Manager:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-      required:
-      - email
-      - firstName
-      - id
-      - lastName
-    ContractAllowedDates:
-      type: object
-      properties:
-        minDateFrom:
-          type: string
-          format: date
-        maxDateFrom:
-          type: string
-          format: date
-        minDateTo:
-          type: string
-          format: date
-        maxDateTo:
-          type: string
-          format: date
+      - taxId
     ContractData:
       type: object
       properties:
@@ -11802,6 +10739,22 @@ components:
       - id
       - scopeSites
       - site
+    Manager:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+      required:
+      - email
+      - firstName
+      - id
+      - lastName
     PageResponseContractData:
       type: object
       properties:
