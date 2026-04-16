@@ -22,6 +22,8 @@ This guide explains how to import the Twind API into Postman using the pre-built
 
 Alternatively, click each link to open the file in your browser, then save it and import via **Import → File**.
 
+> **Keeping up to date:** When the collection is updated, simply re-import using the same links — Postman will update the collection and environment in place, without affecting your saved credentials.
+
 ## Step 2: Select the environment
 
 1. In the top-right corner of Postman, open the environment dropdown
