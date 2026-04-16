@@ -6638,11 +6638,12 @@ paths:
       - Companies and contracts
       summary: Delete an engagement
       description: "Soft deletes the engagement (engagement is marked as deleted).\
-        \ Business rules: deletion is blocked while resources are still assigned—\
-        the API does not auto-unassign them; also blocked if the engagement has child\
-        \ engagements or if it is the only engagement on the contract. After a successful\
-        \ delete, requirement/evidence data tied only to this engagement may be cleaned\
-        \ up asynchronously."
+        \ Deletion is blocked if the engagement has child engagements or if it is\
+        \ the only engagement on the contract. When resources are still assigned,\
+        \ the first delete attempt returns 400 with employee, vehicle, and equipment\
+        \ counts; call again with removeAssignedResourcesConfirmed=true to unassign\
+        \ those resources and delete the engagement. After a successful delete, requirement/evidence\
+        \ data tied only to this engagement may be cleaned up asynchronously."
       operationId: deleteContractEngagement
       parameters:
       - name: companyId
@@ -6666,13 +6667,21 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: removeAssignedResourcesConfirmed
+        in: query
+        description: "When true, assigned resources are removed as part of deletion\
+          \ after the client has confirmed the action."
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "204":
           description: Deleted
           content: {}
         "400":
-          description: "Not found, resources still assigned, has child engagements,\
-            \ or last engagement on the contract"
+          description: "Not found, resources still assigned without confirmation,\
+            \ has child engagements, or last engagement on the contract"
           content:
             application/problem+json:
               schema:
