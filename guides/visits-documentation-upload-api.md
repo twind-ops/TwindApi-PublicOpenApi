@@ -58,8 +58,6 @@ array.
 
 ## Step 1: Request a presigned upload URL
 
-### Request — presigned upload URL
-
 <!-- markdownlint-disable-next-line MD051 -->
 [`GET /v1/companies/{companyId}/visitor/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/access-control/GET/v1/companies/{companyId}/visitor/temporary-upload-url)
 
