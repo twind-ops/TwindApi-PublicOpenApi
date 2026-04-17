@@ -73,8 +73,6 @@ with the **object keys** returned from that flow.
 
 ## Step 1: Request a presigned upload URL
 
-### Request — presigned upload URL
-
 <!-- markdownlint-disable-next-line MD051 -->
 [`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/requirements/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
 
