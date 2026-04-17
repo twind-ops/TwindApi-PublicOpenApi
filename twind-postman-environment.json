@@ -1,0 +1,21 @@
+{
+  "id" : "bef53b44-484d-39ef-8f4a-acf6b2569980",
+  "name" : "Twind API",
+  "_postman_variable_scope" : "environment",
+  "values" : [ {
+    "key" : "baseUrl",
+    "value" : "https://app.twind.io/api",
+    "type" : "default",
+    "enabled" : true
+  }, {
+    "key" : "apiKey",
+    "value" : "",
+    "type" : "secret",
+    "enabled" : true
+  }, {
+    "key" : "companyId",
+    "value" : "",
+    "type" : "default",
+    "enabled" : true
+  } ]
+}

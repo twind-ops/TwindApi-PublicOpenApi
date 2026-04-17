@@ -1,0 +1,3410 @@
+{
+  "info" : {
+    "_postman_id" : "39c9c036-1725-36aa-ae31-0dba9f4cf6a3",
+    "name" : "Public API",
+    "description" : "API for external systems to integrate with Twind using public API keys.\nAdditional products may extend this document over time.\n\n## Authentication\n\nUse the `X-Api-Key` header with your public API key.",
+    "schema" : "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable" : [ {
+    "key" : "baseUrl",
+    "value" : "https://app.twind.io/api",
+    "type" : "string"
+  }, {
+    "key" : "apiKey",
+    "value" : "",
+    "type" : "secret"
+  } ],
+  "auth" : {
+    "type" : "apikey",
+    "apikey" : [ {
+      "key" : "key",
+      "value" : "X-Api-Key",
+      "type" : "string"
+    }, {
+      "key" : "value",
+      "value" : "{{apiKey}}",
+      "type" : "string"
+    }, {
+      "key" : "in",
+      "value" : "header",
+      "type" : "string"
+    } ]
+  },
+  "item" : [ {
+    "name" : "Shared",
+    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **My companies**: Related companies (contractors/clients) for a company\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company",
+    "item" : [ {
+      "name" : "Get current user information",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/users/me",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "users", "me" ],
+          "query" : [ {
+            "key" : "companyId",
+            "value" : "",
+            "description" : "Optional company ID to get permissions for (only applicable for Global Admins)",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves detailed information about the currently authenticated user, including their profile, permissions, company associations and userSettings (e.g. mobile unattended mode)."
+      }
+    }, {
+      "name" : "Get current user's companies",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/users/me/companies",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "users", "me", "companies" ]
+        },
+        "description" : "Retrieves the list of companies that the currently authenticated user has access to."
+      }
+    }, {
+      "name" : "List related companies",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/my-companies",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "my-companies" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Text search term, matched against company name, email, and tax ID. Ignored when filterById is set.",
+            "disabled" : true
+          }, {
+            "key" : "filterById",
+            "value" : "",
+            "description" : "When set, performs a point-lookup by ID and ignores the 'q' search parameter.",
+            "disabled" : true
+          }, {
+            "key" : "filterByIds",
+            "value" : "",
+            "description" : "When set, performs a batch lookup by IDs. The 'q' search parameter is ignored. If combined with filterById, filterById is ignored.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of related companies (contractors or clients). Use this endpoint to obtain company IDs for filtering in other endpoints. **Allowed sort fields:** `name` (company name, default); `taxId` (tax ID); `industry` (industry key); `email` (company email). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "List countries",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/countries",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "countries" ],
+          "query" : [ {
+            "key" : "name",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated countries catalog. Filter by partial **name** match."
+      }
+    }, {
+      "name" : "List assigned resources (as client)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/assigned-resources",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "assigned-resources" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query to filter resources by name",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by a single resource ID. Combined with resourceIds using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated: use resourceTypes instead. If both resourceType and resourceTypes are provided, they are combined using OR.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by specific contractor IDs",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by multiple resource IDs. Combined with resourceId using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of resources assigned to contracts where the company acts as client. Use this endpoint to obtain resource IDs for filtering in access-control endpoints."
+      }
+    }, {
+      "name" : "List assigned resources (as contractor)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/assigned-resources/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "assigned-resources", "as-contractor" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Contractor company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query to filter resources by name",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by a single resource ID. Combined with resourceIds using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated: use resourceTypes instead. If both resourceType and resourceTypes are provided, they are combined using OR.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Filter by subcontractor scope (MY_COMPANY, MY_SUBCONTRACTORS, ALL)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by specific contractor IDs",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by multiple resource IDs. Combined with resourceId using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of resources assigned to contracts where the company acts as contractor. Use this endpoint to obtain resource IDs for filtering in access-control endpoints."
+      }
+    }, {
+      "name" : "List client companies",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:contractorId/clients",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":contractorId", "clients" ],
+          "variable" : [ {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query to filter clients by name",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of client companies for a contractor. Use this endpoint to obtain client IDs for filtering in access-control endpoints."
+      }
+    }, {
+      "name" : "List company users",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/users",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "users" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search text (partial match)",
+            "disabled" : true
+          }, {
+            "key" : "role",
+            "value" : "",
+            "description" : "Filter by a single role ID",
+            "disabled" : true
+          }, {
+            "key" : "roles",
+            "value" : "",
+            "description" : "Filter by role IDs",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional subset of user IDs to include",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of users for the company. Supports optional search (q), role filters, and selected user IDs."
+      }
+    }, {
+      "name" : "List employees",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query (partial match on employee fields)",
+            "disabled" : true
+          }, {
+            "key" : "clientId",
+            "value" : "",
+            "description" : "When set, restricts results to resources for this client company",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Subcontractor scope: which contractors' employees to include (requires permission when not MY_COMPANY)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter to employees belonging to these contractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional employee resource IDs",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of employees for a contractor company. Used to locate the internal `resourceId` needed for contract engagement assignment. The `q` parameter performs a partial match against `firstName`, `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:** `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
+      }
+    }, {
+      "name" : "List vehicles",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/vehicles",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "vehicles" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query (partial match on vehicle fields)",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Subcontractor scope: which contractors' vehicles to include (requires permission when not MY_COMPANY)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter to vehicles belonging to these contractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional vehicle resource IDs",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of vehicles for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
+      }
+    }, {
+      "name" : "List equipment",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/equipment",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "equipment" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query (partial match on equipment fields)",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Subcontractor scope: which contractors' equipment to include (requires permission when not MY_COMPANY)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter to equipment belonging to these contractor company IDs",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of equipment for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
+      }
+    }, {
+      "name" : "List sites",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of sites for a company. Use this endpoint to obtain site IDs for filtering in other endpoints."
+      }
+    } ]
+  }, {
+    "name" : "Access control",
+    "description" : "Track people and assets on site: register access and visits, query authorization status, and issue access cards.\n\n- **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies\n- **Visit register**: List and create visits; read and update a visit record\n- **Employees**: List employees for a company\n- **Access register**: List and create access entries; record exit; read entry by id\n- **Access control (status)**: Read access control row by id; list as contractor or as client\n- **Access card**: Download access card file (PDF or PNG) for a resource\n- **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers\n- **All contractors**: List all contractors for a company",
+    "item" : [ {
+      "name" : "Get visitor by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor/:visitorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor", ":visitorId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          }, {
+            "key" : "visitorId",
+            "value" : "{{visitorId}}",
+            "description" : "Visitor ID"
+          } ]
+        },
+        "description" : "Returns one visitor including identity, company, and document URLs. Use before editing or when resolving `visitorId` for visits."
+      }
+    }, {
+      "name" : "Update a visitor",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor/:visitorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor", ":visitorId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          }, {
+            "key" : "visitorId",
+            "value" : "{{visitorId}}",
+            "description" : "Visitor ID"
+          } ]
+        },
+        "description" : "Updates visitor details. Use [GET /v1/companies/{companyId}/visitor/{visitorId}](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/{visitorId}) to load current values.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List distinct visitors",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search by name, identity number, or plate (case insensitive, partial match)",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Identity document numbers to list first in the page (same as each row's `identity` field)",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated list of visitors for filtering and selection (e.g. visit register filters). Identity numbers returned here match the `visitors` query parameter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register). **Related:** Sites for visits — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)."
+      }
+    }, {
+      "name" : "Create a visitor",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ]
+        },
+        "description" : "Creates a visitor record for the client company. Use the returned ID as `visitorId` when calling [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register). Upload files first via [GET /v1/companies/{companyId}/visitor/temporary-upload-url](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor/temporary-upload-url), then pass the stored object keys in `files`.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get all company visits",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visit-register",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visit-register" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "visitors",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "companies",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "sites",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "Sun Mar 01 00:00:00 UTC 2026",
+            "description" : "Inclusive lower bound on entry date (`YYYY-MM-DD`, entry time at or after start of day UTC).",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "Tue Mar 31 00:00:00 UTC 2026",
+            "description" : "Inclusive upper bound on entry date (`YYYY-MM-DD`, entry time before start of the next day UTC).",
+            "disabled" : true
+          }, {
+            "key" : "plateNumbers",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "onlyAtSite",
+            "value" : "",
+            "description" : "When true, only visits with no exit recorded.",
+            "disabled" : true
+          }, {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search across visitor full name, identity number, and plate (case-insensitive, partial match).",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated visit records for a company. The 'sites' filter parameter accepts site IDs which can be obtained from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites). **Allowed sort fields:** `visitor_name` (visitor name); `company_name` (company name); `resource_name` (visited person name); `site_name` (site name); `entry_at` (entry timestamp); `exit_at` (exit timestamp, default, missing on top). **Sort format:** `?sort=field,direction` (e.g. `?sort=exit_at,desc`). **Search:** Use `q` to filter by visitor name, identity number (national ID, passport, SSN, etc.), or vehicle registration plate (case insensitive, partial match)."
+      }
+    }, {
+      "name" : "Register a visit entry",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visit-register",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visit-register" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ]
+        },
+        "description" : "Creates a visit entry (visitor on site). `siteId` must be a site the company can access; `visitorId` identifies the visitor record. **Related:** Sites — [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites). Visitors — [GET /v1/companies/{companyId}/visitor](#tag/visitor-controller/GET/v1/companies/{companyId}/visitor), [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List access register records",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-register",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-register" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "Filter by site ID. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by resource ID. Obtain resource IDs from access-control endpoints (resource.id field)",
+            "disabled" : true
+          }, {
+            "key" : "contractorId",
+            "value" : "",
+            "description" : "Filter by contractor ID. Obtain contractor IDs from access-control endpoints (contractor.id field)",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource discriminator (e.g. EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "disabled" : true
+          }, {
+            "key" : "from",
+            "value" : "",
+            "description" : "Filter entries with entry_at on or after this instant (inclusive)",
+            "disabled" : true
+          }, {
+            "key" : "to",
+            "value" : "",
+            "description" : "Filter entries with entry_at on or before this instant (inclusive)",
+            "disabled" : true
+          }, {
+            "key" : "entryOnly",
+            "value" : "",
+            "description" : "When true, only entries without an exit are returned",
+            "disabled" : true
+          }, {
+            "key" : "latestEntrance",
+            "value" : "",
+            "description" : "When true, only the latest entrance per resource is returned",
+            "disabled" : true
+          }, {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query: filters by resource fields (contains, case-insensitive). Employee: name, surname, identity ID; Vehicle: name, plate number; Equipment: name, serial number.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated access register records for the company. Supports filters (site, resource, contractor, type, date range, entry-only, latest entrance), text search (q), and pageable sort; default sort is entry_at descending. Allowed sort fields are documented on the pageable parameter."
+      }
+    }, {
+      "name" : "Create access register entry",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-register",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-register" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ]
+        },
+        "description" : "Records a site entry for a resource (Twind 2 IDs in the request body).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List temporary authorizations",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "authorizationIds",
+            "value" : "",
+            "description" : "Filter by authorization group IDs",
+            "disabled" : true
+          }, {
+            "key" : "statuses",
+            "value" : "",
+            "description" : "Filter by status (ALLOWED, NOT_ALLOWED)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor IDs",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "Filter from date (inclusive, overlap semantics)",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "Filter to date (inclusive, overlap semantics)",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by resource IDs",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs",
+            "disabled" : true
+          }, {
+            "key" : "validityStatuses",
+            "value" : "",
+            "description" : "Filter by validity status (SCHEDULED, ACTIVE, EXPIRED, DELETED)",
+            "disabled" : true
+          }, {
+            "key" : "authorizerIds",
+            "value" : "",
+            "description" : "Filter by authorizer user IDs",
+            "disabled" : true
+          }, {
+            "key" : "name",
+            "value" : "",
+            "description" : "Filter by authorization name (partial match)",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated temporary authorizations for the client company (one row per site/resource)."
+      }
+    }, {
+      "name" : "Create temporary authorization",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ]
+        },
+        "description" : "Creates a temporary authorization for the client company. Each resource in resourceIds is added for each site in siteIds (Cartesian product).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get visit details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visit-register/:visitRegisterId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visit-register", ":visitRegisterId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          }, {
+            "key" : "visitRegisterId",
+            "value" : "{{visitRegisterId}}",
+            "description" : "Visit register record ID"
+          } ]
+        },
+        "description" : "Returns full details for a single visit, including visitor, site, entry/exit, and registrants."
+      }
+    }, {
+      "name" : "Register a visit exit",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visit-register/:visitRegisterId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visit-register", ":visitRegisterId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          }, {
+            "key" : "visitRegisterId",
+            "value" : "{{visitRegisterId}}",
+            "description" : "Visit register record ID"
+          } ]
+        },
+        "description" : "Records exit time and notes for an open visit. Use the visit ID returned from the visit list or create-entry response.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Record exit for access register entry",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-register/:accessRegisterId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-register", ":accessRegisterId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "accessRegisterId",
+            "value" : "{{accessRegisterId}}",
+            "description" : "Access register entry ID"
+          } ]
+        },
+        "description" : "Sets exit time and notes for an open access register record (Twind 2 IDs).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get temporary authorization by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations/:temporaryAuthorizationId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations", ":temporaryAuthorizationId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "temporaryAuthorizationId",
+            "value" : "{{temporaryAuthorizationId}}",
+            "description" : "Temporary authorization ID"
+          } ]
+        },
+        "description" : "Returns a single temporary authorization for the client company."
+      }
+    }, {
+      "name" : "Update temporary authorization",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations/:temporaryAuthorizationId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations", ":temporaryAuthorizationId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "temporaryAuthorizationId",
+            "value" : "{{temporaryAuthorizationId}}",
+            "description" : "Temporary authorization ID"
+          } ]
+        },
+        "description" : "Updates an existing temporary authorization for the client company. Each resource in resourceIds is applied for each site in siteIds (Cartesian product).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete temporary authorization",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations/:temporaryAuthorizationId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations", ":temporaryAuthorizationId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "temporaryAuthorizationId",
+            "value" : "{{temporaryAuthorizationId}}",
+            "description" : "Temporary authorization ID"
+          } ]
+        },
+        "description" : "Soft-deletes a temporary authorization for the client company."
+      }
+    }, {
+      "name" : "List related companies",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/all-contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "all-contractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Text search term, matched against company name, email, and tax ID. Ignored when filterById is set.",
+            "disabled" : true
+          }, {
+            "key" : "filterById",
+            "value" : "",
+            "description" : "When set, performs a point-lookup by ID and ignores the 'q' search parameter.",
+            "disabled" : true
+          }, {
+            "key" : "filterByIds",
+            "value" : "",
+            "description" : "When set, performs a batch lookup by IDs. The 'q' search parameter is ignored. If combined with filterById, filterById is ignored.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated list of related companies (contractors or clients). Use this endpoint to obtain company IDs for filtering in other endpoints. **Allowed sort fields:** `name` (company name, default); `taxId` (tax ID); `industry` (industry key); `email` (company email). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "Get presigned upload URL for visitor documents",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor/temporary-upload-url",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor", "temporary-upload-url" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "contentType",
+            "value" : "",
+            "description" : "MIME type of the file to upload",
+            "disabled" : false
+          }, {
+            "key" : "fileName",
+            "value" : "",
+            "description" : "Original file name",
+            "disabled" : false
+          } ]
+        },
+        "description" : "Returns a presigned POST URL and form fields for uploading a file to object storage. After upload, pass the resulting object key(s) in `files` on create or update visitor."
+      }
+    }, {
+      "name" : "List distinct visitor vehicle plates",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor/plate-numbers",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor", "plate-numbers" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search filter (partial match)",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Pre-selected plates to pin in results",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Plate values match the `plateNumbers` filter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register)."
+      }
+    }, {
+      "name" : "List distinct visitor company tax IDs",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/visitor/companies",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "visitor", "companies" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search filter (partial match)",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Pre-selected tax IDs to pin in results",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Tax IDs returned here match the `companies` filter on [GET /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/GET/v1/companies/{companyId}/visit-register)."
+      }
+    }, {
+      "name" : "Download access card",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contractors/:contractorId/access-control/:type/:resourceId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contractors", ":contractorId", "access-control", ":type", ":resourceId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company ID"
+          }, {
+            "key" : "type",
+            "value" : "{{type}}",
+            "description" : "Output format: PDF or PNG (case-insensitive path segment)"
+          }, {
+            "key" : "resourceId",
+            "value" : "{{resourceId}}",
+            "description" : "Contractor resource ID"
+          } ]
+        },
+        "description" : "Returns an access card for the resource as a PDF or PNG attachment (Content-Disposition attachment, body is the file stream). Subcontract visibility follows ACCESS_CONTROL_READ_SUBCONTRACTORS when the user has that permission."
+      }
+    }, {
+      "name" : "Get access register entry by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-register/:accessRecordId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-register", ":accessRecordId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "accessRecordId",
+            "value" : "{{accessRecordId}}",
+            "description" : "Access register entry ID"
+          } ]
+        },
+        "description" : "Returns a single access register record for the company, or 404 if not found."
+      }
+    }, {
+      "name" : "Get access control status by resource",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Composite resource identifier in format '{resourceId}-{siteId}'"
+          } ]
+        },
+        "description" : "Retrieves detailed access control status for a specific resource. The resource ID is a composite identifier in the format '{resourceId}-{siteId}'. Subcontractor data is included if the user has permission."
+      }
+    }, {
+      "name" : "Search authorization names",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations/names",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations", "names" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search term (partial name match)",
+            "disabled" : true
+          }, {
+            "key" : "ids",
+            "value" : "",
+            "description" : "Return specific authorization IDs regardless of search term",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns authorization groups matching the search term, for use in filter dropdowns. Multiple groups may share the same name."
+      }
+    }, {
+      "name" : "Search authorizers for temporary authorizations",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/temporary-authorizations/authorizers",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "temporary-authorizations", "authorizers" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search term (partial name match)",
+            "disabled" : true
+          }, {
+            "key" : "userId",
+            "value" : "",
+            "description" : "Fetch a specific user by ID",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns users who can authorize temporary authorizations (ClientAdmin or TemporaryAuthorizationManager role), for use in filter dropdowns."
+      }
+    }, {
+      "name" : "Get access control status by contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID acting as contractor"
+          } ],
+          "query" : [ {
+            "key" : "clientId",
+            "value" : "",
+            "description" : "Filter by client ID. Results are automatically filtered based on user's client company visibility. Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "Filter by site ID. Results are automatically filtered based on user's client site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)",
+            "disabled" : true
+          }, {
+            "key" : "status",
+            "value" : "",
+            "description" : "Filter by status (ALLOWED, NOT_ALLOWED)",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by specific resource ID. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Filter by subcontractor scope (ALL, MY_COMPANY, MY_SUBCONTRACTORS).",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by specific contractor IDs. Obtain contractor IDs from the response of access-control endpoints (contractor.id field)",
+            "disabled" : true
+          }, {
+            "key" : "onlyExpiringInFifteenDays",
+            "value" : "",
+            "description" : "When true, only show resources with access ending within the next 15 days",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+      }
+    }, {
+      "name" : "Get access control status by client",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/access-control/as-client",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "access-control", "as-client" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID acting as client"
+          } ],
+          "query" : [ {
+            "key" : "contractorId",
+            "value" : "",
+            "description" : "Filter by contractor ID. Obtain contractor IDs from the response of access-control endpoints (contractor.id field)",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "Filter by site ID. Results are automatically filtered based on user's site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)",
+            "disabled" : true
+          }, {
+            "key" : "status",
+            "value" : "",
+            "description" : "Filter by status (ALLOWED, NOT_ALLOWED)",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by specific resource ID. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
+            "disabled" : true
+          }, {
+            "key" : "onlyExpiringInFifteenDays",
+            "value" : "",
+            "description" : "When true, only show resources with access ending within the next 15 days",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, and resource ID. **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+      }
+    } ]
+  }, {
+    "name" : "Requirements",
+    "description" : "Configure contract requirements, inspect requirement instances, and submit or review evidence against them.\n\n- **Requirement (detail)**: Get and update a requirement configuration\n- **Requirements (list)**: List and create requirements\n- **Requirement template upload**: Presigned URL to upload a requirement template file\n- **Requirement stats**: Statistics for a requirement\n- **Requirement enable/disable**: Enable or disable a requirement for a company\n- **Requirement names**: Search requirement names from clients\n- **Requirements with clients**: List requirements with client-side filters\n- **Requirement instance**: Get a requirement instance\n- **Requirement instance logs**: List change logs for an instance\n- **Eligible resources**: List resources eligible for an instance\n- **Requirement instances (contractor)**: List instances and contractor requirement index\n- **Requirement instances (client)**: List instances for the client company\n- **Evidence file upload URL**: Presigned URL for evidence file upload\n- **Evidence agreement**: Submit agreement-type evidence\n- **Evidence (read/update)**: Get or update an evidence record\n- **Evidence approve**: Approve evidence\n- **Evidence reject**: Reject evidence\n- **Evidence matching**: Match submitted evidence to requirement instances",
+    "item" : [ {
+      "name" : "Get requirement configuration by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/:requirementId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", ":requirementId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID that owns the requirement"
+          }, {
+            "key" : "requirementId",
+            "value" : "{{requirementId}}",
+            "description" : "Requirement ID"
+          } ]
+        },
+        "description" : "Returns the full configuration of a requirement for the client company, including evidence type, rules/conditions, acceptance criteria, template file, expiration settings, custody, and periodic configuration. Results are filtered based on the user's site visibility."
+      }
+    }, {
+      "name" : "Update requirement configuration",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/:requirementId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", ":requirementId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "requirementId",
+            "value" : "{{requirementId}}",
+            "description" : "Requirement id"
+          } ]
+        },
+        "description" : "Replaces requirement configuration for the client company, including rules, custody, expiration, and acceptance criteria.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List requirement configurations as client",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID acting as client"
+          } ],
+          "query" : [ {
+            "key" : "name",
+            "value" : "",
+            "description" : "Partial match on requirement name.",
+            "disabled" : true
+          }, {
+            "key" : "subject",
+            "value" : "",
+            "description" : "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE, EQUIPMENT, COMPANY).",
+            "disabled" : true
+          }, {
+            "key" : "multipleRequestInstance",
+            "value" : "",
+            "description" : "Filter by multiple-instance mode string (enum name matching `MultipleInstanceRequest`).",
+            "disabled" : true
+          }, {
+            "key" : "expirationType",
+            "value" : "",
+            "description" : "Filter by one or more expiration type keys (enum names matching `RequirementExpirationType`).",
+            "disabled" : true
+          }, {
+            "key" : "appliedTo",
+            "value" : "",
+            "description" : "Filter by apply-to scope string (enum name matching `ApplyTo`).",
+            "disabled" : true
+          }, {
+            "key" : "related",
+            "value" : "",
+            "description" : "When set, filters requirements linked to related requirement definitions.",
+            "disabled" : true
+          }, {
+            "key" : "disabled",
+            "value" : "",
+            "description" : "When set, includes or excludes disabled requirements.",
+            "disabled" : true
+          }, {
+            "key" : "evidenceType",
+            "value" : "",
+            "description" : "Filter by evidence type (UPLOAD or AGREEMENT).",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "Create requirement configuration",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          } ]
+        },
+        "description" : "Creates a requirement configuration for the client company. Includes rules, custody, expiration, evidence type, and acceptance criteria.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get presigned URL for requirement template upload",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/temporary-upload-url",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", "temporary-upload-url" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company that owns the requirement configuration (client company in both route variants)."
+          } ],
+          "query" : [ {
+            "key" : "contentType",
+            "value" : "",
+            "description" : "MIME type of the file to upload",
+            "disabled" : false
+          }, {
+            "key" : "fileName",
+            "value" : "",
+            "description" : "Original file name",
+            "disabled" : false
+          } ]
+        },
+        "description" : "Returns a presigned POST **URL** and **fields** for uploading a requirement template file to object storage. Exposed as `GET /v1/companies/{companyId}/requirements/temporary-upload-url`. The file is stored under a dated prefix for the company before the requirement record references the resulting key."
+      }
+    }, {
+      "name" : "Get requirement statistics",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/:requirementId/stats",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", ":requirementId", "stats" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "requirementId",
+            "value" : "{{requirementId}}",
+            "description" : "Requirement id"
+          } ]
+        },
+        "description" : "Returns aggregate counts and metrics for a requirement within the client company (e.g. instance and evidence breakdown)."
+      }
+    }, {
+      "name" : "Enable requirement",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/:requirementId/enable",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", ":requirementId", "enable" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "requirementId",
+            "value" : "{{requirementId}}",
+            "description" : "Requirement id"
+          } ]
+        },
+        "description" : "Re-enables a previously disabled requirement for the client company."
+      }
+    }, {
+      "name" : "Disable requirement",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/:requirementId/disable",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", ":requirementId", "disable" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "requirementId",
+            "value" : "{{requirementId}}",
+            "description" : "Requirement id"
+          } ]
+        },
+        "description" : "Soft-disables a requirement for the client company so it no longer generates new instances as configured."
+      }
+    }, {
+      "name" : "List requirement configurations as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/with-clients",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", "with-clients" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID acting as contractor"
+          } ],
+          "query" : [ {
+            "key" : "name",
+            "value" : "",
+            "description" : "Partial match on requirement name.",
+            "disabled" : true
+          }, {
+            "key" : "subject",
+            "value" : "",
+            "description" : "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE, EQUIPMENT, COMPANY).",
+            "disabled" : true
+          }, {
+            "key" : "multipleRequestInstance",
+            "value" : "",
+            "description" : "Filter by multiple-instance mode string (enum name matching `MultipleInstanceRequest`).",
+            "disabled" : true
+          }, {
+            "key" : "expirationType",
+            "value" : "",
+            "description" : "Filter by one or more expiration type keys (enum names matching `RequirementExpirationType`).",
+            "disabled" : true
+          }, {
+            "key" : "appliedTo",
+            "value" : "",
+            "description" : "Filter by apply-to scope string (enum name matching `ApplyTo`).",
+            "disabled" : true
+          }, {
+            "key" : "related",
+            "value" : "",
+            "description" : "When set, filters requirements linked to related requirement definitions.",
+            "disabled" : true
+          }, {
+            "key" : "disabled",
+            "value" : "",
+            "description" : "When set, includes or excludes disabled requirements.",
+            "disabled" : true
+          }, {
+            "key" : "evidenceType",
+            "value" : "",
+            "description" : "Filter by evidence type (UPLOAD or AGREEMENT).",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated requirement configurations for the company acting as a contractor: requirements defined by client companies linked to this contractor. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "Search requirement names (contractor context)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/from-clients/names",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirements", "from-clients", "names" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional case-insensitive search on requirement name",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a page of requirement **names** from clients linked to the contractor, optionally filtered by text (`q`). Scoped by site visibility."
+      }
+    }, {
+      "name" : "Get requirement instance details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/:instanceId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", ":instanceId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "instanceId",
+            "value" : "{{instanceId}}",
+            "description" : "Requirement instance ID"
+          } ]
+        },
+        "description" : "Returns detailed information for a specific requirement instance, including the requirement configuration, current evidence status, resource, contract, and site information. Access is validated based on company ownership or subcontractor chain permissions."
+      }
+    }, {
+      "name" : "Get requirement instance audit logs",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/:instanceId/logs",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", ":instanceId", "logs" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "instanceId",
+            "value" : "{{instanceId}}",
+            "description" : "Requirement instance id"
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated audit trail for a specific requirement instance, including evidence submissions, approvals, rejections, and status changes. Access is validated based on company ownership or subcontractor chain permissions."
+      }
+    }, {
+      "name" : "Get eligible resources for child requirements",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/:instanceId/eligible-resources",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", ":instanceId", "eligible-resources" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          }, {
+            "key" : "instanceId",
+            "value" : "{{instanceId}}",
+            "description" : "Parent requirement instance ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query to filter resources by name",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated resources (employees, vehicles, equipment) eligible for child requirement instances. Can be filtered by a search query on resource name."
+      }
+    }, {
+      "name" : "Get requirement instances as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "requirementId",
+            "value" : "",
+            "description" : "Filter by requirement definition id.",
+            "disabled" : true
+          }, {
+            "key" : "requirementName",
+            "value" : "",
+            "description" : "Partial match on requirement name.",
+            "disabled" : true
+          }, {
+            "key" : "clientId",
+            "value" : "",
+            "description" : "Filter by client company id (subject to visibility).",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by subject resource id (employee, vehicle, or equipment).",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "Filter by contract id.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by one or more site ids.",
+            "disabled" : true
+          }, {
+            "key" : "activityId",
+            "value" : "",
+            "description" : "Filter by activity id.",
+            "disabled" : true
+          }, {
+            "key" : "status",
+            "value" : "",
+            "description" : "Include only instances whose latest evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED).",
+            "disabled" : true
+          }, {
+            "key" : "excludeStatus",
+            "value" : "",
+            "description" : "Exclude instances whose latest evidence status is one of these values.",
+            "disabled" : true
+          }, {
+            "key" : "onlyCompanyRequirements",
+            "value" : "",
+            "description" : "When true, restricts to requirements that apply at company level.",
+            "disabled" : true
+          }, {
+            "key" : "onlyCriticalRequirements",
+            "value" : "",
+            "description" : "When true, restricts to critical requirements.",
+            "disabled" : true
+          }, {
+            "key" : "onlyAgreementRequirements",
+            "value" : "",
+            "description" : "When true, restricts to agreement-type requirements.",
+            "disabled" : true
+          }, {
+            "key" : "onlyExpiringInFifteenDays",
+            "value" : "",
+            "description" : "When true, restricts to instances with evidence expiring within the next fifteen days.",
+            "disabled" : true
+          }, {
+            "key" : "onlyWithGDRequirements",
+            "value" : "",
+            "description" : "When true, restricts to instances tied to general duty (GD) requirements.",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Narrows subcontractor-related rows when the user has subcontractor read permission.",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "When set with subcontractor permissions, filters to instances for these contractor ids.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated requirement instances for a contractor company. **Allowed sort fields:** `client_name` (client company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `contract_date_from` (minimum contract start date); `evidence_expiration` (minimum tolerance date: expiration + grace period); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
+      }
+    }, {
+      "name" : "Get requirement instances as client",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/as-client",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", "as-client" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          } ],
+          "query" : [ {
+            "key" : "requirementId",
+            "value" : "",
+            "description" : "Filter by requirement definition id.",
+            "disabled" : true
+          }, {
+            "key" : "contractorId",
+            "value" : "",
+            "description" : "Filter by contractor company id.",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by subject resource id (employee, vehicle, or equipment).",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "Filter by contract id.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by one or more site ids.",
+            "disabled" : true
+          }, {
+            "key" : "activityId",
+            "value" : "",
+            "description" : "Filter by activity id.",
+            "disabled" : true
+          }, {
+            "key" : "status",
+            "value" : "",
+            "description" : "Include only instances whose latest evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED).",
+            "disabled" : true
+          }, {
+            "key" : "excludeStatus",
+            "value" : "",
+            "description" : "Exclude instances whose latest evidence status is one of these values.",
+            "disabled" : true
+          }, {
+            "key" : "onlyCompanyRequirements",
+            "value" : "",
+            "description" : "When true, restricts to requirements that apply at company level.",
+            "disabled" : true
+          }, {
+            "key" : "onlyCriticalRequirements",
+            "value" : "",
+            "description" : "When true, restricts to critical requirements.",
+            "disabled" : true
+          }, {
+            "key" : "onlyAgreementRequirements",
+            "value" : "",
+            "description" : "When true, restricts to agreement-type requirements.",
+            "disabled" : true
+          }, {
+            "key" : "fromStartDate",
+            "value" : "Wed Jan 01 00:00:00 UTC 2025",
+            "description" : "Lower bound on requirement start date (inclusive), when applicable.",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "Filter by contract manager user ids; only instances whose contract has a manager in this set are included.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      }
+    }, {
+      "name" : "Get presigned URL for evidence file upload",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:requirementInstanceId/temporary-upload-url",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":requirementInstanceId", "temporary-upload-url" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id (acting company)"
+          }, {
+            "key" : "requirementInstanceId",
+            "value" : "{{requirementInstanceId}}",
+            "description" : "Requirement instance id (evidence context)"
+          } ],
+          "query" : [ {
+            "key" : "contentType",
+            "value" : "",
+            "description" : "MIME type of the file to upload",
+            "disabled" : false
+          }, {
+            "key" : "fileName",
+            "value" : "",
+            "description" : "Original file name",
+            "disabled" : false
+          }, {
+            "key" : "asSubcontractorId",
+            "value" : "",
+            "description" : "When set, upload is for this subcontractor company; chain access is validated.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a presigned POST URL and form fields for uploading files to object storage for a requirement instance (requirement instance id in the path identifies that instance). When **asSubcontractorId** is set, the caller must be allowed to submit for that subcontractor chain; otherwise the request is denied."
+      }
+    }, {
+      "name" : "Submit agreement evidence",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/agreement",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", "agreement" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor or client company id"
+          } ]
+        },
+        "description" : "Creates evidence for an agreement-type requirement instance (no file upload).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get evidence details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:evidenceId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":evidenceId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "evidenceId",
+            "value" : "{{evidenceId}}",
+            "description" : "Evidence id"
+          } ]
+        },
+        "description" : "Returns evidence details for the company (requirement read evidences permission)."
+      }
+    }, {
+      "name" : "Update evidence",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:evidenceId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":evidenceId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "evidenceId",
+            "value" : "{{evidenceId}}",
+            "description" : "Evidence id"
+          } ]
+        },
+        "description" : "Updates evidence fields such as express validation (evidence submit permission).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Approve evidence",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:evidenceId/approve",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":evidenceId", "approve" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "evidenceId",
+            "value" : "{{evidenceId}}",
+            "description" : "Evidence id"
+          } ]
+        },
+        "description" : "Approves a submitted evidence. Requires evidence review or approve permission.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Reject evidence",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:evidenceId/reject",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":evidenceId", "reject" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "evidenceId",
+            "value" : "{{evidenceId}}",
+            "description" : "Evidence id"
+          } ]
+        },
+        "description" : "Rejects a submitted evidence with optional reason and rejected acceptance criteria.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Link single-submission evidence to matching requirement instances",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/evidences/:evidenceId/matching-requirement-instances",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "evidences", ":evidenceId", "matching-requirement-instances" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id"
+          }, {
+            "key" : "evidenceId",
+            "value" : "{{evidenceId}}",
+            "description" : "Source evidence id"
+          } ]
+        },
+        "description" : "Applies the source evidence to additional requirement instances allowed by single-submission rules and visibility.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Submit file evidence",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/cm/companies/:companyId/evidences/upload",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "cm", "companies", ":companyId", "evidences", "upload" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Acting company id"
+          } ],
+          "query" : [ {
+            "key" : "asSubcontractorId",
+            "value" : "",
+            "description" : "When set, submit on behalf of this subcontractor company; chain access is validated.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Registers file evidence after uploads completed using the presigned URL from temporary-upload-url.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{\"filePaths\":[\"evidences/company-1/bucket-key-1\"],\"issueDate\":1749945600000,\"requirementInstanceId\":\"3fa85f64-5717-4562-b3fc-2c963f66afa6\",\"comments\":\"Optional note from the submitter.\",\"createdAt\":1749990600000,\"expirationDate\":1844640000000,\"expressValidation\":true,\"requirementDoesNotApply\":false}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    } ]
+  }, {
+    "name" : "Companies and contracts",
+    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company summary**: Read and patch company summary\n- **Contractors**: List and create contractors\n- **Sites**: Create a site; read or update a site; list sites as contractor; hierarchy, ancestors, and descendants\n- **Activities**: List company activities\n- **Contracts (CRUD)**: List, create, read, update, and soft-delete contracts (cascade; not the same as date-based expiry)\n- **Contract details**: Details, dates, logs, resources, risks, tree, and external dependencies for a contract\n- **Contract names and lists**: Search names and list with-clients / with-contractors filters\n- **Contract engagements**: List, create, and soft-delete engagements (delete blocked if resources assigned, has children, or last engagement); read engagement details\n- **Engagement resources**: Replace engagement resources and update resource risks\n- **Subcontracts**: List and create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
+    "item" : [ {
+      "name" : "Get company by id",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ]
+        },
+        "description" : "Returns full company details for the given id. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
+      }
+    }, {
+      "name" : "Update company details",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id to update"
+          } ]
+        },
+        "description" : "Update the information of an existing contractor company. **Body:** fields such as name, contact, address, products, and access-control configuration.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get company summary by id",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/summary",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "summary" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ]
+        },
+        "description" : "Returns a summary of company details for the given id."
+      }
+    }, {
+      "name" : "Create contractor company for a client",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "contractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Client company id that will own the relationship to the new contractor"
+          } ]
+        },
+        "description" : "Creates a new **contractor** company and links it to the client company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List contractors associated with the client company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/my-contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "my-contractors" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Text search on contractor name, email, or tax ID (optional; combined with `selected` when both are set)",
+            "disabled" : true
+          }, {
+            "key" : "activeContractsOnly",
+            "value" : "",
+            "description" : "When true, only contractors with at least one non-expired contract",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional list of contractor company IDs to include (OR with `q` when both are present)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Optional list of contractor company IDs to filter contracts by",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns distinct contractor companies that have at least one contract where the given company is the client. **Search (`q`):** matched against contractor name, email, and tax ID (partial, normalized for tax ID). **Filters:** `activeContractsOnly` restricts to non-expired contracts. `selected` limits results to the given contractor IDs (combined with `q` using OR when both are present). `contractorIds` hard-filters results to contractors whose ID appears in the list (applied before OR logic)."
+      }
+    }, {
+      "name" : "List child subcontractors",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/all-child-subcontractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "all-child-subcontractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search on subcontractor name",
+            "disabled" : true
+          }, {
+            "key" : "activeContractOnly",
+            "value" : "",
+            "description" : "When true, only entries with an active contract",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Subcontractor visibility scope",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional restrict to these subcontractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated child subcontractor companies under the caller’s contract network. **Search:** optional `q` filters by name. **Scope:** `companyScope` (`ALL`, `MY_COMPANY`, `MY_SUBCONTRACTORS`). **Contracts:** `activeContractOnly` limits to active relationships. **Selection:** `selected` restricts to given subcontractor IDs."
+      }
+    }, {
+      "name" : "Create site",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id under which the site is created"
+          } ]
+        },
+        "description" : "Creates a new site under the company. **Body:** `CreateSiteDto` — name, optional phone, photo, address, optional `parentId` / hierarchy (`childrenIds`, `level`), and timestamps as applicable. Returns the new site **id**.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get site by id",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id owning the site"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Site id"
+          } ]
+        },
+        "description" : "Returns a single site for a company."
+      }
+    }, {
+      "name" : "Update site",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id owning the site"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Site id to update"
+          } ]
+        },
+        "description" : "Updates an existing site. **Body:** mutable fields (name, contact, address, hierarchy links).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List client sites as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search on site name or related text handled by the query",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated sites of **client** companies the contractor works with. **Search:** optional `q` filters sites by text. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
+      }
+    }, {
+      "name" : "List client activities",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/activities",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "activities" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
+      }
+    }, {
+      "name" : "Create contract",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ]
+        },
+        "description" : "Creates a contract where the path `companyId` is the **client** company and `contractorId` in the body is the contractor. At least one **engagements** entry is required (site, activity, optional scope sites). Subcontracting rules (allowed tiers, authorization rules) are set via **subcontracting**.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Update contract",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract or subcontract ID to update"
+          } ]
+        },
+        "description" : "Partially updates a contract. The path **`companyId`** is the **client** company; **`contractId`** identifies either the **main** contract or a **subcontract** in its hierarchy. Body:** omit fields you do not want to change. **Main contract:** optional **name**, **managerId** (internal user id), validity **dateFrom** / **dateTo**, and optional **subcontracting** policy. **Subcontract:** only **dateFrom** and **dateTo**; **name**, **managerId**, and **subcontracting** are not accepted. When **dateFrom** or **dateTo** change, values must fall within the allowed window for that contract. The effective end date drives **expired** / **reinstated** lifecycle transitions relative to the company calendar.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete a contract",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID (subcontract ID to remove a subcontract)"
+          } ]
+        },
+        "description" : "Soft deletes the contract (contract is marked as deleted). Business rules: there is no requirement to clear engagements or unassign resources first; the API soft-deletes the contract together with descendant subcontracts, engagements, assignments, and related compliance data. This is not a “close” or “finalize” step—there is no separate REST action for that; date-based contract expiry is handled elsewhere and is independent of delete. To remove only a subcontract, call this with the subcontract’s contract ID."
+      }
+    }, {
+      "name" : "Get contracts where my company is client",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/with-contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "with-contractors" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractName",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showSubcontracts",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showOnlyInternalManagement",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractorTaxId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated contracts where the specified company acts as client. **Allowed sort fields:** `name` (contract name, default ascending); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "Get contracts where my company is contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/with-clients",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "with-clients" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "clientId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showSubcontracts",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractName",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "clientTaxId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated contracts where the specified company acts as contractor. **Allowed sort fields:** `created_at` (contract creation date, default descending); `name` (contract name); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
+      "name" : "List engagements for contract",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/engagements",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "engagements" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client or contractor)"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          } ]
+        },
+        "description" : "Returns engagements for the contract with site, activity, and resource count info per engagement. Deeper resource breakdowns are available on separate engagement detail endpoints."
+      }
+    }, {
+      "name" : "Create engagement under contract",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/engagements",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "engagements" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          } ]
+        },
+        "description" : "Adds a new engagement (site and activity scope) to an existing contract for the client company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete an engagement",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/engagements/:engagementId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "engagements", ":engagementId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          }, {
+            "key" : "engagementId",
+            "value" : "{{engagementId}}",
+            "description" : "Engagement ID to delete"
+          } ],
+          "query" : [ {
+            "key" : "removeAssignedResourcesConfirmed",
+            "value" : "",
+            "description" : "When true, assigned resources are removed as part of deletion after the client has confirmed the action.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Soft deletes the engagement (engagement is marked as deleted). Deletion is blocked if the engagement has child engagements or if it is the only engagement on the contract. When resources are still assigned, the first delete attempt returns 400 with employee, vehicle, and equipment counts; call again with removeAssignedResourcesConfirmed=true to unassign those resources and delete the engagement. After a successful delete, requirement/evidence data tied only to this engagement may be cleaned up asynchronously."
+      }
+    }, {
+      "name" : "Create subcontract directly",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID"
+          } ]
+        },
+        "description" : "Creates subcontractor link(s) for an engagement on behalf of the contractor company (path `companyId`).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List subcontract requests",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/requests",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", "requests" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "engagementId",
+            "value" : "",
+            "description" : "When set, only requests for this engagement are returned.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated subcontract requests for the client company, optionally filtered by engagement."
+      }
+    }, {
+      "name" : "Submit subcontract request",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/requests",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", "requests" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID"
+          } ]
+        },
+        "description" : "Creates a pending subcontract request for client approval (same body shape as direct subcontract creation).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Approve subcontract request",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/requests/:requestId/approve",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", "requests", ":requestId", "approve" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "requestId",
+            "value" : "{{requestId}}",
+            "description" : "Subcontract request ID"
+          } ]
+        },
+        "description" : "Approves a pending subcontract request for the client company."
+      }
+    }, {
+      "name" : "Reject subcontract request",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/requests/:requestId/reject",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", "requests", ":requestId", "reject" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "requestId",
+            "value" : "{{requestId}}",
+            "description" : "Subcontract request ID"
+          } ]
+        },
+        "description" : "Rejects a pending subcontract request. There is no request body; rejection reason is not stored via this endpoint."
+      }
+    }, {
+      "name" : "List subcontract requests submitted by my company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/requests/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", "requests", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID"
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated subcontract requests that the contractor company has submitted to clients."
+      }
+    }, {
+      "name" : "List subcontracts for engagement",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/subcontracts/:engagementId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "subcontracts", ":engagementId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "engagementId",
+            "value" : "{{engagementId}}",
+            "description" : "Engagement ID"
+          } ]
+        },
+        "description" : "Returns subcontracts linked to the given engagement for the client company."
+      }
+    } ]
+  } ]
+}
