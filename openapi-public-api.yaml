@@ -25,6 +25,7 @@ tags:
     - **My companies**: Related companies (contractors/clients) for a company
     - **Countries**: List countries
     - **Sites**: List sites for a company
+    - **Activities**: List company activities
     - **Assigned resources**: Resources assigned to contracts (client view)
     - **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)
     - **Clients**: Client companies for a contractor
@@ -32,13 +33,14 @@ tags:
     - **Employees**: List employees for a company
     - **Vehicles**: List vehicles for a company
     - **Equipment**: List equipment for a company
+    - **Contracts (as contractor)**: List contracts where the company acts as contractor
+    - **Contract engagements**: List engagements for a contract
 - name: Access control
   description: |-
     Track people and assets on site: register access and visits, query authorization status, and issue access cards.
 
     - **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies
     - **Visit register**: List and create visits; read and update a visit record
-    - **Employees**: List employees for a company
     - **Access register**: List and create access entries; record exit; read entry by id
     - **Access control (status)**: Read access control row by id; list as contractor or as client
     - **Access card**: Download access card file (PDF or PNG) for a resource
@@ -53,8 +55,6 @@ tags:
     - **Requirement template upload**: Presigned URL to upload a requirement template file
     - **Requirement stats**: Statistics for a requirement
     - **Requirement enable/disable**: Enable or disable a requirement for a company
-    - **Requirement names**: Search requirement names from clients
-    - **Requirements with clients**: List requirements with client-side filters
     - **Requirement instance**: Get a requirement instance
     - **Requirement instance logs**: List change logs for an instance
     - **Eligible resources**: List resources eligible for an instance
@@ -71,15 +71,12 @@ tags:
     Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.
 
     - **Company summary**: Read and patch company summary
-    - **Contractors**: List and create contractors
-    - **Sites**: Create a site; read or update a site; list sites as contractor; hierarchy, ancestors, and descendants
-    - **Activities**: List company activities
-    - **Contracts (CRUD)**: List, create, read, update, and soft-delete contracts (cascade; not the same as date-based expiry)
-    - **Contract details**: Details, dates, logs, resources, risks, tree, and external dependencies for a contract
-    - **Contract names and lists**: Search names and list with-clients / with-contractors filters
-    - **Contract engagements**: List, create, and soft-delete engagements (delete blocked if resources assigned, has children, or last engagement); read engagement details
-    - **Engagement resources**: Replace engagement resources and update resource risks
-    - **Subcontracts**: List and create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement
+    - **Contractors**: Create contractors; list contractors with active contracts (my-contractors)
+    - **Child subcontractors**: List child subcontractor companies
+    - **Sites**: Create a site; read or update a site; list sites as contractor
+    - **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter
+    - **Contract engagements**: Create engagements for a contract; soft-delete engagement
+    - **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement
 paths:
   /v1/users/me:
     get:
@@ -286,14 +283,94 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/activities:
+    get:
+      tags:
+      - Shared
+      summary: List client activities
+      description: "Returns a paginated list of activities defined for the company\
+        \ (client configuration). **Sort format:** `sort=name,asc` (default: name\
+        \ ascending)."
+      operationId: findAll_5
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: companyId
+        in: path
+        description: Company ID (client)
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: Paged activities
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelActivityDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{id}/assigned-resources:
     get:
       tags:
       - Shared
       summary: List assigned resources (as client)
-      description: Retrieves paginated list of resources assigned to contracts where
-        the company acts as client. Use this endpoint to obtain resource IDs for filtering
-        in access-control endpoints.
+      description: "Retrieves a paginated list of resources (employees, vehicles,\
+        \ equipment) assigned to contracts where the company acts as client. The result\
+        \ covers the whole contract tree: direct contractors and any subcontractors\
+        \ they have engaged, because subcontracts inherit the head client's id. One\
+        \ row per resource. Use this endpoint to obtain resource ids for filtering\
+        \ in access-control endpoints or when a lightweight listing is enough. Max\
+        \ page size: 100."
       operationId: findAssignedResources
       parameters:
       - name: id
@@ -398,14 +475,138 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelResourceBasicData"
+  /v1/companies/{id}/assigned-resources-detailed:
+    get:
+      tags:
+      - Shared
+      summary: List assigned resources with detailed information (as client)
+      description: "Retrieves a paginated list of resources assigned to contracts\
+        \ where the company acts as client. Each resource carries its per-resource\
+        \ attributes (employee identity, vehicle plate, equipment serial, etc.) plus\
+        \ an 'engagements' array describing every (contract, site, activity) where\
+        \ that resource is currently deployed. For EMPLOYEE resources, each engagement\
+        \ also lists the risks assigned on that specific assignment. Pagination is\
+        \ per resource — a resource deployed on N engagements is one page entry with\
+        \ N items in 'engagements'. The result covers the whole contract tree including\
+        \ subcontractors, because subcontracts inherit the head client's id. Max page\
+        \ size: 100."
+      operationId: findAssignedDetailedResources
+      parameters:
+      - name: id
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Search query to filter resources by name
+        required: false
+        schema:
+          type: string
+      - name: resourceId
+        in: query
+        description: Filter by a single resource ID. Combined with resourceIds using
+          OR — the result is the union of both.
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: resourceType
+        in: query
+        description: "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated:\
+          \ use resourceTypes instead. If both resourceType and resourceTypes are\
+          \ provided, they are combined using OR."
+        required: false
+        schema:
+          type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: contractorIds
+        in: query
+        description: Filter by specific contractor IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by multiple resource IDs. Combined with resourceId using
+          OR — the result is the union of both.
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved resources list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
   /v1/companies/{id}/assigned-resources/as-contractor:
     get:
       tags:
       - Shared
-      summary: List assigned resources (as contractor)
-      description: Retrieves paginated list of resources assigned to contracts where
-        the company acts as contractor. Use this endpoint to obtain resource IDs for
-        filtering in access-control endpoints.
+      summary: List assigned resources with detailed information (as contractor)
+      description: "Retrieves a paginated list of resources (employees, vehicles,\
+        \ equipment) assigned to contracts where the company acts as contractor, across\
+        \ all its client relationships. Each resource carries per-type attributes\
+        \ plus an 'engagements' array describing every (contract, site, activity)\
+        \ where the resource is currently deployed. For EMPLOYEE resources, each engagement\
+        \ lists the risks assigned on that specific assignment. Use 'companyScope'\
+        \ to include resources from the contractor's own subcontractors (requires\
+        \ the RESOURCE_READ_SUBCONTRACTOR permission). Max page size: 100."
       operationId: findAssignedResourcesAsContractor
       parameters:
       - name: id
@@ -508,19 +709,19 @@ paths:
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
         "401":
           description: "Unauthorized: authentication required"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
         "403":
           description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelResourceBasicData"
+                $ref: "#/components/schemas/PagedModelResourceDetailedData"
   /v1/companies/{contractorId}/clients:
     get:
       tags:
@@ -972,6 +1173,124 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/contracts/with-clients:
+    get:
+      tags:
+      - Shared
+      summary: Get contracts where my company is contractor
+      description: "Returns paginated contracts where the specified company acts as\
+        \ contractor. **Allowed sort fields:** `created_at` (contract creation date,\
+        \ default descending); `name` (contract name); `client.name` (client company\
+        \ name); `contractor.name` (contractor company name); `mainContractor.name`\
+        \ (main contractor company name); `dateFrom` (contract start date); `dateTo`\
+        \ (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      operationId: contractsWhereMyCompanyIsContractor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: clientId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: showSubcontracts
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractName
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: siteIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: showExpired
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: clientTaxId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "created_at,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractData"
   /v1/companies/{companyId}/visitor/{visitorId}:
     get:
       tags:
@@ -3386,197 +3705,6 @@ paths:
         "200":
           description: OK
           content: {}
-  /v1/companies/{companyId}/requirements/with-clients:
-    get:
-      tags:
-      - Requirements
-      summary: List requirement configurations as contractor
-      description: "Returns paginated requirement configurations for the company acting\
-        \ as a contractor: requirements defined by client companies linked to this\
-        \ contractor. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`,\
-        \ `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`.\
-        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
-      operationId: findAllWithClients
-      parameters:
-      - name: companyId
-        in: path
-        description: Company ID acting as contractor
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: name
-        in: query
-        description: Partial match on requirement name.
-        required: false
-        schema:
-          type: string
-          description: Partial match on requirement name.
-      - name: subject
-        in: query
-        description: "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE,\
-          \ EQUIPMENT, COMPANY)."
-        required: false
-        schema:
-          type: string
-          description: "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE,\
-            \ EQUIPMENT, COMPANY)."
-      - name: multipleRequestInstance
-        in: query
-        description: Filter by multiple-instance mode string (enum name matching `MultipleInstanceRequest`).
-        required: false
-        schema:
-          type: string
-          description: Filter by multiple-instance mode string (enum name matching
-            `MultipleInstanceRequest`).
-      - name: expirationType
-        in: query
-        description: Filter by one or more expiration type keys (enum names matching
-          `RequirementExpirationType`).
-        required: false
-        schema:
-          type: array
-          description: Filter by one or more expiration type keys (enum names matching
-            `RequirementExpirationType`).
-          items:
-            type: string
-            description: Filter by one or more expiration type keys (enum names matching
-              `RequirementExpirationType`).
-      - name: appliedTo
-        in: query
-        description: Filter by apply-to scope string (enum name matching `ApplyTo`).
-        required: false
-        schema:
-          type: string
-          description: Filter by apply-to scope string (enum name matching `ApplyTo`).
-      - name: related
-        in: query
-        description: "When set, filters requirements linked to related requirement\
-          \ definitions."
-        required: false
-        schema:
-          type: boolean
-          description: "When set, filters requirements linked to related requirement\
-            \ definitions."
-      - name: disabled
-        in: query
-        description: "When set, includes or excludes disabled requirements."
-        required: false
-        schema:
-          type: boolean
-          description: "When set, includes or excludes disabled requirements."
-      - name: evidenceType
-        in: query
-        description: Filter by evidence type (UPLOAD or AGREEMENT).
-        required: false
-        schema:
-          type: string
-          description: Filter by evidence type (UPLOAD or AGREEMENT).
-          enum:
-          - UPLOAD
-          - AGREEMENT
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved requirements
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseGetRequirementResponse"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/requirements/from-clients/names:
-    get:
-      tags:
-      - Requirements
-      summary: Search requirement names (contractor context)
-      description: "Returns a page of requirement **names** from clients linked to\
-        \ the contractor, optionally filtered by text (`q`). Scoped by site visibility."
-      operationId: findAllWithClientsOnlyNames
-      parameters:
-      - name: companyId
-        in: path
-        description: Contractor company id
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: Optional case-insensitive search on requirement name
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseString"
   /v1/companies/{companyId}/requirement-instances/{instanceId}:
     get:
       tags:
@@ -3805,12 +3933,21 @@ paths:
           description: Partial match on requirement name.
       - name: clientId
         in: query
-        description: Filter by client company id (subject to visibility).
         required: false
         schema:
           type: string
           format: uuid
-          description: Filter by client company id (subject to visibility).
+      - name: clientIds
+        in: query
+        description: Filter by one or more client company ids (subject to visibility).
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more client company ids (subject to visibility).
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more client company ids (subject to visibility).
       - name: resourceId
         in: query
         description: "Filter by subject resource id (employee, vehicle, or equipment)."
@@ -3827,6 +3964,12 @@ paths:
           type: string
           format: uuid
           description: Filter by contract id.
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
       - name: siteIds
         in: query
         description: Filter by one or more site ids.
@@ -5085,70 +5228,38 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/activities:
+  /v1/companies/{companyId}/sites/as-contractor/hierarchy:
     get:
       tags:
       - Companies and contracts
-      summary: List client activities
-      description: "Returns a paginated list of activities defined for the company\
-        \ (client configuration). **Sort format:** `sort=name,asc` (default: name\
-        \ ascending)."
-      operationId: findAll_5
+      summary: Client site hierarchy as contractor
+      description: Returns site hierarchy trees for each **client** company the contractor
+        has active contracts with. Sites are expanded to full hierarchy branches from
+        the engagement scope. **Search:** optional `q` filters sites by name.
+      operationId: findHierarchyAsContractor
       parameters:
       - name: q
         in: query
+        description: Optional search on site name
         required: false
         schema:
           type: string
-      - name: selected
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
       - name: companyId
         in: path
-        description: Company ID (client)
+        description: Contractor company id
         required: true
         schema:
           type: string
           format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
       responses:
         "200":
-          description: Paged activities
+          description: Successfully retrieved site hierarchies
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelActivityDto"
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractorSiteHierarchyDto"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -5456,128 +5567,10 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseContractData"
-  /v1/companies/{companyId}/contracts/with-clients:
-    get:
-      tags:
-      - Companies and contracts
-      summary: Get contracts where my company is contractor
-      description: "Returns paginated contracts where the specified company acts as\
-        \ contractor. **Allowed sort fields:** `created_at` (contract creation date,\
-        \ default descending); `name` (contract name); `client.name` (client company\
-        \ name); `contractor.name` (contractor company name); `mainContractor.name`\
-        \ (main contractor company name); `dateFrom` (contract start date); `dateTo`\
-        \ (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
-      operationId: contractsWhereMyCompanyIsContractor
-      parameters:
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: clientId
-        in: query
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: showSubcontracts
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: dateFrom
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date
-      - name: dateTo
-        in: query
-        required: false
-        schema:
-          type: string
-          format: date
-      - name: contractId
-        in: query
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: contractName
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: siteIds
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: activityIds
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: showExpired
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: clientTaxId
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "created_at,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseContractData"
   /v1/companies/{companyId}/contracts/{contractId}/engagements:
     get:
       tags:
-      - Companies and contracts
+      - Shared
       summary: List engagements for contract
       description: "Returns engagements for the contract with site, activity, and\
         \ resource count info per engagement. Deeper resource breakdowns are available\
@@ -8185,6 +8178,120 @@ components:
       - id
       - name
       - resourceType
+    ActivityRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    ContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    EngagementAssignment:
+      type: object
+      properties:
+        assignmentId:
+          type: string
+          format: uuid
+        contract:
+          $ref: "#/components/schemas/ContractRef"
+        site:
+          $ref: "#/components/schemas/EngagementSite"
+        activity:
+          $ref: "#/components/schemas/ActivityRef"
+        assignedRisks:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskRef"
+      required:
+      - assignedRisks
+      - assignmentId
+      - contract
+    EngagementSite:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PagedModelResourceDetailedData:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceDetailedData"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    ResourceDetailedData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+        firstName:
+          type: string
+        lastName:
+          type: string
+        identity:
+          type: string
+        registrationPlate:
+          type: string
+        serialNumber:
+          type: string
+        type:
+          type: string
+        manufacturer:
+          type: string
+        model:
+          type: string
+        engagements:
+          type: array
+          items:
+            $ref: "#/components/schemas/EngagementAssignment"
+      required:
+      - engagements
+      - id
+      - name
+      - resourceType
+    RiskRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - id
+      - name
     MyCompanyDataDto:
       type: object
       properties:
@@ -8984,6 +9091,22 @@ components:
       - id
       - level
       - name
+    ContractorSiteHierarchyDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteHierarchyNodeDto"
+      required:
+      - clientId
+      - clientName
+      - sites
     Custody:
       type: object
       properties:

@@ -32,7 +32,7 @@
   },
   "item" : [ {
     "name" : "Shared",
-    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **My companies**: Related companies (contractors/clients) for a company\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company",
+    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **My companies**: Related companies (contractors/clients) for a company\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Activities**: List company activities\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company\n- **Contracts (as contractor)**: List contracts where the company acts as contractor\n- **Contract engagements**: List engagements for a contract",
     "item" : [ {
       "name" : "Get current user information",
       "request" : {
@@ -145,6 +145,49 @@
         "description" : "Paginated countries catalog. Filter by partial **name** match."
       }
     }, {
+      "name" : "List client activities",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/activities",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "activities" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
+      }
+    }, {
       "name" : "List assigned resources (as client)",
       "request" : {
         "method" : "GET",
@@ -205,10 +248,73 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated list of resources assigned to contracts where the company acts as client. Use this endpoint to obtain resource IDs for filtering in access-control endpoints."
+        "description" : "Retrieves a paginated list of resources (employees, vehicles, equipment) assigned to contracts where the company acts as client. The result covers the whole contract tree: direct contractors and any subcontractors they have engaged, because subcontracts inherit the head client's id. One row per resource. Use this endpoint to obtain resource ids for filtering in access-control endpoints or when a lightweight listing is enough. Max page size: 100."
       }
     }, {
-      "name" : "List assigned resources (as contractor)",
+      "name" : "List assigned resources with detailed information (as client)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/assigned-resources-detailed",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "assigned-resources-detailed" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Client company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search query to filter resources by name",
+            "disabled" : true
+          }, {
+            "key" : "resourceId",
+            "value" : "",
+            "description" : "Filter by a single resource ID. Combined with resourceIds using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "resourceType",
+            "value" : "",
+            "description" : "Filter by resource type (EMPLOYEE, VEHICLE, EQUIPMENT). Deprecated: use resourceTypes instead. If both resourceType and resourceTypes are provided, they are combined using OR.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by specific contractor IDs",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by multiple resource IDs. Combined with resourceId using OR — the result is the union of both.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Retrieves a paginated list of resources assigned to contracts where the company acts as client. Each resource carries its per-resource attributes (employee identity, vehicle plate, equipment serial, etc.) plus an 'engagements' array describing every (contract, site, activity) where that resource is currently deployed. For EMPLOYEE resources, each engagement also lists the risks assigned on that specific assignment. Pagination is per resource — a resource deployed on N engagements is one page entry with N items in 'engagements'. The result covers the whole contract tree including subcontractors, because subcontracts inherit the head client's id. Max page size: 100."
+      }
+    }, {
+      "name" : "List assigned resources with detailed information (as contractor)",
       "request" : {
         "method" : "GET",
         "header" : [ ],
@@ -273,7 +379,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated list of resources assigned to contracts where the company acts as contractor. Use this endpoint to obtain resource IDs for filtering in access-control endpoints."
+        "description" : "Retrieves a paginated list of resources (employees, vehicles, equipment) assigned to contracts where the company acts as contractor, across all its client relationships. Each resource carries per-type attributes plus an 'engagements' array describing every (contract, site, activity) where the resource is currently deployed. For EMPLOYEE resources, each engagement lists the risks assigned on that specific assignment. Use 'companyScope' to include resources from the contractor's own subcontractors (requires the RESOURCE_READ_SUBCONTRACTOR permission). Max page size: 100."
       }
     }, {
       "name" : "List client companies",
@@ -526,6 +632,94 @@
         "description" : "Returns a paginated list of equipment for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
       }
     }, {
+      "name" : "Get contracts where my company is contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/with-clients",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "with-clients" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "clientId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showSubcontracts",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractName",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "clientTaxId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated contracts where the specified company acts as contractor. **Allowed sort fields:** `created_at` (contract creation date, default descending); `name` (contract name); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    }, {
       "name" : "List sites",
       "request" : {
         "method" : "GET",
@@ -568,10 +762,31 @@
         },
         "description" : "Retrieves paginated list of sites for a company. Use this endpoint to obtain site IDs for filtering in other endpoints."
       }
+    }, {
+      "name" : "List engagements for contract",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/engagements",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "engagements" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client or contractor)"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          } ]
+        },
+        "description" : "Returns engagements for the contract with site, activity, and resource count info per engagement. Deeper resource breakdowns are available on separate engagement detail endpoints."
+      }
     } ]
   }, {
     "name" : "Access control",
-    "description" : "Track people and assets on site: register access and visits, query authorization status, and issue access cards.\n\n- **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies\n- **Visit register**: List and create visits; read and update a visit record\n- **Employees**: List employees for a company\n- **Access register**: List and create access entries; record exit; read entry by id\n- **Access control (status)**: Read access control row by id; list as contractor or as client\n- **Access card**: Download access card file (PDF or PNG) for a resource\n- **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers\n- **All contractors**: List all contractors for a company",
+    "description" : "Track people and assets on site: register access and visits, query authorization status, and issue access cards.\n\n- **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies\n- **Visit register**: List and create visits; read and update a visit record\n- **Access register**: List and create access entries; record exit; read entry by id\n- **Access control (status)**: Read access control row by id; list as contractor or as client\n- **Access card**: Download access card file (PDF or PNG) for a resource\n- **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers\n- **All contractors**: List all contractors for a company",
     "item" : [ {
       "name" : "Get visitor by ID",
       "request" : {
@@ -1620,7 +1835,7 @@
     } ]
   }, {
     "name" : "Requirements",
-    "description" : "Configure contract requirements, inspect requirement instances, and submit or review evidence against them.\n\n- **Requirement (detail)**: Get and update a requirement configuration\n- **Requirements (list)**: List and create requirements\n- **Requirement template upload**: Presigned URL to upload a requirement template file\n- **Requirement stats**: Statistics for a requirement\n- **Requirement enable/disable**: Enable or disable a requirement for a company\n- **Requirement names**: Search requirement names from clients\n- **Requirements with clients**: List requirements with client-side filters\n- **Requirement instance**: Get a requirement instance\n- **Requirement instance logs**: List change logs for an instance\n- **Eligible resources**: List resources eligible for an instance\n- **Requirement instances (contractor)**: List instances and contractor requirement index\n- **Requirement instances (client)**: List instances for the client company\n- **Evidence file upload URL**: Presigned URL for evidence file upload\n- **Evidence agreement**: Submit agreement-type evidence\n- **Evidence (read/update)**: Get or update an evidence record\n- **Evidence approve**: Approve evidence\n- **Evidence reject**: Reject evidence\n- **Evidence matching**: Match submitted evidence to requirement instances",
+    "description" : "Configure contract requirements, inspect requirement instances, and submit or review evidence against them.\n\n- **Requirement (detail)**: Get and update a requirement configuration\n- **Requirements (list)**: List and create requirements\n- **Requirement template upload**: Presigned URL to upload a requirement template file\n- **Requirement stats**: Statistics for a requirement\n- **Requirement enable/disable**: Enable or disable a requirement for a company\n- **Requirement instance**: Get a requirement instance\n- **Requirement instance logs**: List change logs for an instance\n- **Eligible resources**: List resources eligible for an instance\n- **Requirement instances (contractor)**: List instances and contractor requirement index\n- **Requirement instances (client)**: List instances for the client company\n- **Evidence file upload URL**: Presigned URL for evidence file upload\n- **Evidence agreement**: Submit agreement-type evidence\n- **Evidence (read/update)**: Get or update an evidence record\n- **Evidence approve**: Approve evidence\n- **Evidence reject**: Reject evidence\n- **Evidence matching**: Match submitted evidence to requirement instances",
     "item" : [ {
       "name" : "Get requirement configuration by ID",
       "request" : {
@@ -1863,117 +2078,6 @@
         "description" : "Soft-disables a requirement for the client company so it no longer generates new instances as configured."
       }
     }, {
-      "name" : "List requirement configurations as contractor",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/with-clients",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "requirements", "with-clients" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : "Company ID acting as contractor"
-          } ],
-          "query" : [ {
-            "key" : "name",
-            "value" : "",
-            "description" : "Partial match on requirement name.",
-            "disabled" : true
-          }, {
-            "key" : "subject",
-            "value" : "",
-            "description" : "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE, EQUIPMENT, COMPANY).",
-            "disabled" : true
-          }, {
-            "key" : "multipleRequestInstance",
-            "value" : "",
-            "description" : "Filter by multiple-instance mode string (enum name matching `MultipleInstanceRequest`).",
-            "disabled" : true
-          }, {
-            "key" : "expirationType",
-            "value" : "",
-            "description" : "Filter by one or more expiration type keys (enum names matching `RequirementExpirationType`).",
-            "disabled" : true
-          }, {
-            "key" : "appliedTo",
-            "value" : "",
-            "description" : "Filter by apply-to scope string (enum name matching `ApplyTo`).",
-            "disabled" : true
-          }, {
-            "key" : "related",
-            "value" : "",
-            "description" : "When set, filters requirements linked to related requirement definitions.",
-            "disabled" : true
-          }, {
-            "key" : "disabled",
-            "value" : "",
-            "description" : "When set, includes or excludes disabled requirements.",
-            "disabled" : true
-          }, {
-            "key" : "evidenceType",
-            "value" : "",
-            "description" : "Filter by evidence type (UPLOAD or AGREEMENT).",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Returns paginated requirement configurations for the company acting as a contractor: requirements defined by client companies linked to this contractor. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
-      }
-    }, {
-      "name" : "Search requirement names (contractor context)",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirements/from-clients/names",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "requirements", "from-clients", "names" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : "Contractor company id"
-          } ],
-          "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "Optional case-insensitive search on requirement name",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Returns a page of requirement **names** from clients linked to the contractor, optionally filtered by text (`q`). Scoped by site visibility."
-      }
-    }, {
       "name" : "Get requirement instance details",
       "request" : {
         "method" : "GET",
@@ -2100,7 +2204,12 @@
           }, {
             "key" : "clientId",
             "value" : "",
-            "description" : "Filter by client company id (subject to visibility).",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "clientIds",
+            "value" : "",
+            "description" : "Filter by one or more client company ids (subject to visibility).",
             "disabled" : true
           }, {
             "key" : "resourceId",
@@ -2111,6 +2220,11 @@
             "key" : "contractId",
             "value" : "",
             "description" : "Filter by contract id.",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -2523,7 +2637,7 @@
     } ]
   }, {
     "name" : "Companies and contracts",
-    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company summary**: Read and patch company summary\n- **Contractors**: List and create contractors\n- **Sites**: Create a site; read or update a site; list sites as contractor; hierarchy, ancestors, and descendants\n- **Activities**: List company activities\n- **Contracts (CRUD)**: List, create, read, update, and soft-delete contracts (cascade; not the same as date-based expiry)\n- **Contract details**: Details, dates, logs, resources, risks, tree, and external dependencies for a contract\n- **Contract names and lists**: Search names and list with-clients / with-contractors filters\n- **Contract engagements**: List, create, and soft-delete engagements (delete blocked if resources assigned, has children, or last engagement); read engagement details\n- **Engagement resources**: Replace engagement resources and update resource risks\n- **Subcontracts**: List and create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
+    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company summary**: Read and patch company summary\n- **Contractors**: Create contractors; list contractors with active contracts (my-contractors)\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
     "item" : [ {
       "name" : "Get company by id",
       "request" : {
@@ -2832,47 +2946,27 @@
         "description" : "Paginated sites of **client** companies the contractor works with. **Search:** optional `q` filters sites by text. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
       }
     }, {
-      "name" : "List client activities",
+      "name" : "Client site hierarchy as contractor",
       "request" : {
         "method" : "GET",
         "header" : [ ],
         "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/activities",
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/as-contractor/hierarchy",
           "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "activities" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", "as-contractor", "hierarchy" ],
           "variable" : [ {
             "key" : "companyId",
             "value" : "{{companyId}}",
-            "description" : "Company ID (client)"
+            "description" : "Contractor company id"
           } ],
           "query" : [ {
             "key" : "q",
             "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "selected",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "description" : "Optional search on site name",
             "disabled" : true
           } ]
         },
-        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
+        "description" : "Returns site hierarchy trees for each **client** company the contractor has active contracts with. Sites are expanded to full hierarchy branches from the engagement scope. **Search:** optional `q` filters sites by name."
       }
     }, {
       "name" : "Create contract",
@@ -3048,115 +3142,6 @@
           } ]
         },
         "description" : "Returns paginated contracts where the specified company acts as client. **Allowed sort fields:** `name` (contract name, default ascending); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
-      }
-    }, {
-      "name" : "Get contracts where my company is contractor",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/with-clients",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "contracts", "with-clients" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : ""
-          } ],
-          "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "clientId",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "showSubcontracts",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "dateFrom",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "dateTo",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "contractId",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "contractName",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "siteIds",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "activityIds",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "showExpired",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "clientTaxId",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Returns paginated contracts where the specified company acts as contractor. **Allowed sort fields:** `created_at` (contract creation date, default descending); `name` (contract name); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
-      }
-    }, {
-      "name" : "List engagements for contract",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/engagements",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "engagements" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : "Company ID (client or contractor)"
-          }, {
-            "key" : "contractId",
-            "value" : "{{contractId}}",
-            "description" : "Contract ID"
-          } ]
-        },
-        "description" : "Returns engagements for the contract with site, activity, and resource count info per engagement. Deeper resource breakdowns are available on separate engagement detail endpoints."
       }
     }, {
       "name" : "Create engagement under contract",
