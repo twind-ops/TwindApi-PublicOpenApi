@@ -3900,13 +3900,14 @@ paths:
       tags:
       - Requirements
       summary: Get requirement instances as contractor
-      description: "Returns paginated requirement instances for a contractor company.\
-        \ **Allowed sort fields:** `client_name` (client company name); `subject_name`\
-        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
-        \ (requirement name); `contract_date_from` (minimum contract start date);\
-        \ `evidence_expiration` (minimum tolerance date: expiration + grace period);\
-        \ `created_at` (instance creation date, default). **Sort format:** use query\
-        \ parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
+      description: "**Deprecated – use `v2/as-contractor` instead.** Returns paginated\
+        \ requirement instances for a contractor company. **Allowed sort fields:**\
+        \ `client_name` (client company name); `subject_name` (resource name: employee\
+        \ full name, vehicle, or equipment); `requirement_name` (requirement name);\
+        \ `contract_date_from` (minimum contract start date); `evidence_expiration`\
+        \ (minimum tolerance date: expiration + grace period); `created_at` (instance\
+        \ creation date, default). **Sort format:** use query parameter `sort=field,direction`\
+        \ (e.g. `?sort=client_name,asc`)."
       operationId: getPendingRequirementsAsContractor
       parameters:
       - name: companyId
@@ -4132,18 +4133,20 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseRequirementInstanceAsContractor"
+      deprecated: true
   /v1/companies/{companyId}/requirement-instances/as-client:
     get:
       tags:
       - Requirements
       summary: Get requirement instances as client
-      description: "Returns paginated requirement instances for a client company.\
-        \ **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name`\
-        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
-        \ (requirement name); `evidence_expiration` (minimum tolerance date: expiration\
-        \ + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date`\
-        \ (evidence upload date); `created_at` (instance creation date, default).\
-        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      description: "**Deprecated – use `v2/as-client` instead.** Returns paginated\
+        \ requirement instances for a client company. **Allowed sort fields:** `contractor_name`\
+        \ (contractor company name); `subject_name` (resource name: employee full\
+        \ name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration`\
+        \ (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence\
+        \ date of issue); `evidence_upload_date` (evidence upload date); `created_at`\
+        \ (instance creation date, default). **Sort format:** use query parameter\
+        \ `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       operationId: getPendingRequirementsAsCustomer
       parameters:
       - name: companyId
@@ -4325,6 +4328,7 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseRequirementInstanceAsClient"
+      deprecated: true
   /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url:
     get:
       tags:
