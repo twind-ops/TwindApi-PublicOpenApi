@@ -744,6 +744,11 @@
             "description" : "",
             "disabled" : true
           }, {
+            "key" : "skipTeamFilter",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2873,6 +2878,12 @@
             "key" : "id",
             "value" : "{{id}}",
             "description" : "Site id"
+          } ],
+          "query" : [ {
+            "key" : "skipTeamFilter",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
           } ]
         },
         "description" : "Returns a single site for a company."
@@ -2894,6 +2905,12 @@
             "key" : "id",
             "value" : "{{id}}",
             "description" : "Site id to update"
+          } ],
+          "query" : [ {
+            "key" : "skipTeamFilter",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
           } ]
         },
         "description" : "Updates an existing site. **Body:** mutable fields (name, contact, address, hierarchy links).",

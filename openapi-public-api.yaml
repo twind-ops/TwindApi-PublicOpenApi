@@ -4960,6 +4960,11 @@ paths:
           items:
             type: string
             format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -5082,6 +5087,11 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
       responses:
         "200":
           description: Successfully retrieved site
@@ -5129,6 +5139,11 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
       requestBody:
         content:
           application/json:
