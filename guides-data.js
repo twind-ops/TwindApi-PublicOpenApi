@@ -39,4 +39,12 @@ const GUIDES_DATA = [
       "Learn how to upload a requirement template file using the Twind API.",
     icon: "assets/icon-file-upload.svg",
   },
+  {
+    id: "assigned-resources-api",
+    file: "assigned-resources-api.md",
+    title: "Resources API — Assigned resources",
+    description:
+      "List resources assigned to active contracts with engagement context (contract, site, activity, assigned risks) from the client or contractor side.",
+    icon: "assets/icon-file-upload.svg",
+  },
 ];
