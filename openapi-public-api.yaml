@@ -1208,6 +1208,7 @@ paths:
         required: false
         schema:
           type: boolean
+          default: false
       - name: dateFrom
         in: query
         required: false
@@ -1252,6 +1253,7 @@ paths:
         required: false
         schema:
           type: boolean
+          default: false
       - name: clientTaxId
         in: query
         required: false
@@ -1779,33 +1781,80 @@ paths:
           format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        description: Deprecated — use 'siteIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (multi-value). Replaces deprecated 'siteId'.\
+          \ Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: resourceId
         in: query
-        description: Filter by resource ID. Obtain resource IDs from access-control
-          endpoints (resource.id field)
+        description: Deprecated — use 'resourceIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'.
+          Obtain resource IDs from access-control endpoints (resource.id field)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: contractorId
         in: query
-        description: Filter by contractor ID. Obtain contractor IDs from access-control
-          endpoints (contractor.id field)
+        description: Deprecated — use 'contractorIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-      - name: resourceType
+      - name: contractorIds
         in: query
-        description: "Filter by resource discriminator (e.g. EMPLOYEE, VEHICLE, EQUIPMENT)"
+        description: "Filter by counterparty company IDs (multi-value). Replaces deprecated\
+          \ 'contractorId'. Represents contractors when the authenticated company\
+          \ is the client, and vice-versa. Obtain contractor IDs from access-control\
+          \ endpoints (contractor.id field)"
         required: false
         schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: resourceType
+        in: query
+        description: Deprecated — use 'resourceTypes' instead.
+        required: false
+        deprecated: true
+        schema:
           type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (multi-value: EMPLOYEE, VEHICLE, EQUIPMENT).\
+          \ Replaces deprecated 'resourceType'."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - VEHICLE
+            - EQUIPMENT
       - name: from
         in: query
         description: Filter entries with entry_at on or after this instant (inclusive)
@@ -1876,6 +1925,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetAccessRegisterResponse"
+        "400":
+          description: "Bad request: a deprecated singular filter and its plural counterpart\
+            \ were both supplied (e.g. 'siteId' and 'siteIds')."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -3104,40 +3160,101 @@ paths:
           format: uuid
       - name: clientId
         in: query
-        description: "Filter by client ID. Results are automatically filtered based\
-          \ on user's client company visibility. Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)"
+        description: Deprecated — use 'clientIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: clientIds
+        in: query
+        description: "Filter by client IDs (multi-value). Replaces deprecated 'clientId'.\
+          \ Results are automatically filtered based on user's client company visibility.\
+          \ Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Results are automatically filtered based\
-          \ on user's client site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        description: Deprecated — use 'siteIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (multi-value). Replaces deprecated 'siteId'.\
+          \ Results are automatically filtered based on user's client site visibility.\
+          \ Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: resourceType
         in: query
-        description: "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)"
+        description: Deprecated — use 'resourceTypes' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (multi-value: EMPLOYEE, EQUIPMENT,\
+          \ VEHICLE). Replaces deprecated 'resourceType'."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - VEHICLE
+            - EQUIPMENT
       - name: status
         in: query
-        description: "Filter by status (ALLOWED, NOT_ALLOWED)"
+        description: Deprecated — use 'statuses' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: statuses
+        in: query
+        description: "Filter by statuses (multi-value: ALLOWED, NOT_ALLOWED, PARTIALLY_ALLOWED).\
+          \ Replaces deprecated 'status'."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ALLOWED
+            - PARTIALLY_ALLOWED
+            - NOT_ALLOWED
       - name: resourceId
         in: query
-        description: Filter by specific resource ID. Obtain resource IDs from the
-          response of access-control endpoints (resource.id field)
+        description: Deprecated — use 'resourceIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'.
+          Obtain resource IDs from the response of access-control endpoints (resource.id
+          field)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: companyScope
         in: query
         description: "Filter by subcontractor scope (ALL, MY_COMPANY, MY_SUBCONTRACTORS)."
@@ -3199,6 +3316,13 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "400":
+          description: "Bad request: a deprecated singular filter and its plural counterpart\
+            \ were both supplied (e.g. 'siteId' and 'siteIds')."
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -3241,40 +3365,101 @@ paths:
           format: uuid
       - name: contractorId
         in: query
-        description: Filter by contractor ID. Obtain contractor IDs from the response
-          of access-control endpoints (contractor.id field)
+        description: Deprecated — use 'contractorIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: contractorIds
+        in: query
+        description: Filter by contractor IDs (multi-value). Replaces deprecated 'contractorId'.
+          Obtain contractor IDs from the response of access-control endpoints (contractor.id
+          field)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: siteId
         in: query
-        description: "Filter by site ID. Results are automatically filtered based\
-          \ on user's site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        description: Deprecated — use 'siteIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (multi-value). Replaces deprecated 'siteId'.\
+          \ Results are automatically filtered based on user's site visibility. Obtain\
+          \ site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: resourceType
         in: query
-        description: "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)"
+        description: Deprecated — use 'resourceTypes' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: resourceTypes
+        in: query
+        description: "Filter by resource types (multi-value: EMPLOYEE, EQUIPMENT,\
+          \ VEHICLE). Replaces deprecated 'resourceType'."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - VEHICLE
+            - EQUIPMENT
       - name: status
         in: query
-        description: "Filter by status (ALLOWED, NOT_ALLOWED)"
+        description: Deprecated — use 'statuses' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: statuses
+        in: query
+        description: "Filter by statuses (multi-value: ALLOWED, NOT_ALLOWED, PARTIALLY_ALLOWED).\
+          \ Replaces deprecated 'status'."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ALLOWED
+            - PARTIALLY_ALLOWED
+            - NOT_ALLOWED
       - name: resourceId
         in: query
-        description: Filter by specific resource ID. Obtain resource IDs from the
-          response of access-control endpoints (resource.id field)
+        description: Deprecated — use 'resourceIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: resourceIds
+        in: query
+        description: Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'.
+          Obtain resource IDs from the response of access-control endpoints (resource.id
+          field)
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: onlyExpiringInFifteenDays
         in: query
         description: "When true, only show resources with access ending within the\
@@ -3312,6 +3497,13 @@ paths:
       responses:
         "200":
           description: Successfully retrieved access control statuses
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+        "400":
+          description: "Bad request: a deprecated singular filter and its plural counterpart\
+            \ were both supplied (e.g. 'siteId' and 'siteIds')."
           content:
             '*/*':
               schema:
@@ -3900,14 +4092,13 @@ paths:
       tags:
       - Requirements
       summary: Get requirement instances as contractor
-      description: "**Deprecated – use `v2/as-contractor` instead.** Returns paginated\
-        \ requirement instances for a contractor company. **Allowed sort fields:**\
-        \ `client_name` (client company name); `subject_name` (resource name: employee\
-        \ full name, vehicle, or equipment); `requirement_name` (requirement name);\
-        \ `contract_date_from` (minimum contract start date); `evidence_expiration`\
-        \ (minimum tolerance date: expiration + grace period); `created_at` (instance\
-        \ creation date, default). **Sort format:** use query parameter `sort=field,direction`\
-        \ (e.g. `?sort=client_name,asc`)."
+      description: "Returns paginated requirement instances for a contractor company.\
+        \ **Allowed sort fields:** `client_name` (client company name); `subject_name`\
+        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
+        \ (requirement name); `contract_date_from` (minimum contract start date);\
+        \ `evidence_expiration` (minimum tolerance date: expiration + grace period);\
+        \ `created_at` (instance creation date, default). **Sort format:** use query\
+        \ parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
       operationId: getPendingRequirementsAsContractor
       parameters:
       - name: companyId
@@ -4032,14 +4223,33 @@ paths:
             - UNDER_GRACE_PERIOD
             - EXPIRED
             - PENDING_VALIDITY
+      - name: subject
+        in: query
+        description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+          \ or CONTRACTOR)."
+        required: false
+        schema:
+          type: array
+          description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+            \ or CONTRACTOR)."
+          items:
+            type: string
+            description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+              \ or CONTRACTOR)."
+            enum:
+            - EMPLOYEE
+            - VEHICLE
+            - EQUIPMENT
+            - CONTRACTOR
       - name: onlyCompanyRequirements
         in: query
-        description: "When true, restricts to requirements that apply at company level."
+        description: "When true, restricts to requirements that apply at company level.\
+          \ Deprecated: use `subject=CONTRACTOR`."
         required: false
         schema:
           type: boolean
           description: "When true, restricts to requirements that apply at company\
-            \ level."
+            \ level. Deprecated: use `subject=CONTRACTOR`."
       - name: onlyCriticalRequirements
         in: query
         description: "When true, restricts to critical requirements."
@@ -4133,20 +4343,18 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseRequirementInstanceAsContractor"
-      deprecated: true
   /v1/companies/{companyId}/requirement-instances/as-client:
     get:
       tags:
       - Requirements
       summary: Get requirement instances as client
-      description: "**Deprecated – use `v2/as-client` instead.** Returns paginated\
-        \ requirement instances for a client company. **Allowed sort fields:** `contractor_name`\
-        \ (contractor company name); `subject_name` (resource name: employee full\
-        \ name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration`\
-        \ (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence\
-        \ date of issue); `evidence_upload_date` (evidence upload date); `created_at`\
-        \ (instance creation date, default). **Sort format:** use query parameter\
-        \ `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      description: "Returns paginated requirement instances for a client company.\
+        \ **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name`\
+        \ (resource name: employee full name, vehicle, or equipment); `requirement_name`\
+        \ (requirement name); `evidence_expiration` (minimum tolerance date: expiration\
+        \ + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date`\
+        \ (evidence upload date); `created_at` (instance creation date, default).\
+        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       operationId: getPendingRequirementsAsCustomer
       parameters:
       - name: companyId
@@ -4158,36 +4366,91 @@ paths:
           format: uuid
       - name: requirementId
         in: query
-        description: Filter by requirement definition id.
+        description: Deprecated — use 'requirementIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by requirement definition id.
+          deprecated: true
+          description: Deprecated — use 'requirementIds' instead.
+      - name: requirementIds
+        in: query
+        description: Filter by one or more requirement definition ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more requirement definition ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more requirement definition ids.
       - name: contractorId
         in: query
-        description: Filter by contractor company id.
+        description: Deprecated — use 'contractorIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by contractor company id.
+          deprecated: true
+          description: Deprecated — use 'contractorIds' instead.
+      - name: contractorIds
+        in: query
+        description: Filter by one or more contractor company ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more contractor company ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more contractor company ids.
       - name: resourceId
         in: query
-        description: "Filter by subject resource id (employee, vehicle, or equipment)."
+        description: Deprecated — use 'resourceIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: "Filter by subject resource id (employee, vehicle, or equipment)."
+          deprecated: true
+          description: Deprecated — use 'resourceIds' instead.
+      - name: resourceIds
+        in: query
+        description: "Filter by one or more subject resource ids (employees, vehicles,\
+          \ or equipment)."
+        required: false
+        schema:
+          type: array
+          description: "Filter by one or more subject resource ids (employees, vehicles,\
+            \ or equipment)."
+          items:
+            type: string
+            format: uuid
+            description: "Filter by one or more subject resource ids (employees, vehicles,\
+              \ or equipment)."
       - name: contractId
         in: query
-        description: Filter by contract id.
+        description: Deprecated — use 'contractIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by contract id.
+          deprecated: true
+          description: Deprecated — use 'contractIds' instead.
+      - name: contractIds
+        in: query
+        description: Filter by one or more contract ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more contract ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more contract ids.
       - name: siteIds
         in: query
         description: Filter by one or more site ids.
@@ -4201,12 +4464,25 @@ paths:
             description: Filter by one or more site ids.
       - name: activityId
         in: query
-        description: Filter by activity id.
+        description: Deprecated — use 'activityIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by activity id.
+          deprecated: true
+          description: Deprecated — use 'activityIds' instead.
+      - name: activityIds
+        in: query
+        description: Filter by one or more activity ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more activity ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more activity ids.
       - name: status
         in: query
         description: "Include only instances whose latest evidence status is one of\
@@ -4249,14 +4525,33 @@ paths:
             - UNDER_GRACE_PERIOD
             - EXPIRED
             - PENDING_VALIDITY
+      - name: subject
+        in: query
+        description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+          \ or CONTRACTOR)."
+        required: false
+        schema:
+          type: array
+          description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+            \ or CONTRACTOR)."
+          items:
+            type: string
+            description: "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT\
+              \ or CONTRACTOR)."
+            enum:
+            - EMPLOYEE
+            - VEHICLE
+            - EQUIPMENT
+            - CONTRACTOR
       - name: onlyCompanyRequirements
         in: query
-        description: "When true, restricts to requirements that apply at company level."
+        description: "When true, restricts to requirements that apply at company level.\
+          \ Deprecated: use `subject=CONTRACTOR`."
         required: false
         schema:
           type: boolean
           description: "When true, restricts to requirements that apply at company\
-            \ level."
+            \ level. Deprecated: use `subject=CONTRACTOR`."
       - name: onlyCriticalRequirements
         in: query
         description: "When true, restricts to critical requirements."
@@ -4328,7 +4623,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseRequirementInstanceAsClient"
-      deprecated: true
   /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url:
     get:
       tags:
@@ -4577,8 +4871,8 @@ paths:
     get:
       tags:
       - Companies and contracts
-      summary: Get company by id
-      description: "Returns full company details for the given id. Use GET /v1/companies/{id}/summary\
+      summary: Get my company details
+      description: "Returns my company details. Use GET /v1/companies/{id}/summary\
         \ when the caller does not belong to that company."
       operationId: findMyCompany
       parameters:
@@ -4667,8 +4961,8 @@ paths:
     get:
       tags:
       - Companies and contracts
-      summary: Get company summary by id
-      description: Returns a summary of company details for the given id.
+      summary: Get company by id
+      description: Returns summary of company details for the given id.
       operationId: findCompanySummary
       parameters:
       - name: id
@@ -5502,6 +5796,7 @@ paths:
         required: false
         schema:
           type: boolean
+          default: false
       - name: dateFrom
         in: query
         required: false
@@ -5535,11 +5830,13 @@ paths:
         required: false
         schema:
           type: boolean
+          default: false
       - name: showOnlyInternalManagement
         in: query
         required: false
         schema:
           type: boolean
+          default: false
       - name: managerIds
         in: query
         required: false
@@ -8590,9 +8887,6 @@ components:
           format: uuid
         name:
           type: string
-        level:
-          type: integer
-          format: int32
       required:
       - id
       - name
@@ -11191,6 +11485,44 @@ components:
       - contractId
       - contractName
       - status
+    EngagementAcceptability:
+      type: object
+      properties:
+        engagementId:
+          type: string
+          format: uuid
+        contractId:
+          type: string
+          format: uuid
+        contractName:
+          type: string
+        contractDateFrom:
+          type: string
+          format: date
+        contractDateTo:
+          type: string
+          format: date
+        activityId:
+          type: string
+          format: uuid
+        activityName:
+          type: string
+        site:
+          $ref: "#/components/schemas/SiteInfo"
+        status:
+          type: string
+          enum:
+          - ALLOWED
+          - NOT_ALLOWED
+          - UPCOMING_DATE
+      required:
+      - activityId
+      - activityName
+      - contractId
+      - contractName
+      - engagementId
+      - site
+      - status
     GetAccessControlContractor:
       type: object
       properties:
@@ -11222,7 +11554,7 @@ components:
         contractor:
           $ref: "#/components/schemas/GetAccessControlContractor"
         site:
-          $ref: "#/components/schemas/Site"
+          $ref: "#/components/schemas/SiteInfo"
         status:
           type: string
           enum:
@@ -11246,6 +11578,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ContractAndActivityAcceptability"
+        engagements:
+          type: array
+          items:
+            $ref: "#/components/schemas/EngagementAcceptability"
         risks:
           type: array
           items:
@@ -11258,6 +11594,7 @@ components:
       - accessControlType
       - clientId
       - contractor
+      - engagements
       - issueRequirements
       - issues
       - resource
@@ -11737,3 +12074,7 @@ components:
       - code
       - id
       - name
+    RoleName:
+      type: string
+    Permission:
+      type: string

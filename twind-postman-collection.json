@@ -1028,22 +1028,42 @@
           "query" : [ {
             "key" : "siteId",
             "value" : "",
-            "description" : "Filter by site ID. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "description" : "Deprecated — use 'siteIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (multi-value). Replaces deprecated 'siteId'. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
             "disabled" : true
           }, {
             "key" : "resourceId",
             "value" : "",
-            "description" : "Filter by resource ID. Obtain resource IDs from access-control endpoints (resource.id field)",
+            "description" : "Deprecated — use 'resourceIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'. Obtain resource IDs from access-control endpoints (resource.id field)",
             "disabled" : true
           }, {
             "key" : "contractorId",
             "value" : "",
-            "description" : "Filter by contractor ID. Obtain contractor IDs from access-control endpoints (contractor.id field)",
+            "description" : "Deprecated — use 'contractorIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by counterparty company IDs (multi-value). Replaces deprecated 'contractorId'. Represents contractors when the authenticated company is the client, and vice-versa. Obtain contractor IDs from access-control endpoints (contractor.id field)",
             "disabled" : true
           }, {
             "key" : "resourceType",
             "value" : "",
-            "description" : "Filter by resource discriminator (e.g. EMPLOYEE, VEHICLE, EQUIPMENT)",
+            "description" : "Deprecated — use 'resourceTypes' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (multi-value: EMPLOYEE, VEHICLE, EQUIPMENT). Replaces deprecated 'resourceType'.",
             "disabled" : true
           }, {
             "key" : "from",
@@ -1718,27 +1738,52 @@
           "query" : [ {
             "key" : "clientId",
             "value" : "",
-            "description" : "Filter by client ID. Results are automatically filtered based on user's client company visibility. Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)",
+            "description" : "Deprecated — use 'clientIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "clientIds",
+            "value" : "",
+            "description" : "Filter by client IDs (multi-value). Replaces deprecated 'clientId'. Results are automatically filtered based on user's client company visibility. Obtain client IDs from [GET /v1/companies/{contractorId}/clients](#tag/company-controller/GET/v1/companies/{contractorId}/clients)",
             "disabled" : true
           }, {
             "key" : "siteId",
             "value" : "",
-            "description" : "Filter by site ID. Results are automatically filtered based on user's client site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "description" : "Deprecated — use 'siteIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (multi-value). Replaces deprecated 'siteId'. Results are automatically filtered based on user's client site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
             "disabled" : true
           }, {
             "key" : "resourceType",
             "value" : "",
-            "description" : "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)",
+            "description" : "Deprecated — use 'resourceTypes' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (multi-value: EMPLOYEE, EQUIPMENT, VEHICLE). Replaces deprecated 'resourceType'.",
             "disabled" : true
           }, {
             "key" : "status",
             "value" : "",
-            "description" : "Filter by status (ALLOWED, NOT_ALLOWED)",
+            "description" : "Deprecated — use 'statuses' instead.",
+            "disabled" : true
+          }, {
+            "key" : "statuses",
+            "value" : "",
+            "description" : "Filter by statuses (multi-value: ALLOWED, NOT_ALLOWED, PARTIALLY_ALLOWED). Replaces deprecated 'status'.",
             "disabled" : true
           }, {
             "key" : "resourceId",
             "value" : "",
-            "description" : "Filter by specific resource ID. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
+            "description" : "Deprecated — use 'resourceIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
             "disabled" : true
           }, {
             "key" : "companyScope",
@@ -1791,27 +1836,52 @@
           "query" : [ {
             "key" : "contractorId",
             "value" : "",
-            "description" : "Filter by contractor ID. Obtain contractor IDs from the response of access-control endpoints (contractor.id field)",
+            "description" : "Deprecated — use 'contractorIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor IDs (multi-value). Replaces deprecated 'contractorId'. Obtain contractor IDs from the response of access-control endpoints (contractor.id field)",
             "disabled" : true
           }, {
             "key" : "siteId",
             "value" : "",
-            "description" : "Filter by site ID. Results are automatically filtered based on user's site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
+            "description" : "Deprecated — use 'siteIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (multi-value). Replaces deprecated 'siteId'. Results are automatically filtered based on user's site visibility. Obtain site IDs from [GET /v1/companies/{companyId}/sites](#tag/site-controller/GET/v1/companies/{companyId}/sites)",
             "disabled" : true
           }, {
             "key" : "resourceType",
             "value" : "",
-            "description" : "Filter by resource type (EMPLOYEE, EQUIPMENT, VEHICLE)",
+            "description" : "Deprecated — use 'resourceTypes' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceTypes",
+            "value" : "",
+            "description" : "Filter by resource types (multi-value: EMPLOYEE, EQUIPMENT, VEHICLE). Replaces deprecated 'resourceType'.",
             "disabled" : true
           }, {
             "key" : "status",
             "value" : "",
-            "description" : "Filter by status (ALLOWED, NOT_ALLOWED)",
+            "description" : "Deprecated — use 'statuses' instead.",
+            "disabled" : true
+          }, {
+            "key" : "statuses",
+            "value" : "",
+            "description" : "Filter by statuses (multi-value: ALLOWED, NOT_ALLOWED, PARTIALLY_ALLOWED). Replaces deprecated 'status'.",
             "disabled" : true
           }, {
             "key" : "resourceId",
             "value" : "",
-            "description" : "Filter by specific resource ID. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
+            "description" : "Deprecated — use 'resourceIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'. Obtain resource IDs from the response of access-control endpoints (resource.id field)",
             "disabled" : true
           }, {
             "key" : "onlyExpiringInFifteenDays",
@@ -2252,9 +2322,14 @@
             "description" : "Exclude instances whose latest evidence status is one of these values.",
             "disabled" : true
           }, {
+            "key" : "subject",
+            "value" : "",
+            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT or CONTRACTOR).",
+            "disabled" : true
+          }, {
             "key" : "onlyCompanyRequirements",
             "value" : "",
-            "description" : "When true, restricts to requirements that apply at company level.",
+            "description" : "When true, restricts to requirements that apply at company level. Deprecated: use `subject=CONTRACTOR`.",
             "disabled" : true
           }, {
             "key" : "onlyCriticalRequirements",
@@ -2303,7 +2378,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "**Deprecated – use `v2/as-contractor` instead.** Returns paginated requirement instances for a contractor company. **Allowed sort fields:** `client_name` (client company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `contract_date_from` (minimum contract start date); `evidence_expiration` (minimum tolerance date: expiration + grace period); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
+        "description" : "Returns paginated requirement instances for a contractor company. **Allowed sort fields:** `client_name` (client company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `contract_date_from` (minimum contract start date); `evidence_expiration` (minimum tolerance date: expiration + grace period); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
       }
     }, {
       "name" : "Get requirement instances as client",
@@ -2322,22 +2397,42 @@
           "query" : [ {
             "key" : "requirementId",
             "value" : "",
-            "description" : "Filter by requirement definition id.",
+            "description" : "Deprecated — use 'requirementIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "requirementIds",
+            "value" : "",
+            "description" : "Filter by one or more requirement definition ids.",
             "disabled" : true
           }, {
             "key" : "contractorId",
             "value" : "",
-            "description" : "Filter by contractor company id.",
+            "description" : "Deprecated — use 'contractorIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by one or more contractor company ids.",
             "disabled" : true
           }, {
             "key" : "resourceId",
             "value" : "",
-            "description" : "Filter by subject resource id (employee, vehicle, or equipment).",
+            "description" : "Deprecated — use 'resourceIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by one or more subject resource ids (employees, vehicles, or equipment).",
             "disabled" : true
           }, {
             "key" : "contractId",
             "value" : "",
-            "description" : "Filter by contract id.",
+            "description" : "Deprecated — use 'contractIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter by one or more contract ids.",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -2347,7 +2442,12 @@
           }, {
             "key" : "activityId",
             "value" : "",
-            "description" : "Filter by activity id.",
+            "description" : "Deprecated — use 'activityIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by one or more activity ids.",
             "disabled" : true
           }, {
             "key" : "status",
@@ -2360,9 +2460,14 @@
             "description" : "Exclude instances whose latest evidence status is one of these values.",
             "disabled" : true
           }, {
+            "key" : "subject",
+            "value" : "",
+            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT or CONTRACTOR).",
+            "disabled" : true
+          }, {
             "key" : "onlyCompanyRequirements",
             "value" : "",
-            "description" : "When true, restricts to requirements that apply at company level.",
+            "description" : "When true, restricts to requirements that apply at company level. Deprecated: use `subject=CONTRACTOR`.",
             "disabled" : true
           }, {
             "key" : "onlyCriticalRequirements",
@@ -2401,7 +2506,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "**Deprecated – use `v2/as-client` instead.** Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       }
     }, {
       "name" : "Get presigned URL for evidence file upload",
@@ -2644,7 +2749,7 @@
     "name" : "Companies and contracts",
     "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company summary**: Read and patch company summary\n- **Contractors**: Create contractors; list contractors with active contracts (my-contractors)\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
     "item" : [ {
-      "name" : "Get company by id",
+      "name" : "Get my company details",
       "request" : {
         "method" : "GET",
         "header" : [ ],
@@ -2658,7 +2763,7 @@
             "description" : "Company id"
           } ]
         },
-        "description" : "Returns full company details for the given id. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
+        "description" : "Returns my company details. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
       }
     }, {
       "name" : "Update company details",
@@ -2687,7 +2792,7 @@
         }
       }
     }, {
-      "name" : "Get company summary by id",
+      "name" : "Get company by id",
       "request" : {
         "method" : "GET",
         "header" : [ ],
@@ -2701,7 +2806,7 @@
             "description" : "Company id"
           } ]
         },
-        "description" : "Returns a summary of company details for the given id."
+        "description" : "Returns summary of company details for the given id."
       }
     }, {
       "name" : "Create contractor company for a client",
