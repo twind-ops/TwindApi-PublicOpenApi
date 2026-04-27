@@ -3467,6 +3467,18 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: siteLevel
+        in: query
+        description: Filter by site hierarchy level
+        required: false
+        schema:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7567,6 +7579,7 @@ components:
         identityType:
           type: string
           minLength: 1
+          pattern: IDENTITY_NUMBER|PASSPORT|SOCIAL_SECURITY_NUMBER|OTHER|FOREIGNIDNUMBER|IDNUMBER|IdentityNumber|OTHERTYPE|Passport|SSN
         identity:
           type: string
           minLength: 1
@@ -11962,6 +11975,18 @@ components:
       required:
       - id
       - name
+    GetAccessControlActiveEntry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        entryAt:
+          type: string
+          format: date-time
+      required:
+      - entryAt
+      - id
     GetAccessControlClient:
       type: object
       properties:
@@ -12023,6 +12048,8 @@ components:
             $ref: "#/components/schemas/Contract"
         temporaryAuthorization:
           $ref: "#/components/schemas/TemporaryAuthorizationSummary"
+        activeEntry:
+          $ref: "#/components/schemas/GetAccessControlActiveEntry"
       required:
       - activities
       - client

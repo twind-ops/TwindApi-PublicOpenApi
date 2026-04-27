@@ -1889,6 +1889,11 @@
             "description" : "When true, only show resources with access ending within the next 15 days",
             "disabled" : true
           }, {
+            "key" : "siteLevel",
+            "value" : "",
+            "description" : "Filter by site hierarchy level",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
