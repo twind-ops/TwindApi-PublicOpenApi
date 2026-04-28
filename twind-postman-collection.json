@@ -653,6 +653,11 @@
           }, {
             "key" : "clientId",
             "value" : "",
+            "description" : "Deprecated — use 'clientIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "clientIds",
+            "value" : "",
             "description" : "",
             "disabled" : true
           }, {
@@ -677,6 +682,11 @@
             "disabled" : true
           }, {
             "key" : "contractName",
+            "value" : "",
+            "description" : "Deprecated — use 'contractNames' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractNames",
             "value" : "",
             "description" : "",
             "disabled" : true
@@ -2274,17 +2284,27 @@
           "query" : [ {
             "key" : "requirementId",
             "value" : "",
-            "description" : "Filter by requirement definition id.",
+            "description" : "Deprecated — use 'requirementIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "requirementIds",
+            "value" : "",
+            "description" : "Filter by one or more requirement definition ids.",
             "disabled" : true
           }, {
             "key" : "requirementName",
             "value" : "",
-            "description" : "Partial match on requirement name.",
+            "description" : "Deprecated — use 'requirementNames' instead. Performs a partial, accent-insensitive match on requirement name.",
+            "disabled" : true
+          }, {
+            "key" : "requirementNames",
+            "value" : "",
+            "description" : "Filter by one or more exact requirement names. Unlike the deprecated 'requirementName', this performs exact matching.",
             "disabled" : true
           }, {
             "key" : "clientId",
             "value" : "",
-            "description" : "",
+            "description" : "Deprecated — use 'clientIds' instead.",
             "disabled" : true
           }, {
             "key" : "clientIds",
@@ -2294,17 +2314,27 @@
           }, {
             "key" : "resourceId",
             "value" : "",
-            "description" : "Filter by subject resource id (employee, vehicle, or equipment).",
+            "description" : "Deprecated — use 'resourceIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "resourceIds",
+            "value" : "",
+            "description" : "Filter by one or more subject resource ids (employees, vehicles, or equipment).",
             "disabled" : true
           }, {
             "key" : "contractId",
             "value" : "",
-            "description" : "Filter by contract id.",
+            "description" : "Deprecated — use 'contractIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter by one or more contract ids.",
             "disabled" : true
           }, {
             "key" : "siteId",
             "value" : "",
-            "description" : "",
+            "description" : "Deprecated — use 'siteIds' instead.",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -2314,7 +2344,12 @@
           }, {
             "key" : "activityId",
             "value" : "",
-            "description" : "Filter by activity id.",
+            "description" : "Deprecated — use 'activityIds' instead.",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by one or more activity ids.",
             "disabled" : true
           }, {
             "key" : "status",
@@ -3198,6 +3233,11 @@
             "disabled" : true
           }, {
             "key" : "contractName",
+            "value" : "",
+            "description" : "Deprecated — use 'contractNames' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractNames",
             "value" : "",
             "description" : "",
             "disabled" : true

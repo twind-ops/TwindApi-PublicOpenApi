@@ -1199,10 +1199,20 @@ paths:
           type: string
       - name: clientId
         in: query
+        description: Deprecated — use 'clientIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+      - name: clientIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: showSubcontracts
         in: query
         required: false
@@ -1229,9 +1239,18 @@ paths:
           format: uuid
       - name: contractName
         in: query
+        description: Deprecated — use 'contractNames' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: contractNames
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: siteIds
         in: query
         required: false
@@ -4122,25 +4141,59 @@ paths:
           format: uuid
       - name: requirementId
         in: query
-        description: Filter by requirement definition id.
+        description: Deprecated — use 'requirementIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by requirement definition id.
+          deprecated: true
+          description: Deprecated — use 'requirementIds' instead.
+      - name: requirementIds
+        in: query
+        description: Filter by one or more requirement definition ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more requirement definition ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more requirement definition ids.
       - name: requirementName
         in: query
-        description: Partial match on requirement name.
+        description: "Deprecated — use 'requirementNames' instead. Performs a partial,\
+          \ accent-insensitive match on requirement name."
         required: false
+        deprecated: true
         schema:
           type: string
-          description: Partial match on requirement name.
+          deprecated: true
+          description: "Deprecated — use 'requirementNames' instead. Performs a partial,\
+            \ accent-insensitive match on requirement name."
+      - name: requirementNames
+        in: query
+        description: "Filter by one or more exact requirement names. Unlike the deprecated\
+          \ 'requirementName', this performs exact matching."
+        required: false
+        schema:
+          type: array
+          description: "Filter by one or more exact requirement names. Unlike the\
+            \ deprecated 'requirementName', this performs exact matching."
+          items:
+            type: string
+            description: "Filter by one or more exact requirement names. Unlike the\
+              \ deprecated 'requirementName', this performs exact matching."
       - name: clientId
         in: query
+        description: Deprecated — use 'clientIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+          deprecated: true
+          description: Deprecated — use 'clientIds' instead.
       - name: clientIds
         in: query
         description: Filter by one or more client company ids (subject to visibility).
@@ -4154,26 +4207,59 @@ paths:
             description: Filter by one or more client company ids (subject to visibility).
       - name: resourceId
         in: query
-        description: "Filter by subject resource id (employee, vehicle, or equipment)."
+        description: Deprecated — use 'resourceIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: "Filter by subject resource id (employee, vehicle, or equipment)."
+          deprecated: true
+          description: Deprecated — use 'resourceIds' instead.
+      - name: resourceIds
+        in: query
+        description: "Filter by one or more subject resource ids (employees, vehicles,\
+          \ or equipment)."
+        required: false
+        schema:
+          type: array
+          description: "Filter by one or more subject resource ids (employees, vehicles,\
+            \ or equipment)."
+          items:
+            type: string
+            format: uuid
+            description: "Filter by one or more subject resource ids (employees, vehicles,\
+              \ or equipment)."
       - name: contractId
         in: query
-        description: Filter by contract id.
+        description: Deprecated — use 'contractIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by contract id.
+          deprecated: true
+          description: Deprecated — use 'contractIds' instead.
+      - name: contractIds
+        in: query
+        description: Filter by one or more contract ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more contract ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more contract ids.
       - name: siteId
         in: query
+        description: Deprecated — use 'siteIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
+          deprecated: true
+          description: Deprecated — use 'siteIds' instead.
       - name: siteIds
         in: query
         description: Filter by one or more site ids.
@@ -4187,12 +4273,25 @@ paths:
             description: Filter by one or more site ids.
       - name: activityId
         in: query
-        description: Filter by activity id.
+        description: Deprecated — use 'activityIds' instead.
         required: false
+        deprecated: true
         schema:
           type: string
           format: uuid
-          description: Filter by activity id.
+          deprecated: true
+          description: Deprecated — use 'activityIds' instead.
+      - name: activityIds
+        in: query
+        description: Filter by one or more activity ids.
+        required: false
+        schema:
+          type: array
+          description: Filter by one or more activity ids.
+          items:
+            type: string
+            format: uuid
+            description: Filter by one or more activity ids.
       - name: status
         in: query
         description: "Include only instances whose latest evidence status is one of\
@@ -5792,9 +5891,18 @@ paths:
           format: uuid
       - name: contractName
         in: query
+        description: Deprecated — use 'contractNames' instead.
         required: false
+        deprecated: true
         schema:
           type: string
+      - name: contractNames
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
       - name: contractorIds
         in: query
         required: false
@@ -7252,6 +7360,7 @@ components:
       - classifications
       - name
       - registrationPlate
+      - vehicleType
     ResourceCreateClassificationDto:
       type: object
       properties:
@@ -7565,6 +7674,7 @@ components:
           uniqueItems: true
       required:
       - classifications
+      - equipmentType
       - name
       - serialNumber
     CreateEmployeeDto:
