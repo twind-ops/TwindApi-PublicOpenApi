@@ -32,7 +32,7 @@
   },
   "item" : [ {
     "name" : "Shared",
-    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **My companies**: Related companies (contractors/clients) for a company\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Activities**: List company activities\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company\n- **Contracts (as contractor)**: List contracts where the company acts as contractor\n- **Contract engagements**: List engagements for a contract",
+    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **Company (read)**: Get a company by id\n- **Contractors with active contracts**: List contractors associated with a client company (my-contractors)\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Activities**: List company activities\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company\n- **Contracts (as contractor)**: List contracts where the company acts as contractor\n- **Contract engagements**: List engagements for a contract",
     "item" : [ {
       "name" : "Get current user information",
       "request" : {
@@ -64,33 +64,38 @@
         "description" : "Retrieves the list of companies that the currently authenticated user has access to."
       }
     }, {
-      "name" : "List related companies",
+      "name" : "List contractors associated with the client company",
       "request" : {
         "method" : "GET",
         "header" : [ ],
         "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:id/my-companies",
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/my-contractors",
           "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":id", "my-companies" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "my-contractors" ],
           "variable" : [ {
-            "key" : "id",
-            "value" : "{{id}}",
-            "description" : "Company ID"
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company id"
           } ],
           "query" : [ {
             "key" : "q",
             "value" : "",
-            "description" : "Text search term, matched against company name, email, and tax ID. Ignored when filterById is set.",
+            "description" : "Text search on contractor name, email, or tax ID (optional; combined with `selected` when both are set)",
             "disabled" : true
           }, {
-            "key" : "filterById",
+            "key" : "activeContractsOnly",
             "value" : "",
-            "description" : "When set, performs a point-lookup by ID and ignores the 'q' search parameter.",
+            "description" : "When true, only contractors with at least one non-expired contract",
             "disabled" : true
           }, {
-            "key" : "filterByIds",
+            "key" : "selected",
             "value" : "",
-            "description" : "When set, performs a batch lookup by IDs. The 'q' search parameter is ignored. If combined with filterById, filterById is ignored.",
+            "description" : "Optional list of contractor company IDs to include (OR with `q` when both are present)",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Optional list of contractor company IDs to filter contracts by",
             "disabled" : true
           }, {
             "key" : "page",
@@ -109,7 +114,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated list of related companies (contractors or clients). Use this endpoint to obtain company IDs for filtering in other endpoints. **Allowed sort fields:** `name` (company name, default); `taxId` (tax ID); `industry` (industry key); `email` (company email). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns distinct contractor companies that have at least one contract where the given company is the client. **Search (`q`):** matched against contractor name, email, and tax ID (partial, normalized for tax ID). **Filters:** `activeContractsOnly` restricts to non-expired contracts. `selected` limits results to the given contractor IDs (combined with `q` using OR when both are present). `contractorIds` hard-filters results to contractors whose ID appears in the list (applied before OR logic)."
       }
     }, {
       "name" : "List countries",
@@ -728,6 +733,23 @@
           } ]
         },
         "description" : "Returns a paginated list of equipment for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
+      }
+    }, {
+      "name" : "Get my company details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ]
+        },
+        "description" : "Returns my company details. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
       }
     }, {
       "name" : "List sites",
@@ -1368,7 +1390,7 @@
     } ]
   }, {
     "name" : "Access control",
-    "description" : "Track people and assets on site: register access and visits, query authorization status, and issue access cards.\n\n- **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies\n- **Visit register**: List and create visits; read and update a visit record\n- **Access register**: List and create access entries; record exit; read entry by id\n- **Access control (status)**: Read access control row by id; list as contractor or as client\n- **Access card**: Download access card file (PDF or PNG) for a resource\n- **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers\n- **All contractors**: List all contractors for a company",
+    "description" : "Track people and assets on site: register access and visits, query authorization status, and issue access cards.\n\n- **Visitors**: List, create, read, and update visitor records; presigned upload URL; plate numbers and visitor companies\n- **Visit register**: List and create visits; read and update a visit record\n- **Access register**: List and create access entries; record exit; read entry by id\n- **Access control (status)**: Read access control row by id; list as contractor or as client\n- **Access card**: Download access card file (PDF or PNG) for a resource\n- **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers",
     "item" : [ {
       "name" : "Get visitor by ID",
       "request" : {
@@ -1978,54 +2000,6 @@
           } ]
         },
         "description" : "Soft-deletes a temporary authorization for the client company."
-      }
-    }, {
-      "name" : "List related companies",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:id/all-contractors",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":id", "all-contractors" ],
-          "variable" : [ {
-            "key" : "id",
-            "value" : "{{id}}",
-            "description" : "Company ID"
-          } ],
-          "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "Text search term, matched against company name, email, and tax ID. Ignored when filterById is set.",
-            "disabled" : true
-          }, {
-            "key" : "filterById",
-            "value" : "",
-            "description" : "When set, performs a point-lookup by ID and ignores the 'q' search parameter.",
-            "disabled" : true
-          }, {
-            "key" : "filterByIds",
-            "value" : "",
-            "description" : "When set, performs a batch lookup by IDs. The 'q' search parameter is ignored. If combined with filterById, filterById is ignored.",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Retrieves paginated list of related companies (contractors or clients). Use this endpoint to obtain company IDs for filtering in other endpoints. **Allowed sort fields:** `name` (company name, default); `taxId` (tax ID); `industry` (industry key); `email` (company email). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Get presigned upload URL for visitor documents",
@@ -3354,25 +3328,8 @@
     } ]
   }, {
     "name" : "Companies and contracts",
-    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company summary**: Read and patch company summary\n- **Contractors**: Create contractors; list contractors with active contracts (my-contractors)\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
+    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company (update)**: Update company details\n- **Company summary**: Read company summary\n- **Contractors**: Create contractors\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
     "item" : [ {
-      "name" : "Get my company details",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:id",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":id" ],
-          "variable" : [ {
-            "key" : "id",
-            "value" : "{{id}}",
-            "description" : "Company id"
-          } ]
-        },
-        "description" : "Returns my company details. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
-      }
-    }, {
       "name" : "Update company details",
       "request" : {
         "method" : "PATCH",
@@ -3440,59 +3397,6 @@
             }
           }
         }
-      }
-    }, {
-      "name" : "List contractors associated with the client company",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/my-contractors",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "contracts", "my-contractors" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : "Client company id"
-          } ],
-          "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "Text search on contractor name, email, or tax ID (optional; combined with `selected` when both are set)",
-            "disabled" : true
-          }, {
-            "key" : "activeContractsOnly",
-            "value" : "",
-            "description" : "When true, only contractors with at least one non-expired contract",
-            "disabled" : true
-          }, {
-            "key" : "selected",
-            "value" : "",
-            "description" : "Optional list of contractor company IDs to include (OR with `q` when both are present)",
-            "disabled" : true
-          }, {
-            "key" : "contractorIds",
-            "value" : "",
-            "description" : "Optional list of contractor company IDs to filter contracts by",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Returns distinct contractor companies that have at least one contract where the given company is the client. **Search (`q`):** matched against contractor name, email, and tax ID (partial, normalized for tax ID). **Filters:** `activeContractsOnly` restricts to non-expired contracts. `selected` limits results to the given contractor IDs (combined with `q` using OR when both are present). `contractorIds` hard-filters results to contractors whose ID appears in the list (applied before OR logic)."
       }
     }, {
       "name" : "List child subcontractors",

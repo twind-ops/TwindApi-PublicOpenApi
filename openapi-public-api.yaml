@@ -31,7 +31,8 @@ tags:
 
     - **Me**: Current user and permissions for the API key
     - **User companies**: Companies visible to the authenticated user
-    - **My companies**: Related companies (contractors/clients) for a company
+    - **Company (read)**: Get a company by id
+    - **Contractors with active contracts**: List contractors associated with a client company (my-contractors)
     - **Countries**: List countries
     - **Sites**: List sites for a company
     - **Activities**: List company activities
@@ -64,7 +65,6 @@ tags:
     - **Access control (status)**: Read access control row by id; list as contractor or as client
     - **Access card**: Download access card file (PDF or PNG) for a resource
     - **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers
-    - **All contractors**: List all contractors for a company
 - name: Requirements
   description: |-
     Configure contract requirements, inspect requirement instances, and submit or review evidence against them.
@@ -89,8 +89,9 @@ tags:
   description: |-
     Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.
 
-    - **Company summary**: Read and patch company summary
-    - **Contractors**: Create contractors; list contractors with active contracts (my-contractors)
+    - **Company (update)**: Update company details
+    - **Company summary**: Read company summary
+    - **Contractors**: Create contractors
     - **Child subcontractors**: List child subcontractor companies
     - **Sites**: Create a site; read or update a site; list sites as contractor
     - **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter
@@ -153,58 +154,59 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserCompanyInfo"
-  /v1/companies/{id}/my-companies:
+  /v1/companies/{companyId}/contracts/my-contractors:
     get:
       tags:
       - Shared
-      summary: List related companies
-      description: "Retrieves paginated list of related companies (contractors or\
-        \ clients). Use this endpoint to obtain company IDs for filtering in other\
-        \ endpoints. **Allowed sort fields:** `name` (company name, default); `taxId`\
-        \ (tax ID); `industry` (industry key); `email` (company email). **Sort format:**\
-        \ `?sort=field,direction` (e.g. `?sort=name,asc`)."
-      operationId: findAllContractors
+      summary: List contractors associated with the client company
+      description: "Returns distinct contractor companies that have at least one contract\
+        \ where the given company is the client. **Search (`q`):** matched against\
+        \ contractor name, email, and tax ID (partial, normalized for tax ID). **Filters:**\
+        \ `activeContractsOnly` restricts to non-expired contracts. `selected` limits\
+        \ results to the given contractor IDs (combined with `q` using OR when both\
+        \ are present). `contractorIds` hard-filters results to contractors whose\
+        \ ID appears in the list (applied before OR logic)."
+      operationId: mySuppliers
       parameters:
-      - name: id
+      - name: companyId
         in: path
-        description: Company ID
+        description: Client company id
         required: true
         schema:
           type: string
           format: uuid
       - name: q
         in: query
-        description: "Text search term, matched against company name, email, and tax\
-          \ ID. Ignored when filterById is set."
+        description: "Text search on contractor name, email, or tax ID (optional;\
+          \ combined with `selected` when both are set)"
         required: false
         schema:
           type: string
-          description: "Text search term, matched against company name, email, and\
-            \ tax ID. Ignored when filterById is set."
-      - name: filterById
+      - name: activeContractsOnly
         in: query
-        description: "When set, performs a point-lookup by ID and ignores the 'q'\
-          \ search parameter."
+        description: "When true, only contractors with at least one non-expired contract"
         required: false
         schema:
-          type: string
-          format: uuid
-          description: "When set, performs a point-lookup by ID and ignores the 'q'\
-            \ search parameter."
-      - name: filterByIds
+          type: boolean
+      - name: selected
         in: query
-        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-          \ is ignored. If combined with filterById, filterById is ignored."
+        description: Optional list of contractor company IDs to include (OR with `q`
+          when both are present)
         required: false
         schema:
           type: array
-          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-            \ is ignored. If combined with filterById, filterById is ignored."
           items:
             type: string
             format: uuid
-            description: "When set, performs a batch lookup by IDs. The 'q' search\
-              \ parameter is ignored. If combined with filterById, filterById is ignored."
+      - name: contractorIds
+        in: query
+        description: Optional list of contractor company IDs to filter contracts by
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -234,23 +236,23 @@ paths:
             type: string
       responses:
         "200":
-          description: Successfully retrieved companies list
+          description: Successfully retrieved contractors
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
+                $ref: "#/components/schemas/PageResponseMyContractor"
         "401":
           description: "Unauthorized: authentication required"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
+                $ref: "#/components/schemas/ProblemDetail"
         "403":
           description: "Access denied: insufficient permissions"
           content:
-            '*/*':
+            application/problem+json:
               schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/countries:
     get:
       tags:
@@ -3619,104 +3621,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{id}/all-contractors:
-    get:
-      tags:
-      - Access control
-      summary: List related companies
-      description: "Retrieves paginated list of related companies (contractors or\
-        \ clients). Use this endpoint to obtain company IDs for filtering in other\
-        \ endpoints. **Allowed sort fields:** `name` (company name, default); `taxId`\
-        \ (tax ID); `industry` (industry key); `email` (company email). **Sort format:**\
-        \ `?sort=field,direction` (e.g. `?sort=name,asc`)."
-      operationId: findAllContractors_1
-      parameters:
-      - name: id
-        in: path
-        description: Company ID
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: "Text search term, matched against company name, email, and tax\
-          \ ID. Ignored when filterById is set."
-        required: false
-        schema:
-          type: string
-          description: "Text search term, matched against company name, email, and\
-            \ tax ID. Ignored when filterById is set."
-      - name: filterById
-        in: query
-        description: "When set, performs a point-lookup by ID and ignores the 'q'\
-          \ search parameter."
-        required: false
-        schema:
-          type: string
-          format: uuid
-          description: "When set, performs a point-lookup by ID and ignores the 'q'\
-            \ search parameter."
-      - name: filterByIds
-        in: query
-        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-          \ is ignored. If combined with filterById, filterById is ignored."
-        required: false
-        schema:
-          type: array
-          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
-            \ is ignored. If combined with filterById, filterById is ignored."
-          items:
-            type: string
-            format: uuid
-            description: "When set, performs a batch lookup by IDs. The 'q' search\
-              \ parameter is ignored. If combined with filterById, filterById is ignored."
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved companies list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelMyCompanyDataDto"
   /v1/companies/{companyId}/visitor/temporary-upload-url:
     get:
       tags:
@@ -6073,7 +5977,7 @@ paths:
   /v1/companies/{id}:
     get:
       tags:
-      - Companies and contracts
+      - Shared
       summary: Get my company details
       description: "Returns my company details. Use GET /v1/companies/{id}/summary\
         \ when the caller does not belong to that company."
@@ -6237,105 +6141,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetail"
         "400":
           description: Validation error
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/contracts/my-contractors:
-    get:
-      tags:
-      - Companies and contracts
-      summary: List contractors associated with the client company
-      description: "Returns distinct contractor companies that have at least one contract\
-        \ where the given company is the client. **Search (`q`):** matched against\
-        \ contractor name, email, and tax ID (partial, normalized for tax ID). **Filters:**\
-        \ `activeContractsOnly` restricts to non-expired contracts. `selected` limits\
-        \ results to the given contractor IDs (combined with `q` using OR when both\
-        \ are present). `contractorIds` hard-filters results to contractors whose\
-        \ ID appears in the list (applied before OR logic)."
-      operationId: mySuppliers
-      parameters:
-      - name: companyId
-        in: path
-        description: Client company id
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: q
-        in: query
-        description: "Text search on contractor name, email, or tax ID (optional;\
-          \ combined with `selected` when both are set)"
-        required: false
-        schema:
-          type: string
-      - name: activeContractsOnly
-        in: query
-        description: "When true, only contractors with at least one non-expired contract"
-        required: false
-        schema:
-          type: boolean
-      - name: selected
-        in: query
-        description: Optional list of contractor company IDs to include (OR with `q`
-          when both are present)
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: contractorIds
-        in: query
-        description: Optional list of contractor company IDs to filter contracts by
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      responses:
-        "200":
-          description: Successfully retrieved contractors
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PageResponseMyContractor"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
           content:
             application/problem+json:
               schema:
@@ -9631,6 +9436,18 @@ components:
         mobileSettings:
           $ref: "#/components/schemas/MobileSettings"
           description: Settings for the mobile app
+        dateFormat:
+          type: string
+          description: Preferred date format for displaying dates
+          enum:
+          - dd/mm/yyyy
+          - dd/mm/yy
+          - mm/dd/yyyy
+          - mm/dd/yy
+          - dd/mm/yyyy
+          - dd/mm/yy
+          - mm/dd/yyyy
+          - mm/dd/yy
     CompanyDto:
       type: object
       properties:
@@ -10043,40 +9860,6 @@ components:
       required:
       - id
       - name
-    MyCompanyDataDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        taxId:
-          type: string
-        email:
-          type: string
-        invitationId:
-          type: string
-          format: uuid
-        euCategory:
-          type: string
-        industry:
-          type: string
-        industryKey:
-          type: string
-      required:
-      - id
-      - name
-      - taxId
-    PagedModelMyCompanyDataDto:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/MyCompanyDataDto"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
     PageData:
       type: object
       properties:
