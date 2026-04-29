@@ -13,8 +13,17 @@ info:
     email: support@twind.com
   version: "1.0"
 servers:
-- url: https://app.twind.io/api
-  description: Production server
+- url: "https://{host}/api"
+  description: Twind API
+  variables:
+    host:
+      description: "Environment host: production or development"
+      default: app.twind.io
+      enum:
+      - app.twind.io
+      - app.twinddev.com
+security:
+- ApiKeyAuth: []
 tags:
 - name: Shared
   description: |-
@@ -13622,3 +13631,10 @@ components:
       type: string
     Permission:
       type: string
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      description: Public API key issued by Twind. Sent on every request in the `X-Api-Key`
+        header.
+      name: X-Api-Key
+      in: header
