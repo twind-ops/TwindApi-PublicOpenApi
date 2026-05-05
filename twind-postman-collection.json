@@ -32,7 +32,7 @@
   },
   "item" : [ {
     "name" : "Shared",
-    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **Company (read)**: Get a company by id\n- **Contractors with active contracts**: List contractors associated with a client company (my-contractors)\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Activities**: List company activities\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company\n- **Contracts (as contractor)**: List contracts where the company acts as contractor\n- **Contract engagements**: List engagements for a contract",
+    "description" : "Shared endpoints for who is calling the API, which companies apply, and common lists used to filter other operations.\n\n- **Me**: Current user and permissions for the API key\n- **User companies**: Companies visible to the authenticated user\n- **Company details**: Get full company details (members only)\n- **Company summary**: Get a summary of any company by id (any authenticated user)\n- **Contractors with active contracts**: List contractors associated with a client company (my-contractors)\n- **Countries**: List countries\n- **Sites**: List sites for a company\n- **Activities**: List company activities\n- **Assigned resources**: Resources assigned to contracts (client view)\n- **Assigned resources (contractor)**: Resources assigned to contracts (contractor view)\n- **Clients**: Client companies for a contractor\n- **Users**: List users for a company\n- **Employees**: List employees for a company\n- **Vehicles**: List vehicles for a company\n- **Equipment**: List equipment for a company\n- **Contracts (as contractor)**: List contracts where the company acts as contractor\n- **Contract engagements**: List engagements for a contract",
     "item" : [ {
       "name" : "Get current user information",
       "request" : {
@@ -62,6 +62,23 @@
           "path" : [ "v1", "users", "me", "companies" ]
         },
         "description" : "Retrieves the list of companies that the currently authenticated user has access to."
+      }
+    }, {
+      "name" : "Get company by id",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/summary",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "summary" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ]
+        },
+        "description" : "Returns summary of company details for the given id."
       }
     }, {
       "name" : "List contractors associated with the client company",
@@ -3328,7 +3345,7 @@
     } ]
   }, {
     "name" : "Companies and contracts",
-    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company (update)**: Update company details\n- **Company summary**: Read company summary\n- **Contractors**: Create contractors\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
+    "description" : "Manage company profile, sites, commercial relationships, contracts, engagements, and subcontracts.\n\n- **Company (update)**: Update company details\n- **Contractors**: Create contractors\n- **Child subcontractors**: List child subcontractor companies\n- **Sites**: Create a site; read or update a site; list sites as contractor\n- **Contracts**: Create, update, and soft-delete contracts; list with-contractors filter\n- **Contract engagements**: Create engagements for a contract; soft-delete engagement\n- **Subcontracts**: Create subcontracts; subcontract requests (list, create, approve, reject); list as contractor; read by engagement",
     "item" : [ {
       "name" : "Update company details",
       "request" : {
@@ -3354,23 +3371,6 @@
             }
           }
         }
-      }
-    }, {
-      "name" : "Get company by id",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:id/summary",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":id", "summary" ],
-          "variable" : [ {
-            "key" : "id",
-            "value" : "{{id}}",
-            "description" : "Company id"
-          } ]
-        },
-        "description" : "Returns summary of company details for the given id."
       }
     }, {
       "name" : "Create contractor company for a client",
