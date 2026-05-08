@@ -9667,6 +9667,10 @@ components:
           $ref: "#/components/schemas/TimeOnSite"
         specificLocation:
           $ref: "#/components/schemas/SiteNodeItem"
+        exitSite:
+          $ref: "#/components/schemas/SiteInfo"
+        specificExitLocation:
+          $ref: "#/components/schemas/SiteNodeItem"
       required:
       - client
       - contractor
