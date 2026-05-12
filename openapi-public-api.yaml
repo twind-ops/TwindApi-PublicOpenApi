@@ -6245,6 +6245,9 @@ components:
           type: string
       required:
       - type
+    ProjectsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     PublicApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6354,6 +6357,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
@@ -6634,6 +6638,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
@@ -6997,6 +7002,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
@@ -7880,13 +7886,23 @@ components:
           enum:
           - CTAIMA
           - INTERNAL
+        canBeSetInFuture:
+          type: boolean
+        dependencyRole:
+          type: string
+          enum:
+          - NONE
+          - MAIN
+          - DEPENDANT
       required:
       - acceptanceCriteria
       - appliedTo
+      - canBeSetInFuture
       - companyName
       - createdAt
       - critical
       - custody
+      - dependencyRole
       - enableDoesNotApply
       - evidenceType
       - expirationType
@@ -9671,6 +9687,10 @@ components:
           $ref: "#/components/schemas/SiteInfo"
         specificExitLocation:
           $ref: "#/components/schemas/SiteNodeItem"
+        entryLocationNameWithLevel:
+          type: string
+        exitLocationNameWithLevel:
+          type: string
       required:
       - client
       - contractor
