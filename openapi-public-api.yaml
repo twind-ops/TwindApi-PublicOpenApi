@@ -8672,10 +8672,6 @@ components:
           type: boolean
         float:
           type: boolean
-        valueNode:
-          type: boolean
-        object:
-          type: boolean
         nodeType:
           type: string
           enum:
@@ -8701,6 +8697,10 @@ components:
         bigInteger:
           type: boolean
         missingNode:
+          type: boolean
+        valueNode:
+          type: boolean
+        object:
           type: boolean
         pojo:
           type: boolean
