@@ -5444,6 +5444,8 @@ components:
           type: string
           format: uuid
           description: Optional related requirement id for grouped logic.
+        validableByEmail:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -5784,6 +5786,8 @@ components:
           enum:
           - CTAIMA
           - INTERNAL
+        validableByEmail:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -9625,6 +9629,8 @@ components:
           type: string
         temporaryAuthorization:
           $ref: "#/components/schemas/TemporaryAuthorizationSummary"
+        specificLocation:
+          $ref: "#/components/schemas/SiteInfo"
       required:
       - at
       - origin
@@ -9681,16 +9687,6 @@ components:
           $ref: "#/components/schemas/AccessRegisterMovement"
         timeOnSite:
           $ref: "#/components/schemas/TimeOnSite"
-        specificLocation:
-          $ref: "#/components/schemas/SiteNodeItem"
-        exitSite:
-          $ref: "#/components/schemas/SiteInfo"
-        specificExitLocation:
-          $ref: "#/components/schemas/SiteNodeItem"
-        entryLocationNameWithLevel:
-          type: string
-        exitLocationNameWithLevel:
-          type: string
       required:
       - client
       - contractor
