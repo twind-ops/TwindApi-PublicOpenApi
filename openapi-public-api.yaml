@@ -4471,6 +4471,7 @@ paths:
             - VEHICLE
             - EQUIPMENT
             - CONTRACTOR
+            - PRODUCT
       - name: onlyCompanyRequirements
         in: query
         description: "When true, restricts to requirements that apply at company level.\
@@ -4773,6 +4774,7 @@ paths:
             - VEHICLE
             - EQUIPMENT
             - CONTRACTOR
+            - PRODUCT
       - name: onlyCompanyRequirements
         in: query
         description: "When true, restricts to requirements that apply at company level.\
