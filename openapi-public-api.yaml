@@ -2074,6 +2074,7 @@ paths:
             - EMPLOYEE
             - VEHICLE
             - EQUIPMENT
+            - PRODUCT
       - name: from
         in: query
         description: Filter entries with entry_at on or after this instant (inclusive)
@@ -3351,6 +3352,7 @@ paths:
             - EMPLOYEE
             - VEHICLE
             - EQUIPMENT
+            - PRODUCT
       - name: status
         in: query
         description: Deprecated — use 'statuses' instead.
@@ -3556,6 +3558,7 @@ paths:
             - EMPLOYEE
             - VEHICLE
             - EQUIPMENT
+            - PRODUCT
       - name: status
         in: query
         description: Deprecated — use 'statuses' instead.
@@ -5341,6 +5344,9 @@ components:
         equipmentType:
           type: string
           description: Rule key or expression for equipment type.
+        productType:
+          type: string
+          description: Rule key or expression for product type.
         euCategory:
           type: string
           description: EU category filter when applicable.
@@ -5363,6 +5369,7 @@ components:
           - EQUIPMENT
           - CONTRACTOR
           - VEHICLE
+          - PRODUCT
         multipleInstanceRequest:
           type: string
           description: How multiple requirement instances are created for the subject.
@@ -5710,6 +5717,7 @@ components:
           - EQUIPMENT
           - CONTRACTOR
           - VEHICLE
+          - PRODUCT
         multipleInstanceRequest:
           type: string
           enum:
@@ -7105,6 +7113,7 @@ components:
           - EMPLOYEE
           - VEHICLE
           - EQUIPMENT
+          - PRODUCT
       required:
       - id
       - name
@@ -7185,6 +7194,7 @@ components:
           - EMPLOYEE
           - VEHICLE
           - EQUIPMENT
+          - PRODUCT
         firstName:
           type: string
         lastName:
@@ -7828,6 +7838,7 @@ components:
           - EQUIPMENT
           - CONTRACTOR
           - VEHICLE
+          - PRODUCT
         multipleInstanceRequest:
           type: string
           enum:
@@ -7985,6 +7996,7 @@ components:
             - EQUIPMENT
             - CONTRACTOR
             - VEHICLE
+            - PRODUCT
           multipleInstanceRequest:
             type: string
             enum:
@@ -8050,6 +8062,8 @@ components:
             enum:
             - CTAIMA
             - INTERNAL
+          validableByEmail:
+            type: boolean
           documentType:
             $ref: "#/components/schemas/DocumentType"
           automaticReviewer:
@@ -8079,6 +8093,7 @@ components:
       - name
       - rules
       - subject
+      - validableByEmail
     DocumentType:
       type: object
       properties:
@@ -8107,6 +8122,7 @@ components:
             - EQUIPMENT
             - CONTRACTOR
             - VEHICLE
+            - PRODUCT
           multipleInstanceRequest:
             type: string
             enum:
@@ -8172,6 +8188,8 @@ components:
             enum:
             - CTAIMA
             - INTERNAL
+          validableByEmail:
+            type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -8188,6 +8206,7 @@ components:
       - name
       - rules
       - subject
+      - validableByEmail
     GetRequirementDetailsCustody:
       type: object
       properties:
@@ -8292,6 +8311,8 @@ components:
         equipmentType:
           $ref: "#/components/schemas/IdAndName"
         employeeType:
+          $ref: "#/components/schemas/IdAndName"
+        productType:
           $ref: "#/components/schemas/IdAndName"
         euCategory:
           type: string
@@ -8517,6 +8538,7 @@ components:
           - EQUIPMENT
           - CONTRACTOR
           - VEHICLE
+          - PRODUCT
         multipleRequestInstance:
           type: string
           enum:
@@ -8615,6 +8637,7 @@ components:
           - EMPLOYEE
           - VEHICLE
           - EQUIPMENT
+          - PRODUCT
         identifier:
           type: string
           description: "External identifier for the subject (e.g. document id, plate)."
@@ -8790,6 +8813,7 @@ components:
           oneOf:
           - $ref: "#/components/schemas/Employee"
           - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Product"
           - $ref: "#/components/schemas/Vehicle"
       required:
       - requirementInstanceId
@@ -8806,6 +8830,25 @@ components:
       required:
       - content
       - page
+    Product:
+      allOf:
+      - $ref: "#/components/schemas/Resource"
+      - type: object
+        properties:
+          code:
+            type: string
+          manufacturer:
+            type: string
+          serialNumber:
+            type: string
+          displayId:
+            type: string
+      required:
+      - code
+      - displayId
+      - id
+      - manufacturer
+      - serialNumber
     Resource:
       type: object
       discriminator:
@@ -9678,6 +9721,7 @@ components:
           oneOf:
           - $ref: "#/components/schemas/Employee"
           - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Product"
           - $ref: "#/components/schemas/Vehicle"
         site:
           $ref: "#/components/schemas/SiteInfo"
@@ -9845,6 +9889,7 @@ components:
           oneOf:
           - $ref: "#/components/schemas/Employee"
           - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Product"
           - $ref: "#/components/schemas/Vehicle"
         contractor:
           $ref: "#/components/schemas/GetAccessControlContractor"
@@ -10059,12 +10104,15 @@ components:
           - EMPLOYEE
           - VEHICLE
           - EQUIPMENT
+          - PRODUCT
         employee:
           $ref: "#/components/schemas/GetTemporaryAuthorizationEmployee"
         vehicle:
           $ref: "#/components/schemas/GetTemporaryAuthorizationVehicle"
         equipment:
           $ref: "#/components/schemas/GetTemporaryAuthorizationEquipment"
+        product:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationProduct"
         contractor:
           $ref: "#/components/schemas/GetTemporaryAuthorizationContractor"
         authorizer:
@@ -10112,6 +10160,15 @@ components:
       - site
       - status
       - validityStatus
+    GetTemporaryAuthorizationProduct:
+      type: object
+      properties:
+        productCode:
+          type: string
+        productType:
+          type: string
+        serialNumber:
+          type: string
     GetTemporaryAuthorizationVehicle:
       type: object
       properties:
@@ -10149,12 +10206,15 @@ components:
           - EMPLOYEE
           - VEHICLE
           - EQUIPMENT
+          - PRODUCT
         employee:
           $ref: "#/components/schemas/GetTemporaryAuthorizationEmployee"
         vehicle:
           $ref: "#/components/schemas/GetTemporaryAuthorizationVehicle"
         equipment:
           $ref: "#/components/schemas/GetTemporaryAuthorizationEquipment"
+        product:
+          $ref: "#/components/schemas/GetTemporaryAuthorizationProduct"
       required:
       - resourceId
       - resourceType
@@ -10318,6 +10378,7 @@ components:
           oneOf:
           - $ref: "#/components/schemas/Employee"
           - $ref: "#/components/schemas/Equipment"
+          - $ref: "#/components/schemas/Product"
           - $ref: "#/components/schemas/Vehicle"
         site:
           $ref: "#/components/schemas/Site"
