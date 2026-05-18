@@ -2028,6 +2028,11 @@
             "description" : "Filter by evidence type (UPLOAD or AGREEMENT).",
             "disabled" : true
           }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Pre-selected requirement IDs to ensure inclusion in the result page. When provided together with `name`, they are combined using OR — the result is the union of name-matching rows and the explicitly listed IDs. Other filters still apply. Sorted alongside the rest of the page (no top-of-page pinning).",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2044,7 +2049,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Create requirement configuration",
