@@ -5479,6 +5479,12 @@ components:
           description: Optional related requirement id for grouped logic.
         validableByEmail:
           type: boolean
+        validableByEmailUserIds:
+          type: array
+          description: Full desired email-validation recipient list. The backend diffs
+            against the currently stored set to determine inserts and deletes.
+          items:
+            type: string
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
@@ -5827,6 +5833,10 @@ components:
           - INTERNAL
         validableByEmail:
           type: boolean
+        validableByEmailUserIds:
+          type: array
+          items:
+            type: string
       required:
       - acceptanceCriteria
       - appliedTo
@@ -6405,9 +6415,13 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
+          - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - id
+    TrainingConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     UpdateCompanyDto:
       type: object
       properties:
@@ -6455,6 +6469,8 @@ components:
             $ref: "#/components/schemas/SystemProductAssignDto"
         taxId:
           type: string
+        seedDemoData:
+          type: boolean
     WorkPermitsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6686,6 +6702,7 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
+          - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - config
@@ -6947,6 +6964,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/QuotaDto"
+        hasBeenSeeded:
+          type: boolean
         active:
           type: boolean
       required:
@@ -7050,6 +7069,7 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
+          - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - config
@@ -8383,6 +8403,25 @@ components:
           format: int32
       required:
       - contractorsAffected
+    EmailValidableUser:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        selected:
+          type: boolean
+      required:
+      - email
+      - firstName
+      - id
+      - lastName
+      - selected
     Applicability:
       type: object
       properties:
