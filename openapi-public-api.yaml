@@ -5485,6 +5485,8 @@ components:
             against the currently stored set to determine inserts and deletes.
           items:
             type: string
+        paymentRequired:
+          type: boolean
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
@@ -5837,6 +5839,8 @@ components:
           type: array
           items:
             type: string
+        paymentRequired:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -6289,6 +6293,9 @@ components:
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    PaymentAuthorizationConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ProductTypeConfig:
       discriminator:
         propertyName: type
@@ -6377,6 +6384,9 @@ components:
       - rejectionCurrencyId
       - rejectionPrice
       - useSamePrice
+    ScheduledLinksConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     SiteHierarchyConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6409,10 +6419,12 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
@@ -6696,10 +6708,12 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
@@ -7063,10 +7077,12 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
@@ -7959,6 +7975,8 @@ components:
           - NONE
           - MAIN
           - DEPENDANT
+        paymentRequired:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -8114,6 +8132,8 @@ components:
             - INTERNAL
           validableByEmail:
             type: boolean
+          paymentRequired:
+            type: boolean
           documentType:
             $ref: "#/components/schemas/DocumentType"
           automaticReviewer:
@@ -8239,6 +8259,8 @@ components:
             - CTAIMA
             - INTERNAL
           validableByEmail:
+            type: boolean
+          paymentRequired:
             type: boolean
       required:
       - acceptanceCriteria
