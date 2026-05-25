@@ -2008,6 +2008,11 @@
             "description" : "Filter by one or more expiration type keys (enum names matching `RequirementExpirationType`).",
             "disabled" : true
           }, {
+            "key" : "critical",
+            "value" : "",
+            "description" : "When set, filters critical vs non-critical requirements.",
+            "disabled" : true
+          }, {
             "key" : "appliedTo",
             "value" : "",
             "description" : "Filter by apply-to scope string (enum name matching `ApplyTo`).",
@@ -2033,6 +2038,61 @@
             "description" : "Pre-selected requirement IDs to ensure inclusion in the result page. When provided together with `name`, they are combined using OR — the result is the union of name-matching rows and the explicitly listed IDs. Other filters still apply. Sorted alongside the rest of the page (no top-of-page pinning).",
             "disabled" : true
           }, {
+            "key" : "hasTemplate",
+            "value" : "",
+            "description" : "When true, only requirements with a template file; when false, only without.",
+            "disabled" : true
+          }, {
+            "key" : "hasRules",
+            "value" : "",
+            "description" : "When false, only requirements requested under any condition (empty rules); when true, only those with rules.",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by activity IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter by contract IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "euCategories",
+            "value" : "",
+            "description" : "Filter by EU category values referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "riskIds",
+            "value" : "",
+            "description" : "Filter by risk IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "employeeTypeIds",
+            "value" : "",
+            "description" : "Filter by employee type IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "vehicleTypeIds",
+            "value" : "",
+            "description" : "Filter by vehicle type IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
+            "key" : "equipmentTypeIds",
+            "value" : "",
+            "description" : "Filter by equipment type IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2049,7 +2109,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `isCritical`, `appliedTo`, `related`, `disabled`, `evidenceType`. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Create requirement configuration",
