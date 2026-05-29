@@ -3773,9 +3773,9 @@ paths:
         \ `multipleRequestInstance`, `expirationType`, `critical`, `appliedTo`, `related`,\
         \ `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`,\
         \ `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`,\
-        \ `vehicleTypeIds`, `equipmentTypeIds`. Rule-based list parameters use OR\
-        \ within the same parameter and AND across different parameters. **Sort format:**\
-        \ use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        \ `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`. Rule-based list\
+        \ parameters use OR within the same parameter and AND across different parameters.\
+        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: findAll_2
       parameters:
       - name: companyId
@@ -3862,6 +3862,7 @@ paths:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
       - name: selected
         in: query
         description: "Pre-selected requirement IDs to ensure inclusion in the result\
@@ -4031,6 +4032,20 @@ paths:
             type: string
             format: uuid
             description: Filter by equipment type IDs referenced in rules. Multiple
+              values combine with OR.
+      - name: productTypeIds
+        in: query
+        description: Filter by product type IDs referenced in rules. Multiple values
+          combine with OR.
+        required: false
+        schema:
+          type: array
+          description: Filter by product type IDs referenced in rules. Multiple values
+            combine with OR.
+          items:
+            type: string
+            format: uuid
+            description: Filter by product type IDs referenced in rules. Multiple
               values combine with OR.
       - name: page
         in: query
@@ -5576,6 +5591,7 @@ components:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
         templateFile:
           type: string
           description: Object storage key for a template file; blank clears the template
@@ -5644,11 +5660,17 @@ components:
             type: string
         paymentRequired:
           type: boolean
+          description: Whether the requirement must be fulfilled for payment authorization.
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
             \ it disabled; default is false to avoid unintended activation. Only can\
             \ be send when the requirement is currently disabled."
+        trainingCourseId:
+          type: string
+          format: uuid
+          description: Training course to link to this requirement. Only valid when
+            evidenceType is TRAINING.
       required:
       - acceptanceCriteria
       - appliedTo
@@ -5933,6 +5955,7 @@ components:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
         templateFile:
           type: string
         critical:
@@ -5998,6 +6021,9 @@ components:
             type: string
         paymentRequired:
           type: boolean
+        trainingCourseId:
+          type: string
+          format: uuid
       required:
       - acceptanceCriteria
       - appliedTo
@@ -6402,6 +6428,15 @@ components:
       - endDate
       - plan
       - startDate
+    CustomAccessCardsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          templateKey:
+            type: string
+      required:
+      - templateKey
     DocumentalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6426,6 +6461,9 @@ components:
             type: integer
             format: int32
     EmployeeTypeConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ErpPropertiesConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     InternalManagementConfig:
@@ -6577,9 +6615,11 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
+          - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
+          - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -6866,9 +6906,11 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
+          - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
+          - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -7005,6 +7047,10 @@ components:
         userSettings:
           $ref: "#/components/schemas/UserSettings"
           description: User preferences and settings (e.g. mobile unattended mode)
+        marketingConsent:
+          type: boolean
+          description: "User-scoped marketing consent (true=opted-in, false=opted-out,\
+            \ null=not captured yet)"
       required:
       - companiesPermissions
       - createdAt
@@ -7235,9 +7281,11 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
+          - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
+          - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -8102,6 +8150,7 @@ components:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
         hasTemplate:
           type: boolean
         expirationType:
@@ -8260,6 +8309,7 @@ components:
             enum:
             - UPLOAD
             - AGREEMENT
+            - TRAINING
           expirationType:
             type: string
             enum:
@@ -8297,6 +8347,9 @@ components:
             type: boolean
           paymentRequired:
             type: boolean
+          trainingCourseId:
+            type: string
+            format: uuid
           documentType:
             $ref: "#/components/schemas/DocumentType"
           automaticReviewer:
@@ -8335,9 +8388,12 @@ components:
           format: uuid
         code:
           type: string
+        name:
+          type: string
       required:
       - code
       - id
+      - name
     GetRequirementDetailResponse:
       allOf:
       - $ref: "#/components/schemas/RequirementDetailResponse"
@@ -8388,6 +8444,7 @@ components:
             enum:
             - UPLOAD
             - AGREEMENT
+            - TRAINING
           expirationType:
             type: string
             enum:
@@ -8425,6 +8482,9 @@ components:
             type: boolean
           paymentRequired:
             type: boolean
+          trainingCourseId:
+            type: string
+            format: uuid
       required:
       - acceptanceCriteria
       - appliedTo
@@ -8681,6 +8741,9 @@ components:
         expiredAt:
           type: string
           format: date-time
+        consultedAt:
+          type: string
+          format: date-time
       required:
       - createdAt
       - files
@@ -8812,6 +8875,7 @@ components:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
         isCritical:
           type: boolean
         enableDoesNotApply:
@@ -8859,6 +8923,8 @@ components:
         templateFile:
           type: string
         canBeSetInFuture:
+          type: boolean
+        paymentRequired:
           type: boolean
       required:
       - acceptanceCriteria
@@ -9089,11 +9155,15 @@ components:
       - $ref: "#/components/schemas/Resource"
       - type: object
         properties:
+          name:
+            type: string
           code:
             type: string
           manufacturer:
             type: string
           serialNumber:
+            type: string
+          subtype:
             type: string
           displayId:
             type: string
@@ -9262,9 +9332,13 @@ components:
           enum:
           - UPLOAD
           - AGREEMENT
+          - TRAINING
         critical:
           type: boolean
           description: Whether the requirement is marked critical for compliance.
+        paymentRequired:
+          type: boolean
+          description: Whether the requirement must be fulfilled for payment authorization.
       required:
       - critical
       - id
@@ -9309,6 +9383,12 @@ components:
           type: string
           format: date-time
           description: Evidence upload timestamp when available.
+        consultedAt:
+          type: string
+          format: date-time
+          description: Timestamp set when AIA flagged the evidence as 'Client consulted'
+            (INQUIRY). Only populated for evidences in PENDING_REVIEW status; otherwise
+            null.
       required:
       - status
     RequirementInstanceAsContractor:

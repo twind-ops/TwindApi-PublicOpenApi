@@ -2093,6 +2093,11 @@
             "description" : "Filter by equipment type IDs referenced in rules. Multiple values combine with OR.",
             "disabled" : true
           }, {
+            "key" : "productTypeIds",
+            "value" : "",
+            "description" : "Filter by product type IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2109,7 +2114,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Create requirement configuration",
