@@ -4664,9 +4664,9 @@ paths:
               \ or CONTRACTOR)."
             enum:
             - EMPLOYEE
-            - VEHICLE
             - EQUIPMENT
             - CONTRACTOR
+            - VEHICLE
             - PRODUCT
       - name: onlyCompanyRequirements
         in: query
@@ -4967,9 +4967,9 @@ paths:
               \ or CONTRACTOR)."
             enum:
             - EMPLOYEE
-            - VEHICLE
             - EQUIPMENT
             - CONTRACTOR
+            - VEHICLE
             - PRODUCT
       - name: onlyCompanyRequirements
         in: query
