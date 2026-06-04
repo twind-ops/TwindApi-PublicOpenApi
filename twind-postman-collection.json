@@ -2385,7 +2385,7 @@
           }, {
             "key" : "resourceIds",
             "value" : "",
-            "description" : "Filter by one or more subject resource ids (employees, vehicles, or equipment).",
+            "description" : "Filter by one or more subject resource ids (employees, vehicles, equipment, or products).",
             "disabled" : true
           }, {
             "key" : "contractId",
@@ -2430,7 +2430,7 @@
           }, {
             "key" : "subject",
             "value" : "",
-            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT or CONTRACTOR).",
+            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT, PRODUCT or CONTRACTOR).",
             "disabled" : true
           }, {
             "key" : "onlyCompanyRequirements",
@@ -2484,7 +2484,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement instances for a contractor company. **Allowed sort fields:** `client_name` (client company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `contract_date_from` (minimum contract start date); `evidence_expiration` (minimum tolerance date: expiration + grace period); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
+        "description" : "Returns paginated requirement instances for a contractor company. **Allowed sort fields:** `client_name` (client company name); `subject_name` (resource name: employee full name, vehicle, equipment, or product); `requirement_name` (requirement name); `contract_date_from` (minimum contract start date); `evidence_expiration` (minimum tolerance date: expiration + grace period); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=client_name,asc`)."
       }
     }, {
       "name" : "Get requirement instances as client",
@@ -2528,7 +2528,7 @@
           }, {
             "key" : "resourceIds",
             "value" : "",
-            "description" : "Filter by one or more subject resource ids (employees, vehicles, or equipment).",
+            "description" : "Filter by one or more subject resource ids (employees, vehicles, equipment, or products).",
             "disabled" : true
           }, {
             "key" : "contractId",
@@ -2568,7 +2568,7 @@
           }, {
             "key" : "subject",
             "value" : "",
-            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT or CONTRACTOR).",
+            "description" : "Filter by requirement subject type (EMPLOYEE, VEHICLE, EQUIPMENT, PRODUCT or CONTRACTOR).",
             "disabled" : true
           }, {
             "key" : "onlyCompanyRequirements",
@@ -2612,7 +2612,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, or equipment); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, equipment, or product); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       }
     }, {
       "name" : "Get presigned URL for evidence file upload",
