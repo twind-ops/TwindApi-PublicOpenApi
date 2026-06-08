@@ -79,6 +79,8 @@ status, resource, client, and contract details.
 
 **Available filters (query parameters):**
 
+> **Multi-value parameters** accept repeated query params: `?status=PENDING_UPLOAD&status=PENDING_REVIEW`. Comma-separated values are not supported.
+
 | Parameter | Description |
 | --- | --- |
 | `requirementIds` | Filter by requirement definition ids. |
@@ -96,6 +98,8 @@ status, resource, client, and contract details.
 | `onlyWithGDRequirements` | When `true`, restricts to general duty (GD) requirements — obligations imposed by law on all companies regardless of contract. |
 | `companyScope` | Narrows subcontractor-related rows. |
 | `contractorIds` | Filters to instances for these contractor ids (used with subcontractor access). |
+| `page` | Zero-based page number (default `0`). |
+| `size` | Page size — number of items per page (default `20`). |
 
 **Allowed sort fields:** `client_name`, `subject_name`, `requirement_name`,
 `evidence_expiration`, `date_of_issue`, `created_at` (default, ascending).
@@ -125,6 +129,8 @@ working under this client company.
 
 **Available filters (query parameters):**
 
+> **Multi-value parameters** use repeated query params (same format as the contractor endpoint above).
+
 | Parameter | Description |
 | --- | --- |
 | `requirementIds` | Filter by requirement definition ids. |
@@ -140,6 +146,8 @@ working under this client company.
 | `onlyAgreementRequirements` | When `true`, restricts to agreement-type requirements. |
 | `fromStartDate` | Lower bound on requirement start date (inclusive), format `YYYY-MM-DD`. |
 | `managerIds` | Filter to instances whose contract has a manager in this set. |
+| `page` | Zero-based page number (default `0`). |
+| `size` | Page size — number of items per page (default `20`). |
 
 **Allowed sort fields:** `contractor_name`, `subject_name`, `requirement_name`,
 `evidence_expiration`, `date_of_issue`, `evidence_upload_date`, `created_at`
