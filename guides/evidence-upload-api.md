@@ -58,6 +58,183 @@ X-Api-Key: your-api-key-here
 - **`{evidenceId}`** on `POST .../evidences/{...}/matching-requirement-instances`
   — **Evidence record id** — the source document you want to propagate.
 
+## Discovering requirement instances
+
+Before you can upload evidence you need the **requirement instance id** — the row
+that identifies the specific obligation you are satisfying. The API exposes two
+separate listing endpoints depending on your role, plus a detail endpoint shared
+by both.
+
+### As contractor
+
+```http
+GET /v1/companies/{companyId}/requirement-instances/as-contractor
+```
+
+`{companyId}` is your **contractor company id**.
+
+The response is a paginated list (`content`, `page`) of requirement instances
+assigned to your company. Each item includes the requirement name, evidence
+status, resource, client, and contract details.
+
+**Available filters (query parameters):**
+
+| Parameter | Description |
+| --- | --- |
+| `requirementIds` | Filter by requirement definition ids. |
+| `clientIds` | Filter by client company ids. |
+| `resourceIds` | Filter by resource ids (employees, vehicles, equipment, or products). |
+| `contractIds` | Filter by contract ids. |
+| `siteIds` | Filter by site ids. |
+| `activityIds` | Filter by activity ids. |
+| `status` | Include only instances with these evidence statuses (e.g. `PENDING_UPLOAD`, `PENDING_REVIEW`). |
+| `excludeStatus` | Exclude instances with these evidence statuses. |
+| `subject` | Filter by subject type: `EMPLOYEE`, `VEHICLE`, `EQUIPMENT`, `PRODUCT`, or `CONTRACTOR`. |
+| `onlyCriticalRequirements` | When `true`, restricts to critical requirements. |
+| `onlyAgreementRequirements` | When `true`, restricts to agreement-type requirements. |
+| `onlyExpiringInFifteenDays` | When `true`, restricts to instances with evidence expiring within fifteen days. |
+| `onlyWithGDRequirements` | When `true`, restricts to general duty (GD) requirements. |
+| `companyScope` | Narrows subcontractor-related rows. |
+| `contractorIds` | Filters to instances for these contractor ids (used with subcontractor access). |
+
+**Allowed sort fields:** `client_name`, `subject_name`, `requirement_name`,
+`evidence_expiration`, `date_of_issue`, `created_at` (default, ascending).
+Sort format: `?sort=field,asc` or `?sort=field,desc`.
+
+#### Example: cURL — list instances as contractor
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/requirement-instances/as-contractor?status=PENDING_UPLOAD&sort=requirement_name,asc" \
+  -H "Authorization: Bearer your-token-here" \
+  -H "Accept: application/json"
+```
+
+---
+
+### As client
+
+```http
+GET /v1/companies/{companyId}/requirement-instances/as-client
+```
+
+`{companyId}` is your **client company id**.
+
+The response is a paginated list of requirement instances across all contractors
+working under this client company.
+
+**Available filters (query parameters):**
+
+| Parameter | Description |
+| --- | --- |
+| `requirementIds` | Filter by requirement definition ids. |
+| `contractorIds` | Filter by contractor company ids. |
+| `resourceIds` | Filter by resource ids (employees, vehicles, equipment, or products). |
+| `contractIds` | Filter by contract ids. |
+| `siteIds` | Filter by site ids. |
+| `activityIds` | Filter by activity ids. |
+| `status` | Include only instances with these evidence statuses. |
+| `excludeStatus` | Exclude instances with these evidence statuses. |
+| `subject` | Filter by subject type: `EMPLOYEE`, `VEHICLE`, `EQUIPMENT`, `PRODUCT`, or `CONTRACTOR`. |
+| `onlyCriticalRequirements` | When `true`, restricts to critical requirements. |
+| `onlyAgreementRequirements` | When `true`, restricts to agreement-type requirements. |
+| `fromStartDate` | Lower bound on requirement start date (inclusive), format `YYYY-MM-DD`. |
+| `managerIds` | Filter to instances whose contract has a manager in this set. |
+
+**Allowed sort fields:** `contractor_name`, `subject_name`, `requirement_name`,
+`evidence_expiration`, `date_of_issue`, `evidence_upload_date`, `created_at`
+(default, ascending). Sort format: `?sort=field,asc` or `?sort=field,desc`.
+
+#### Example: cURL — list instances as client
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/requirement-instances/as-client?status=PENDING_REVIEW&contractorIds={contractorId}" \
+  -H "Authorization: Bearer your-token-here" \
+  -H "Accept: application/json"
+```
+
+---
+
+### Get requirement instance details
+
+Once you have an instance id (from the listing or from another source), fetch
+its full details — requirement configuration, current evidence status, resource,
+contract, and site — with:
+
+```http
+GET /v1/companies/{companyId}/requirement-instances/{instanceId}
+```
+
+This endpoint accepts either a contractor or a client `{companyId}`. Returns
+**404** if the instance does not exist or is not accessible to the company.
+
+#### Example: cURL — get instance details
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/requirement-instances/{instanceId}" \
+  -H "Authorization: Bearer your-token-here" \
+  -H "Accept: application/json"
+```
+
+**Response** (`200 OK`)
+
+```json
+{
+  "id": "11111111-2222-3333-4444-555555555555",
+  "requirement": {
+    "id": "…",
+    "name": "Safety certificate",
+    "subject": "EMPLOYEE",
+    "evidenceType": "UPLOAD",
+    "description": "…",
+    "isCritical": false,
+    "enableDoesNotApply": false,
+    "expirationType": "PERIODIC",
+    "periodicity": 12,
+    "periodicityType": "MONTHS",
+    "gracePeriod": 15,
+    "acceptanceCriteria": [],
+    "rules": []
+  },
+  "evidence": {
+    "id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+    "status": "PENDING_REVIEW",
+    "files": ["https://…presigned-url…"],
+    "dateOfIssue": "2025-06-01",
+    "expiration": "2026-06-01",
+    "createdAt": "2025-06-01T10:00:00Z"
+  },
+  "contractor": { "id": "…", "name": "Acme Ltd", "taxId": "…" },
+  "client": { "id": "…", "name": "Client Corp", "taxId": "…" },
+  "subject": {
+    "id": "…",
+    "name": "Jane Doe",
+    "type": "EMPLOYEE",
+    "identifier": "12345678A"
+  },
+  "applicability": [
+    {
+      "contract": { "id": "…", "name": "…", "managerName": "…", "managerEmail": "…" },
+      "site": { "id": "…", "name": "…" },
+      "activity": { "id": "…", "name": "…" }
+    }
+  ],
+  "lastEvidence": "ffffffff-ffff-ffff-ffff-ffffffffffff",
+  "lastReviewedEvidence": null,
+  "createdAt": "2025-01-15T08:00:00Z"
+}
+```
+
+- **`id`** — the `requirementInstanceId` to use in the upload steps below.
+- **`requirement.evidenceType`** — `UPLOAD` uses the file upload flow; `AGREEMENT` uses `POST /v1/companies/{companyId}/evidences/agreement`.
+- **`evidence`** — the current evidence record, or `null` if nothing has been submitted yet. File URLs are presigned and valid for 10 minutes.
+- **`subject`** — the resource the requirement applies to (employee, vehicle, equipment, or product); `null` for company-level requirements.
+- **`applicability`** — one entry per contract/site/activity combination that triggered this instance.
+
+---
+
 ## Upload document (three steps)
 
 The API does **not** accept raw file bytes on `POST .../upload`. You upload the
