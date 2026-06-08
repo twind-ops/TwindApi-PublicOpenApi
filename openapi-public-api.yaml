@@ -56,6 +56,17 @@ tags:
     - **Access control (status)**: Read access control row by id; list as contractor or as client
     - **Access card**: Download access card file (PDF or PNG) for a resource
     - **Temporary authorizations**: List, create, read, update, and delete; search names and authorizers
+- name: Payment authorization
+  description: |-
+    Query contractor and contract payment authorization status, including the requirements blocking payment when a contractor or contract is not authorized.
+
+    Supports both calculation modes (Individual and Subcontracting Chain) following the same business rules as the Payment Authorization module.
+
+    - **Payment status by contractor**: List contractors with their aggregated payment authorization status (paginated, filterable by contractor/company, payment status, contract, site and activity)
+    - **Contractor detail**: Aggregated status for a single contractor plus the payment-required requirement instances blocking payment when not authorized
+    - **Payment status by contract**: List contracts with the contractor's payment authorization status for each contract (paginated, filterable by contractor/company, contract, site, activity and payment status)
+    - **Contract detail**: Payment authorization status and blocking requirement issues for a contractor on a specific contract
+    - **Resolving blocking requirements**: Each blocking requirement (`blockingRequirements[]` on contractor detail, `issues[]` on contract detail) carries a `requirementInstanceId`. To obtain the full requirement configuration and evidence detail, dereference it via the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}`. This requires the Requirements API product to be subscribed in addition to Payment Authorization.
 - name: Requirements
   description: |-
     Configure contract requirements, inspect requirement instances, and submit or review evidence against them.
@@ -1435,6 +1446,14 @@ paths:
         required: false
         schema:
           type: string
+      - name: projectIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -3676,6 +3695,431 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetAccessControlResponse"
+  /v1/companies/{clientId}/payment-authorization/by-company:
+    get:
+      tags:
+      - Payment authorization
+      summary: Get payment authorization status by company (Individual calculation
+        mode)
+      description: "Returns one row per contractor with at least one active contract\
+        \ with the client, with their aggregated payment authorization status. Only\
+        \ relevant when the client's calculation mode is Individual. **Allowed sort\
+        \ fields:** `contractor_name` (default). **Sort format:** `?sort=field,direction`\
+        \ (e.g. `?sort=contractor_name,asc`)."
+      operationId: getByCompany
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "contractor_name,ASC"
+          items:
+            type: string
+      - name: paymentStatus
+        in: query
+        description: Filter by aggregated payment status
+        required: false
+        schema:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      - name: contractorIds
+        in: query
+        description: "Filter by contractor company IDs. Obtain them from the `by-company`\
+          \ list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contractIds
+        in: query
+        description: Filter contractors to those with at least one matching contract.
+          Obtain contract IDs from the `by-contract` list response (field `contract.id`).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (matches contract scope including child sites).\
+          \ Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        description: "Filter by activity IDs (contract has an engagement on one of\
+          \ these activities). Obtain them from `GET /v1/companies/{companyId}/activities`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: dateFrom
+        in: query
+        description: Contract date range start (contract.dateFrom >= dateFrom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        description: Contract date range end (contract.dateTo <= dateTo)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: managerIds
+        in: query
+        description: "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: maxContractsPerContractor
+        in: query
+        description: "Maximum number of contracts to return per contractor. When omitted,\
+          \ all contracts are returned (useful for exports)."
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization rows
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByCompanyRowDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByCompanyRowDto"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByCompanyRowDto"
+  /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}:
+    get:
+      tags:
+      - Payment authorization
+      summary: Get payment authorization detail for a contractor
+      description: "Returns the contractor, the aggregated payment status, the count\
+        \ of active contracts with the calling client, and the payment-required requirement\
+        \ instances currently blocking payment (with the specific failing subject:\
+        \ contractor company, employee, vehicle, equipment or product). When `paymentStatus`\
+        \ is not authorized, `blockingRequirements[]` lists the failing requirement\
+        \ instances. To obtain the full requirement configuration and evidence detail\
+        \ for each, take its `requirementInstanceId` and call the Requirements API:\
+        \ `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the\
+        \ API key must also have the Requirements API product subscribed)."
+      operationId: getContractorDetail
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: "Contractor company ID. UUID of the contractor company. Obtain\
+          \ it from the `by-company` list response (field `contractor.id`) or from\
+          \ `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`)."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved blocking requirements
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractorPaymentAuthorizationDetailDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractorPaymentAuthorizationDetailDto"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractorPaymentAuthorizationDetailDto"
+        "404":
+          description: Contractor has no active contract with this client
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractorPaymentAuthorizationDetailDto"
+  /v1/companies/{clientId}/payment-authorization/by-contract:
+    get:
+      tags:
+      - Payment authorization
+      summary: Get payment authorization status by contract (Individual calculation
+        mode)
+      description: "Returns one row per contract between the client and any contractor,\
+        \ with the contractor's payment authorization status for that specific contract.\
+        \ Only relevant when the client's calculation mode is Individual. **`showExpired`:**\
+        \ when `false` (default), only non-expired contracts are returned. When `true`,\
+        \ expired contracts are included alongside active ones. **Allowed sort fields:**\
+        \ `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g.\
+        \ `?sort=contractor_name,asc`)."
+      operationId: getByContract
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "contractor_name,ASC"
+          items:
+            type: string
+      - name: paymentStatus
+        in: query
+        description: Filter by per-contract payment status
+        required: false
+        schema:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      - name: contractorIds
+        in: query
+        description: "Filter by contractor company IDs. Obtain them from the `by-company`\
+          \ list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contractIds
+        in: query
+        description: Filter by specific contract IDs. Obtain them from the `by-contract`
+          list response (field `contract.id`).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (matches contract scope including child sites).\
+          \ Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        description: "Filter by activity IDs (contract has an engagement on one of\
+          \ these activities). Obtain them from `GET /v1/companies/{companyId}/activities`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: dateFrom
+        in: query
+        description: Contract date range start (contract.dateFrom >= dateFrom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        description: Contract date range end (contract.dateTo <= dateTo)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: managerIds
+        in: query
+        description: "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: subcontractingLevel
+        in: query
+        description: "Filter by subcontracting level (0 = Main contract, ≥1 = Subcontract\
+          \ level N)"
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: showExpired
+        in: query
+        description: "When true, includes contracts whose end date has passed alongside\
+          \ active contracts."
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization rows by contract
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByContractRowDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByContractRowDto"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByContractRowDto"
+  /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}:
+    get:
+      tags:
+      - Payment authorization
+      summary: Get payment authorization detail for a contract
+      description: "Returns the payment authorization status and any blocking requirement\
+        \ issues for the contractor on the given contract. When the status is not\
+        \ authorized, `issues[]` lists the failing requirement instances. To obtain\
+        \ the full requirement configuration and evidence detail for each, take its\
+        \ `requirementInstanceId` and call the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}`\
+        \ (the API key must also have the Requirements API product subscribed)."
+      operationId: getByContractDetail
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID. UUID of the contract. Obtain it from the `by-contract`
+          list response (field `contract.id`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization detail
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationContractDetailDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationContractDetailDto"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationContractDetailDto"
+        "404":
+          description: No contract found for this client
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationContractDetailDto"
   /v1/companies/{companyId}/requirements/{requirementId}:
     get:
       tags:
@@ -6199,6 +6643,9 @@ components:
           type: string
         photo:
           type: string
+        birthDate:
+          type: string
+          format: date
         classifications:
           type: array
           description: "Client-specific classifications for the employee. Each entry\
@@ -6519,6 +6966,9 @@ components:
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    PaymentAuthorizationApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     PaymentAuthorizationConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6647,6 +7097,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
@@ -6709,6 +7160,10 @@ components:
             $ref: "#/components/schemas/SystemProductAssignDto"
         taxId:
           type: string
+        spaceCode:
+          type: string
+          maxLength: 50
+          minLength: 1
         seedDemoData:
           type: boolean
     WorkPermitsConfig:
@@ -6938,6 +7393,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
@@ -7151,6 +7607,8 @@ components:
           $ref: "#/components/schemas/SystemCurrencyDto"
         taxId:
           type: string
+        spaceCode:
+          type: string
         name:
           type: string
         email:
@@ -7313,6 +7771,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
@@ -9698,6 +10157,9 @@ components:
           type: string
         photo:
           type: string
+        birthDate:
+          type: string
+          format: date
         classifications:
           type: array
           items:
@@ -9846,6 +10308,8 @@ components:
           $ref: "#/components/schemas/Requirements"
         manager:
           $ref: "#/components/schemas/Manager"
+        project:
+          $ref: "#/components/schemas/ProjectRef"
       required:
       - client
       - contractor
@@ -9907,6 +10371,17 @@ components:
       required:
       - content
       - page
+    ProjectRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     Requirements:
       type: object
       properties:
@@ -10822,6 +11297,346 @@ components:
       required:
       - id
       - name
+    ContractorPaymentAuthorizationContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`, or as the\
+            \ `contractIds` filter."
+        name:
+          type: string
+        level:
+          type: integer
+          format: int32
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      required:
+      - id
+      - level
+      - name
+      - paymentStatus
+    ContractorPaymentAuthorizationDetailDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/ContractorRef"
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        calculationMode:
+          type: string
+          enum:
+          - INDIVIDUAL
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractorPaymentAuthorizationContractRef"
+        blockingRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationIssueDto"
+      required:
+      - blockingRequirements
+      - calculationMode
+      - contractor
+      - contracts
+      - paymentStatus
+    ContractorRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contractor company id. It is also the `companyId` for the\
+            \ Requirements API dereference of each blocking requirement instance (`GET\
+            \ /v1/companies/{companyId}/requirement-instances/{instanceId}`)."
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+    PaymentAuthorizationIssueDto:
+      type: object
+      properties:
+        requirementInstanceId:
+          type: string
+          format: uuid
+          description: "Id of the requirement instance blocking payment. Use it with\
+            \ `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (Requirements\
+            \ API) to obtain the full requirement configuration and evidence detail.\
+            \ The `companyId` path variable is the contractor company that owns the\
+            \ requirement instance: read it from `contractor.id` of the enclosing\
+            \ detail response (`ContractorPaymentAuthorizationDetailDto` or `PaymentAuthorizationContractDetailDto`);\
+            \ it also equals `subject.id` when the subject is the contractor company\
+            \ itself."
+        requirement:
+          $ref: "#/components/schemas/RequirementRef"
+          description: The requirement (id and name) that is blocking payment.
+        status:
+          type: string
+          description: "Evidence status of the requirement instance. Only blocking\
+            \ statuses appear here: PENDING_UPLOAD, PENDING_REVIEW, REJECTED, EXPIRED\
+            \ or PENDING_VALIDITY. Satisfied statuses (APPROVED, UNDER_GRACE_PERIOD)\
+            \ never appear, since such an instance no longer blocks payment."
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
+        subject:
+          $ref: "#/components/schemas/SubjectRef"
+          description: "The specific subject failing the requirement: contractor company,\
+            \ employee, vehicle, equipment or product."
+      required:
+      - requirement
+      - requirementInstanceId
+      - status
+      - subject
+    RequirementRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Requirement id (the requirement definition). To dereference\
+            \ the blocking instance use `requirementInstanceId` against the Requirements\
+            \ API, not this id."
+        name:
+          type: string
+          description: Requirement name.
+      required:
+      - id
+      - name
+    SubjectRef:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "Subject type: CONTRACTOR (the contractor company itself),\
+            \ EMPLOYEE, VEHICLE, EQUIPMENT or PRODUCT."
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        id:
+          type: string
+          format: uuid
+          description: "Subject id. Its source depends on `type`: when CONTRACTOR\
+            \ it equals the contractor company id (`contractor.id` of the enclosing\
+            \ detail response); when EMPLOYEE, VEHICLE, EQUIPMENT or PRODUCT it is\
+            \ the resource id from the matching resource list endpoint (`GET /v1/companies/{companyId}/employees|vehicles|equipment|products`,\
+            \ field `id`), which requires the corresponding resource product to be\
+            \ subscribed in addition to Payment Authorization."
+        name:
+          type: string
+          description: Subject display name.
+        identifier:
+          type: string
+          description: "Human-readable identifier of the subject when available, e.g.\
+            \ an employee's national id or a vehicle's plate number."
+      required:
+      - id
+      - name
+      - type
+    PageResponsePaymentAuthorizationByContractRowDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractRowDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    PaymentAuthorizationByContractActivityRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Activity id. Pass it as an `activityIds` filter value. Obtain\
+            \ the full catalogue from `GET /v1/companies/{companyId}/activities` (field\
+            \ `id`)."
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PaymentAuthorizationByContractContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`, or as the\
+            \ `contractIds` filter."
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        level:
+          type: integer
+          format: int32
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractSiteRef"
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractActivityRef"
+      required:
+      - activities
+      - id
+      - level
+      - name
+      - sites
+    PaymentAuthorizationByContractContractorRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contractor company id. Pass it as the `contractorId` path\
+            \ variable of `GET .../payment-authorization/contractors/{contractorId}`,\
+            \ or as the `contractorIds` filter. It is also the `companyId` for the\
+            \ Requirements API dereference of blocking requirement instances."
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+    PaymentAuthorizationByContractRowDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractorRef"
+        contract:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractRef"
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      required:
+      - contract
+      - contractor
+      - paymentStatus
+    PaymentAuthorizationByContractSiteRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Site id. Pass it as a `siteIds` filter value. Obtain the full\
+            \ catalogue from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        breadcrumb:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
+      required:
+      - breadcrumb
+      - id
+      - level
+      - name
+    PaymentAuthorizationContractDetailDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractorRef"
+        contract:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractRef"
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        issueCount:
+          type: integer
+          format: int32
+        issues:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationIssueDto"
+      required:
+      - contract
+      - contractor
+      - issueCount
+      - issues
+      - paymentStatus
+    PageResponsePaymentAuthorizationByCompanyRowDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByCompanyRowDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    PaymentAuthorizationByCompanyRowDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/ContractorRef"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractRef"
+        totalContractsCount:
+          type: integer
+          format: int32
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        calculationMode:
+          type: string
+          enum:
+          - INDIVIDUAL
+      required:
+      - calculationMode
+      - contractor
+      - contracts
+      - paymentStatus
+      - totalContractsCount
     PagedModelSystemCountry:
       type: object
       properties:

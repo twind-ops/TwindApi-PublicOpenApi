@@ -798,6 +798,11 @@
             "description" : "",
             "disabled" : true
           }, {
+            "key" : "projectIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -1917,6 +1922,213 @@
           } ]
         },
         "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, and resource ID. **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+      }
+    } ]
+  }, {
+    "name" : "Payment authorization",
+    "description" : "Query contractor and contract payment authorization status, including the requirements blocking payment when a contractor or contract is not authorized.\n\nSupports both calculation modes (Individual and Subcontracting Chain) following the same business rules as the Payment Authorization module.\n\n- **Payment status by contractor**: List contractors with their aggregated payment authorization status (paginated, filterable by contractor/company, payment status, contract, site and activity)\n- **Contractor detail**: Aggregated status for a single contractor plus the payment-required requirement instances blocking payment when not authorized\n- **Payment status by contract**: List contracts with the contractor's payment authorization status for each contract (paginated, filterable by contractor/company, contract, site, activity and payment status)\n- **Contract detail**: Payment authorization status and blocking requirement issues for a contractor on a specific contract\n- **Resolving blocking requirements**: Each blocking requirement (`blockingRequirements[]` on contractor detail, `issues[]` on contract detail) carries a `requirementInstanceId`. To obtain the full requirement configuration and evidence detail, dereference it via the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}`. This requires the Requirements API product to be subscribed in addition to Payment Authorization.",
+    "item" : [ {
+      "name" : "Get payment authorization status by company (Individual calculation mode)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-company",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-company" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "paymentStatus",
+            "value" : "",
+            "description" : "Filter by aggregated payment status",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter contractors to those with at least one matching contract. Obtain contract IDs from the `by-contract` list response (field `contract.id`).",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (matches contract scope including child sites). Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by activity IDs (contract has an engagement on one of these activities). Obtain them from `GET /v1/companies/{companyId}/activities` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "Contract date range start (contract.dateFrom >= dateFrom)",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "Contract date range end (contract.dateTo <= dateTo)",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "maxContractsPerContractor",
+            "value" : "",
+            "description" : "Maximum number of contracts to return per contractor. When omitted, all contracts are returned (useful for exports).",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns one row per contractor with at least one active contract with the client, with their aggregated payment authorization status. Only relevant when the client's calculation mode is Individual. **Allowed sort fields:** `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      }
+    }, {
+      "name" : "Get payment authorization detail for a contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/contractors/:contractorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "contractors", ":contractorId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company ID. UUID of the contractor company. Obtain it from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`)."
+          } ]
+        },
+        "description" : "Returns the contractor, the aggregated payment status, the count of active contracts with the calling client, and the payment-required requirement instances currently blocking payment (with the specific failing subject: contractor company, employee, vehicle, equipment or product). When `paymentStatus` is not authorized, `blockingRequirements[]` lists the failing requirement instances. To obtain the full requirement configuration and evidence detail for each, take its `requirementInstanceId` and call the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the API key must also have the Requirements API product subscribed)."
+      }
+    }, {
+      "name" : "Get payment authorization status by contract (Individual calculation mode)",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-contract",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-contract" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "paymentStatus",
+            "value" : "",
+            "description" : "Filter by per-contract payment status",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter by specific contract IDs. Obtain them from the `by-contract` list response (field `contract.id`).",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (matches contract scope including child sites). Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by activity IDs (contract has an engagement on one of these activities). Obtain them from `GET /v1/companies/{companyId}/activities` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "Contract date range start (contract.dateFrom >= dateFrom)",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "Contract date range end (contract.dateTo <= dateTo)",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "subcontractingLevel",
+            "value" : "",
+            "description" : "Filter by subcontracting level (0 = Main contract, ≥1 = Subcontract level N)",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "When true, includes contracts whose end date has passed alongside active contracts.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns one row per contract between the client and any contractor, with the contractor's payment authorization status for that specific contract. Only relevant when the client's calculation mode is Individual. **`showExpired`:** when `false` (default), only non-expired contracts are returned. When `true`, expired contracts are included alongside active ones. **Allowed sort fields:** `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      }
+    }, {
+      "name" : "Get payment authorization detail for a contract",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-contract/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-contract", ":contractId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID. UUID of the contract. Obtain it from the `by-contract` list response (field `contract.id`)."
+          } ]
+        },
+        "description" : "Returns the payment authorization status and any blocking requirement issues for the contractor on the given contract. When the status is not authorized, `issues[]` lists the failing requirement instances. To obtain the full requirement configuration and evidence detail for each, take its `requirementInstanceId` and call the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the API key must also have the Requirements API product subscribed)."
       }
     } ]
   }, {
