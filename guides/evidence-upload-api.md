@@ -93,7 +93,7 @@ status, resource, client, and contract details.
 | `onlyCriticalRequirements` | When `true`, restricts to critical requirements. |
 | `onlyAgreementRequirements` | When `true`, restricts to agreement-type requirements. |
 | `onlyExpiringInFifteenDays` | When `true`, restricts to instances with evidence expiring within fifteen days. |
-| `onlyWithGDRequirements` | When `true`, restricts to general duty (GD) requirements. |
+| `onlyWithGDRequirements` | When `true`, restricts to general duty (GD) requirements — obligations imposed by law on all companies regardless of contract. |
 | `companyScope` | Narrows subcontractor-related rows. |
 | `contractorIds` | Filters to instances for these contractor ids (used with subcontractor access). |
 
@@ -163,7 +163,7 @@ its full details — requirement configuration, current evidence status, resourc
 contract, and site — with:
 
 ```http
-GET /v1/companies/{companyId}/requirement-instances/{instanceId}
+GET /v1/companies/{companyId}/requirement-instances/{requirementInstanceId}
 ```
 
 This endpoint accepts either a contractor or a client `{companyId}`. Returns
@@ -173,7 +173,7 @@ This endpoint accepts either a contractor or a client `{companyId}`. Returns
 
 ```bash
 curl -X GET \
-  "https://app.twind.io/api/v1/companies/{companyId}/requirement-instances/{instanceId}" \
+  "https://app.twind.io/api/v1/companies/{companyId}/requirement-instances/{requirementInstanceId}" \
   -H "Authorization: Bearer your-token-here" \
   -H "Accept: application/json"
 ```
@@ -230,6 +230,8 @@ curl -X GET \
 - **`id`** — the `requirementInstanceId` to use in the upload steps below.
 - **`requirement.evidenceType`** — `UPLOAD` uses the file upload flow; `AGREEMENT` uses `POST /v1/companies/{companyId}/evidences/agreement`.
 - **`evidence`** — the current evidence record, or `null` if nothing has been submitted yet. File URLs are presigned and valid for 10 minutes.
+- **`lastEvidence`** — UUID of the most recently submitted evidence record for this instance (matches `evidence.id` when evidence is present). Useful for tracking submission history when the current evidence has been superseded.
+- **`lastReviewedEvidence`** — UUID of the most recent evidence record that reached a terminal review state (`APPROVED` or `REJECTED`), or `null` if no evidence has been reviewed yet. Differs from `lastEvidence` when the latest submission is still `PENDING_REVIEW`.
 - **`subject`** — the resource the requirement applies to (employee, vehicle, equipment, or product); `null` for company-level requirements.
 - **`applicability`** — one entry per contract/site/activity combination that triggered this instance.
 
