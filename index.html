@@ -111,6 +111,31 @@
       // Initialize navbar on page load
       initNavbar();
 
+      // Restore state from URL on load
+      document.addEventListener('DOMContentLoaded', function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('guide')) {
+          const guideId = params.get('guide');
+          const guide = GUIDES_DATA.find(g => g.id === guideId);
+          if (guide) showGuide(guide.file, guide.id);
+        } else if (params.get('section') === 'guides') {
+          showSection('guides');
+        }
+      });
+
+      // Handle browser back/forward
+      window.addEventListener('popstate', function() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('guide')) {
+          const guide = GUIDES_DATA.find(g => g.id === params.get('guide'));
+          if (guide) showGuide(guide.file, guide.id);
+        } else if (params.get('section') === 'guides') {
+          showSection('guides');
+        } else {
+          showSection('api');
+        }
+      });
+
       function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("collapsed");
       }
@@ -137,10 +162,12 @@
         if (section === "api") {
           apiContainer.classList.add("visible");
           setActiveNav("nav-api");
+          history.pushState({}, '', '?');
         } else if (section === "guides") {
           guidesContainer.classList.add("visible");
           setActiveNav("nav-guides");
           renderGuidesList();
+          history.pushState({}, '', '?section=guides');
         }
       }
 
@@ -247,6 +274,7 @@
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.add("visible");
         setActiveNav("nav-guide-" + guideId);
+        history.pushState({}, '', '?guide=' + guideId);
 
         // Show loading
         guideContent.innerHTML = '<p style="color: #8b8b9e;">Loading...</p>';
