@@ -9,9 +9,9 @@ instances).
 
 Before you integrate, ensure you have the following:
 
-- **Authentication** — Valid credentials for the API (JWT session or API key,
-  depending on your integration). See [API Authentication Guide](get-api-token.md)
-  for API keys and the `X-Api-Key` header.
+- **Authentication** — Valid credentials for the API (API key). See
+  [API Authentication Guide](get-api-token.md) for API keys and the `X-Api-Key`
+  header.
 - **Requirement instance id** — The obligation row you are satisfying
   (employee, vehicle, equipment, or company-level, depending on the
   requirement).
@@ -30,17 +30,10 @@ for a flow you expect to use.
 
 ## Authentication
 
-Include credentials on every request. For interactive users, use a **Bearer**
-token. For machine integrations, use **`X-Api-Key`** as described in the
+Include credentials on every request using **`X-Api-Key`** as described in the
 [API Authentication Guide](get-api-token.md).
 
 Example header:
-
-```text
-Authorization: Bearer your-token-here
-```
-
-or
 
 ```text
 X-Api-Key: your-api-key-here
@@ -88,7 +81,7 @@ supports that scenario).
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url?contentType=application/pdf&fileName=certificate.pdf" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Accept: application/json"
 ```
 
@@ -175,7 +168,7 @@ Optional query: **`asSubcontractorId`**
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/cm/companies/{companyId}/evidences/upload" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
     "requirementInstanceId": "11111111-2222-3333-4444-555555555555",
@@ -232,7 +225,7 @@ Content-Type: application/json
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/evidences/agreement" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{"requirementInstanceId": "11111111-2222-3333-4444-555555555555"}'
 ```
@@ -293,7 +286,7 @@ subject to visibility and server validation.
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/evidences/{sourceEvidenceId}/matching-requirement-instances" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{"requirementInstanceIds": ["22222222-3333-4444-5555-666666666666"]}'
 ```

@@ -8,9 +8,9 @@ referenced when you **create** or **update** a visitor.
 
 Before you integrate, ensure you have the following:
 
-- **Authentication** — Valid credentials for the API (JWT session or API key,
-  depending on your integration). See [API Authentication Guide](get-api-token.md)
-  for API keys and the `X-Api-Key` header.
+- **Authentication** — Valid credentials for the API (API key). See
+  [API Authentication Guide](get-api-token.md) for API keys and the `X-Api-Key`
+  header.
 - **Company id** — The client company (`companyId`) whose visit register you are
   using.
 
@@ -20,17 +20,10 @@ expect to use.
 
 ## Authentication
 
-Include credentials on every request. For interactive users, use a **Bearer**
-token. For machine integrations, use **`X-Api-Key`** as described in the
+Include credentials on every request using **`X-Api-Key`** as described in the
 [API Authentication Guide](get-api-token.md).
 
 Example header:
-
-```text
-Authorization: Bearer your-token-here
-```
-
-or
 
 ```text
 X-Api-Key: your-api-key-here
@@ -69,7 +62,7 @@ array.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/visitor/temporary-upload-url?contentType=application/pdf&fileName=visitor-id.pdf" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Accept: application/json"
 ```
 
@@ -149,7 +142,7 @@ Repeat for each documentation file you need. Collect each object **`key`** (from
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/visitor" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
     "visitorName": "Jane",
