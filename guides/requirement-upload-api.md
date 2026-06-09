@@ -10,9 +10,9 @@ pass the resulting **object key** in **`templateFile`** when you **create** or
 
 Before you integrate, ensure you have the following:
 
-- **Authentication** — Valid credentials for the API (JWT session or API key,
-  depending on your integration). See [API Authentication Guide](get-api-token.md)
-  for API keys and the `X-Api-Key` header.
+- **Authentication** — Valid credentials for the API (API key). See
+  [API Authentication Guide](get-api-token.md) for API keys and the `X-Api-Key`
+  header.
 - **Company id** — The company (`companyId`) that owns the requirement
   definition.
 
@@ -22,17 +22,10 @@ use.
 
 ## Authentication
 
-Include credentials on every request. For interactive users, use a **Bearer**
-token. For machine integrations, use **`X-Api-Key`** as described in the
+Include credentials on every request using **`X-Api-Key`** as described in the
 [API Authentication Guide](get-api-token.md).
 
 Example header:
-
-```text
-Authorization: Bearer your-token-here
-```
-
-or
 
 ```text
 X-Api-Key: your-api-key-here
@@ -73,7 +66,7 @@ upload routes).
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements/temporary-upload-url?contentType=application/pdf&fileName=requirement-template.pdf" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Accept: application/json"
 ```
 
@@ -156,7 +149,7 @@ shows where **`templateFile`** fits.
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Example requirement",
@@ -203,7 +196,7 @@ create).
 ```bash
 curl -X PUT \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements/{requirementId}" \
-  -H "Authorization: Bearer your-token-here" \
+  -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Example requirement",
