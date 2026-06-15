@@ -127,3 +127,65 @@ describe('ApidocDns', () => {
   });
 });
 
+describe('GithubOidcRole', () => {
+  function buildOidcStack() {
+    const app = new cdk.App();
+    const stack = new cdk.Stack(app, 'TestStack', {
+      env: { account: '602259773298', region: 'eu-west-1' },
+    });
+    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
+    const { bucket } = new ApidocBucket(stack, 'Bucket', { oai });
+    const { distribution } = new ApidocDistribution(stack, 'Dist', {
+      bucket,
+      oai,
+      certificateArn: 'arn:aws:acm:us-east-1:602259773298:certificate/test-cert-id',
+    });
+    new GithubOidcRole(stack, 'OidcRole', { bucket, distribution });
+    return stack;
+  }
+
+  test('creates IAM role with GitHub OIDC trust scoped to repo', () => {
+    const template = Template.fromStack(buildOidcStack());
+
+    template.hasResourceProperties('AWS::IAM::Role', {
+      AssumeRolePolicyDocument: {
+        Statement: [
+          {
+            Action: 'sts:AssumeRoleWithWebIdentity',
+            Condition: {
+              StringLike: {
+                'token.actions.githubusercontent.com:sub':
+                  'repo:twind-ops/TwindApi-PublicOpenApi:*',
+              },
+            },
+            Effect: 'Allow',
+          },
+        ],
+      },
+    });
+  });
+
+  test('role has s3 put/delete/list and cloudfront invalidation permissions', () => {
+    const template = Template.fromStack(buildOidcStack());
+
+    template.hasResourceProperties('AWS::IAM::Policy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: Match.arrayWith(['s3:PutObject', 's3:DeleteObject']),
+            Effect: 'Allow',
+          }),
+          Match.objectLike({
+            Action: 's3:ListBucket',
+            Effect: 'Allow',
+          }),
+          Match.objectLike({
+            Action: 'cloudfront:CreateInvalidation',
+            Effect: 'Allow',
+          }),
+        ]),
+      },
+    });
+  });
+});
+
