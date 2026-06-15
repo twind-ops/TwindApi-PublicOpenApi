@@ -3,3 +3,8 @@
 
 ### VS Code ###
 .vscode/
+
+# CDK infra
+infra/node_modules/
+infra/dist/
+infra/cdk.out/
