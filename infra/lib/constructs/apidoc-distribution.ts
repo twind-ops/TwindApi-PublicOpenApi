@@ -6,7 +6,6 @@ import { Construct } from 'constructs';
 
 interface ApidocDistributionProps {
   bucket: s3.Bucket;
-  oai: cloudfront.OriginAccessIdentity;
   certificateArn: string;
 }
 
@@ -44,9 +43,7 @@ export class ApidocDistribution extends Construct {
 
     this.distribution = new cloudfront.Distribution(this, 'Distribution', {
       defaultBehavior: {
-        origin: new origins.S3Origin(props.bucket, {
-          originAccessIdentity: props.oai,
-        }),
+        origin: origins.S3BucketOrigin.withOriginAccessControl(props.bucket),
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
         compress: true,

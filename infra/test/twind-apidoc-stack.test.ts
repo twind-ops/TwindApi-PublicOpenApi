@@ -6,12 +6,11 @@ import { ApidocDns } from '../lib/constructs/apidoc-dns';
 import { GithubOidcRole } from '../lib/constructs/github-oidc-role';
 
 describe('ApidocBucket', () => {
-  test('creates private S3 bucket with OAI and encryption', () => {
+  test('creates private S3 bucket with encryption', () => {
     const app = new cdk.App();
     const stack = new cdk.Stack(app, 'TestStack');
-    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
 
-    new ApidocBucket(stack, 'Bucket', { oai });
+    new ApidocBucket(stack, 'Bucket');
 
     const template = Template.fromStack(stack);
 
@@ -37,17 +36,9 @@ describe('ApidocBucket', () => {
       },
     });
 
-    // Bucket policy grants OAI read access
-    template.hasResourceProperties('AWS::S3::BucketPolicy', {
-      PolicyDocument: {
-        Statement: Match.arrayWith([
-          Match.objectLike({
-            Action: Match.arrayWith(['s3:GetObject*']),
-            Effect: 'Allow',
-          }),
-        ]),
-      },
-    });
+    // The OAC bucket policy is attached at the distribution, not on a
+    // standalone bucket — so no bucket policy is expected here.
+    template.resourceCountIs('AWS::S3::BucketPolicy', 0);
   });
 });
 
@@ -57,15 +48,34 @@ describe('ApidocDistribution', () => {
     const stack = new cdk.Stack(app, 'TestStack', {
       env: { account: '602259773298', region: 'eu-west-1' },
     });
-    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
-    const { bucket } = new ApidocBucket(stack, 'Bucket', { oai });
+    const { bucket } = new ApidocBucket(stack, 'Bucket');
     new ApidocDistribution(stack, 'Dist', {
       bucket,
-      oai,
       certificateArn: 'arn:aws:acm:us-east-1:602259773298:certificate/test-cert-id',
     });
     return stack;
   }
+
+  test('grants CloudFront read access via an OAC bucket policy', () => {
+    const template = Template.fromStack(buildStack());
+    template.hasResourceProperties('AWS::CloudFront::OriginAccessControl', {
+      OriginAccessControlConfig: Match.objectLike({
+        OriginAccessControlOriginType: 's3',
+        SigningBehavior: 'always',
+      }),
+    });
+    template.hasResourceProperties('AWS::S3::BucketPolicy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: 's3:GetObject',
+            Effect: 'Allow',
+            Principal: { Service: 'cloudfront.amazonaws.com' },
+          }),
+        ]),
+      },
+    });
+  });
 
   test('creates CloudFront distribution with defaultRootObject index.html', () => {
     const template = Template.fromStack(buildStack());
@@ -101,11 +111,9 @@ describe('ApidocDns', () => {
     const stack = new cdk.Stack(app, 'TestStack', {
       env: { account: '602259773298', region: 'eu-west-1' },
     });
-    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
-    const { bucket } = new ApidocBucket(stack, 'Bucket', { oai });
+    const { bucket } = new ApidocBucket(stack, 'Bucket');
     const { distribution } = new ApidocDistribution(stack, 'Dist', {
       bucket,
-      oai,
       certificateArn: 'arn:aws:acm:us-east-1:602259773298:certificate/test-cert-id',
     });
 
@@ -133,11 +141,9 @@ describe('GithubOidcRole', () => {
     const stack = new cdk.Stack(app, 'TestStack', {
       env: { account: '602259773298', region: 'eu-west-1' },
     });
-    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
-    const { bucket } = new ApidocBucket(stack, 'Bucket', { oai });
+    const { bucket } = new ApidocBucket(stack, 'Bucket');
     const { distribution } = new ApidocDistribution(stack, 'Dist', {
       bucket,
-      oai,
       certificateArn: 'arn:aws:acm:us-east-1:602259773298:certificate/test-cert-id',
     });
     new GithubOidcRole(stack, 'OidcRole', { bucket, distribution });

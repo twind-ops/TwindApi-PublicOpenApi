@@ -1,5 +1,4 @@
 import * as cdk from 'aws-cdk-lib';
-import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import { Construct } from 'constructs';
 import { ApidocBucket } from './constructs/apidoc-bucket';
 import { ApidocDistribution } from './constructs/apidoc-distribution';
@@ -19,14 +18,9 @@ export class TwindApidocStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: TwindApidocStackProps) {
     super(scope, id, { ...props, crossRegionReferences: true });
 
-    const oai = new cloudfront.OriginAccessIdentity(this, 'OAI', {
-      comment: 'twind-apidoc CloudFront OAI',
-    });
-
-    const apidocBucket = new ApidocBucket(this, 'Bucket', { oai });
+    const apidocBucket = new ApidocBucket(this, 'Bucket');
     const apidocDist = new ApidocDistribution(this, 'Distribution', {
       bucket: apidocBucket.bucket,
-      oai,
       certificateArn: props.certificateArn,
     });
 
