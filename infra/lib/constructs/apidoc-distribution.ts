@@ -1,4 +1,3 @@
-import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -15,9 +14,10 @@ const DIRECTORY_INDEX_FUNCTION_CODE = `
 function handler(event) {
   var request = event.request;
   var uri = request.uri;
+  var lastSegment = uri.substring(uri.lastIndexOf('/') + 1);
   if (uri.endsWith('/')) {
     request.uri += 'index.html';
-  } else if (!uri.includes('.')) {
+  } else if (!lastSegment.includes('.')) {
     request.uri += '/index.html';
   }
   return request;
