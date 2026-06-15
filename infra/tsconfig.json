@@ -10,7 +10,8 @@
     "declaration": true,
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["jest", "node"]
   },
   "include": ["bin", "lib", "test"],
   "exclude": ["node_modules", "dist"]
