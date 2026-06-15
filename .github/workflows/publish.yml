@@ -1,0 +1,53 @@
+name: Publish to S3
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish:
+    name: Sync site to S3 and invalidate CloudFront
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::602259773298:role/twind-apidoc-github-deploy-role
+          aws-region: eu-west-1
+
+      - name: Verify required configuration
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          if [ -z "$CLOUDFRONT_DISTRIBUTION_ID" ]; then
+            echo "::error::CLOUDFRONT_DISTRIBUTION_ID repository variable is not set. Set it to the deployed distribution ID before publishing." >&2
+            exit 1
+          fi
+
+      - name: Sync site files to S3
+        run: |
+          aws s3 sync . s3://twind-apidoc-assets-bucket-prod --delete \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "infra/*" \
+            --exclude "node_modules/*" \
+            --exclude "README.md" \
+            --exclude ".gitignore" \
+            --exclude "CNAME" \
+            --exclude "docs/*"
+
+      - name: Invalidate CloudFront cache
+        env:
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+            --paths "/*"
