@@ -2,6 +2,8 @@ import * as cdk from 'aws-cdk-lib';
 import { Match, Template } from 'aws-cdk-lib/assertions';
 import { ApidocBucket } from '../lib/constructs/apidoc-bucket';
 import { ApidocDistribution } from '../lib/constructs/apidoc-distribution';
+import { ApidocDns } from '../lib/constructs/apidoc-dns';
+import { GithubOidcRole } from '../lib/constructs/github-oidc-role';
 
 describe('ApidocBucket', () => {
   test('creates private S3 bucket with OAI and encryption', () => {
@@ -92,3 +94,36 @@ describe('ApidocDistribution', () => {
     });
   });
 });
+
+describe('ApidocDns', () => {
+  test('creates A and AAAA alias records for api-doc.twind.io', () => {
+    const app = new cdk.App();
+    const stack = new cdk.Stack(app, 'TestStack', {
+      env: { account: '602259773298', region: 'eu-west-1' },
+    });
+    const oai = new cdk.aws_cloudfront.OriginAccessIdentity(stack, 'OAI');
+    const { bucket } = new ApidocBucket(stack, 'Bucket', { oai });
+    const { distribution } = new ApidocDistribution(stack, 'Dist', {
+      bucket,
+      oai,
+      certificateArn: 'arn:aws:acm:us-east-1:602259773298:certificate/test-cert-id',
+    });
+
+    new ApidocDns(stack, 'Dns', { distribution });
+
+    const template = Template.fromStack(stack);
+
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'api-doc.twind.io.',
+      Type: 'A',
+      HostedZoneId: 'Z09139373LEQZJW35V2WI',
+    });
+
+    template.hasResourceProperties('AWS::Route53::RecordSet', {
+      Name: 'api-doc.twind.io.',
+      Type: 'AAAA',
+      HostedZoneId: 'Z09139373LEQZJW35V2WI',
+    });
+  });
+});
+
