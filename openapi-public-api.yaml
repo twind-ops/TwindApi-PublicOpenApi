@@ -6419,6 +6419,245 @@ components:
     BackupConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    CardConfig:
+      type: object
+      properties:
+        paper:
+          type: string
+          enum:
+          - A4
+          - A5
+          - A3
+          - CUSTOM
+        customPaperWidthMm:
+          type: number
+          format: double
+        customPaperHeightMm:
+          type: number
+          format: double
+        orientation:
+          type: string
+          enum:
+          - PORTRAIT
+          - LANDSCAPE
+        sheetMarginsMm:
+          $ref: "#/components/schemas/MarginsMm"
+        columns:
+          type: integer
+          format: int32
+        rows:
+          type: integer
+          format: int32
+        labelWidthMm:
+          type: number
+          format: double
+        labelHeightMm:
+          type: number
+          format: double
+        labelGapMm:
+          $ref: "#/components/schemas/GapMm"
+        showBorder:
+          type: boolean
+        title:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardTextField"
+        qr:
+          $ref: "#/components/schemas/CardQr"
+        photo:
+          $ref: "#/components/schemas/CardPhoto"
+        logo:
+          $ref: "#/components/schemas/CardLogo"
+        risks:
+          $ref: "#/components/schemas/CardRisks"
+      required:
+      - columns
+      - fields
+      - labelGapMm
+      - labelHeightMm
+      - labelWidthMm
+      - orientation
+      - paper
+      - qr
+      - rows
+      - sheetMarginsMm
+      - showBorder
+    CardLogo:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        widthMm:
+          type: number
+          format: double
+        heightMm:
+          type: number
+          format: double
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - heightMm
+      - widthMm
+      - xmm
+      - ymm
+    CardPhoto:
+      type: object
+      properties:
+        policy:
+          type: string
+          enum:
+          - REQUIRED
+          - OPTIONAL
+          - HIDDEN
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        widthMm:
+          type: number
+          format: double
+        heightMm:
+          type: number
+          format: double
+        noPhotoText:
+          type: string
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - heightMm
+      - policy
+      - widthMm
+      - xmm
+      - ymm
+    CardQr:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        sizeMm:
+          type: number
+          format: double
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - sizeMm
+      - xmm
+      - ymm
+    CardRisks:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        iconSizeMm:
+          type: number
+          format: double
+        columns:
+          type: integer
+          format: int32
+        gapMm:
+          type: number
+          format: double
+        maxIcons:
+          type: integer
+          format: int32
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - columns
+      - gapMm
+      - iconSizeMm
+      - maxIcons
+      - xmm
+      - ymm
+    CardTextField:
+      type: object
+      properties:
+        field:
+          type: string
+          enum:
+          - TITLE
+          - WORKER_NAME
+          - IDENTITY
+          - CONTRACTOR
+          - CLIENT_NAME
+          - SITE
+          - VALIDITY_DATE
+          - SUBCONTRACTING
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        fontPt:
+          type: number
+          format: double
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        maxWidthMm:
+          type: number
+          format: double
+        style:
+          type: string
+          enum:
+          - REGULAR
+          - BOLD
+          - ITALIC
+          - UNDERLINE
+        centered:
+          type: boolean
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - centered
+      - field
+      - fontPt
+      - style
+      - ymm
     ClientPlanConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6492,6 +6731,8 @@ components:
         properties:
           templateKey:
             type: string
+          cardConfig:
+            $ref: "#/components/schemas/CardConfig"
       required:
       - templateKey
     DocumentalManagementConfig:
@@ -6523,6 +6764,18 @@ components:
     ErpPropertiesConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    GapMm:
+      type: object
+      properties:
+        horizontal:
+          type: number
+          format: double
+        vertical:
+          type: number
+          format: double
+      required:
+      - horizontal
+      - vertical
     InternalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -6548,6 +6801,26 @@ components:
       required:
       - enabled
       - level
+    MarginsMm:
+      type: object
+      properties:
+        top:
+          type: number
+          format: double
+        bottom:
+          type: number
+          format: double
+        left:
+          type: number
+          format: double
+        right:
+          type: number
+          format: double
+      required:
+      - bottom
+      - left
+      - right
+      - top
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
