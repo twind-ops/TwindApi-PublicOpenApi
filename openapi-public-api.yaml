@@ -5554,6 +5554,9 @@ components:
         contract:
           type: string
           description: Rule key or expression for contract scope.
+        project:
+          type: string
+          description: Rule key or expression for project scope.
         contractor:
           type: string
           description: Rule key or expression for contractor scope.
@@ -8958,6 +8961,8 @@ components:
         site:
           $ref: "#/components/schemas/SiteInfo"
         contract:
+          $ref: "#/components/schemas/IdAndName"
+        project:
           $ref: "#/components/schemas/IdAndName"
         contractor:
           $ref: "#/components/schemas/IdAndName"
