@@ -143,13 +143,16 @@
         });
       }
 
-      // Initialize navbar on page load
+      // Initialize navbar and guides list once on page load
       initNavbar();
+      renderGuidesList();
 
-      // When a collapsible closes, also close any open collapsibles nested inside it
+      // When a nav sidebar collapsible closes, also close any nav collapsibles nested inside it.
+      // Restricted to #sidebar so guides-list and curl-block <details> are not affected.
       document.addEventListener("toggle", function (e) {
         const details = e.target;
         if (!(details instanceof HTMLDetailsElement)) return;
+        if (!details.closest("#sidebar")) return;
         if (details.open) {
           details.querySelectorAll("details").forEach((d) => { d.open = true; });
         } else {
@@ -206,11 +209,25 @@
         }
       }
 
+      // Chromium resets <details open> when an ancestor goes through display:none.
+      // Save/restore the open state around each hide/show cycle.
+      function saveGuidesOpenState() {
+        document.querySelectorAll("#guides-list details").forEach((d) => {
+          d.dataset.savedOpen = d.open ? "1" : "0";
+        });
+      }
+      function restoreGuidesOpenState() {
+        document.querySelectorAll("#guides-list details").forEach((d) => {
+          d.open = d.dataset.savedOpen === "1";
+        });
+      }
+
       function showSection(section) {
         const apiContainer = document.getElementById("api-container");
         const guidesContainer = document.getElementById("guides-container");
         const guideContentContainer = document.getElementById("guide-content-container");
 
+        saveGuidesOpenState();
         apiContainer.classList.remove("visible");
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.remove("visible");
@@ -223,8 +240,8 @@
           }
         } else if (section === "guides") {
           guidesContainer.classList.add("visible");
+          restoreGuidesOpenState();
           setActiveNav("nav-guides");
-          renderGuidesList();
           history.pushState({}, '', '?section=guides');
         }
       }
@@ -473,6 +490,7 @@
         const guideContentContainer = document.getElementById("guide-content-container");
         const guideContent = document.getElementById("guide-content");
 
+        saveGuidesOpenState();
         apiContainer.classList.remove("visible");
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.add("visible");
