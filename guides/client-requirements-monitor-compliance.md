@@ -7,18 +7,18 @@ While your contractors work, you want to know at any moment what documentation i
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: List the instances that need attention
 
 Filter the instance list by `status` (one of `APPROVED`, `REJECTED`, `PENDING_REVIEW`, `PENDING_UPLOAD`, `UNDER_GRACE_PERIOD`, `EXPIRED`, `PENDING_VALIDITY`) or invert with `excludeStatus=APPROVED` to see everything unresolved. Other useful filters: `contractorIds`, `contractIds`, `siteIds`, `onlyCriticalRequirements`. Sort by `evidence_expiration` to chase the most urgent first.
 
-[`GET /v1/companies/{companyId}/requirement-instances/as-client`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-client)
+[`GET /v1/companies/{companyId}/requirement-instances/as-client`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-client)
 
 ### Example: Everything unresolved, most urgent first
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -49,12 +49,12 @@ Response (`200 OK`, trimmed):
 
 The instance detail returns the full requirement configuration (acceptance criteria, expiration rules, template), the current evidence with its status and files, and the parties involved. The audit log tells you what happened and when — submissions, approvals, rejections, status changes — useful when a contractor disputes a rejection.
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}) · [`GET .../{instanceId}/logs`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/logs)
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}) · [`GET .../{instanceId}/logs`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/logs)
 
 ### Example: Audit trail of an instance
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -86,12 +86,12 @@ Response (`200 OK`, trimmed):
 
 For a per-requirement view — e.g. before tightening a critical requirement — the stats endpoint tells you how many contractors are affected by it.
 
-[`GET /v1/companies/{companyId}/requirements/{requirementId}/stats`](../index.html#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}/stats)
+[`GET /v1/companies/{companyId}/requirements/{requirementId}/stats`](#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}/stats)
 
 ### Example: Get requirement stats
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

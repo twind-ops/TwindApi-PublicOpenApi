@@ -13,12 +13,12 @@ When a requirement instance asks you to provide a document, you upload the file 
 
 Request a presigned POST URL for your file. `contentType` and `fileName` are required; `contentType` must be one of the accepted MIME types (see [Supported content types](#supported-content-types)).
 
-[`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url`](../index.html#tag/evidence/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
+[`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url`](#tag/evidence/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
 
 ### Example: Get the upload URL
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000070/temporary-upload-url?contentType=application%2Fpdf&fileName=insurance-policy.pdf" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000070/temporary-upload-url?contentType=application%2Fpdf&fileName=insurance-policy.pdf" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -68,7 +68,7 @@ curl -X POST "$URL_FROM_STEP_1" \
 
 Once every file is in storage, register the submission against the requirement instance in one call.
 
-[`POST /v1/cm/companies/{companyId}/evidences/upload`](../index.html#tag/evidence/POST/v1/cm/companies/{companyId}/evidences/upload)
+[`POST /v1/cm/companies/{companyId}/evidences/upload`](#tag/evidence/POST/v1/cm/companies/{companyId}/evidences/upload)
 
 > **Note:** This route lives under `/v1/cm/...` while the presigned-URL route lives under `/v1/...` — the two prefixes are intentional; use each URL as documented.
 
@@ -86,7 +86,7 @@ Once every file is in storage, register the submission against the requirement i
 ### Example: Register a document with two files
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
+curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{

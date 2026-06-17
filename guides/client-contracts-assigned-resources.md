@@ -9,13 +9,13 @@ When work is underway, you want to know exactly which resources — employees, v
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: List the resources assigned to your contracts
 
 Two views are available. The lightweight one returns one row per resource (id, name, type) — useful for lookups and filters. The detailed one adds per-resource attributes plus an array describing every assignment (contract, site, activity) where that resource is currently deployed, with the risks assigned on each one.
 
-[`GET /v1/companies/{id}/assigned-resources`](../index.html#tag/assigned-resources/GET/v1/companies/{id}/assigned-resources) · [`GET /v2/companies/{id}/assigned-resources-detailed/as-client`](../index.html#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-client)
+[`GET /v1/companies/{id}/assigned-resources`](#tag/assigned-resources/GET/v1/companies/{id}/assigned-resources) · [`GET /v2/companies/{id}/assigned-resources-detailed/as-client`](#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-client)
 
 Both support filtering by `q` (name search), `resourceTypes` (`EMPLOYEE`, `VEHICLE`, `EQUIPMENT`) and `contractorIds`. Max page size: 100.
 
@@ -61,12 +61,12 @@ The `engagements` JSON property lists the resource's **assignments**: each entry
 
 The contract detail shows each site with its activities and a `resourceCount`; the resources view returns the full roster grouped by site.
 
-[`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId}) · `GET /v2/companies/{companyId}/contracts/{contractId}/resources`
+[`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId}) · `GET /v2/companies/{companyId}/contracts/{contractId}/resources`
 
 ### Example: Roster of a contract, grouped by site
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/resources" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/resources" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -103,7 +103,7 @@ To focus on a single site — its activities, scope and the resources deployed t
 ### Example: Site detail
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

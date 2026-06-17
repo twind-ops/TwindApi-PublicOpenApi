@@ -7,19 +7,19 @@ When contractors submit evidences for your requirements, someone has to validate
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 - **Evidence review not delegated** — if your company has document management delegated (evidences reviewed by CTAIMA), the approve and reject calls in Step 3 return **403 "User cannot review requirement"** for every evidence. This flow applies only when your company reviews its own evidences.
 
 ## Step 1: Find the evidences waiting for review
 
 List your requirement instances and pick those whose `evidences` array carries an entry in `PENDING_REVIEW` — that is the one to review. Filter by `requirementIds` (ids from your [requirements list](client-requirements-configure.md)), or use `excludeStatus=APPROVED` to see everything still open.
 
-[`GET /v1/companies/{companyId}/requirement-instances/as-client`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-client)
+[`GET /v1/companies/{companyId}/requirement-instances/as-client`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-client)
 
 ### Example: List instances pending review
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?requirementIds=00000000-0000-0000-0000-000000000060&page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?requirementIds=00000000-0000-0000-0000-000000000060&page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -59,12 +59,12 @@ Keep the **evidence id** (`evidences[].id`) for the next steps.
 
 Fetch the evidence details: the uploaded `files` (URLs), the contractor's declared `dateOfIssue`, and any `comment`.
 
-[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](../index.html#tag/evidence/GET/v1/companies/{companyId}/evidences/{evidenceId})
+[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/evidence/GET/v1/companies/{companyId}/evidences/{evidenceId})
 
 ### Example: Get evidence details
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -74,7 +74,7 @@ Response (`200 OK`, trimmed):
 {
   "id": "00000000-0000-0000-0000-000000000071",
   "status": "PENDING_REVIEW",
-  "files": ["https://storage.twinddev.com/evidences/2026/06/certificate-john-smith.pdf"],
+  "files": ["https://storage.twind.io/evidences/2026/06/certificate-john-smith.pdf"],
   "dateOfIssue": "2026-06-01",
   "comment": "Renewed certificate, valid for one year.",
   "createdAt": "2026-06-10T11:20:00Z"
@@ -85,12 +85,12 @@ Response (`200 OK`, trimmed):
 
 Both decisions require the **`issueDate`** — the date the document was actually issued, which drives the expiration calculation. When rejecting, include a `reason` and, if it helps the contractor, the specific `rejectedAcceptanceCriteria`.
 
-[`PUT /v1/companies/{companyId}/evidences/{evidenceId}/approve`](../index.html#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/approve) · [`PUT .../reject`](../index.html#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/reject)
+[`PUT /v1/companies/{companyId}/evidences/{evidenceId}/approve`](#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/approve) · [`PUT .../reject`](#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/reject)
 
 ### Example: Approve
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/approve" \
+curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/approve" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -104,7 +104,7 @@ Response: `200 OK` (no body).
 ### Example: Reject with actionable feedback
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/reject" \
+curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/reject" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{

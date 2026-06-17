@@ -7,7 +7,7 @@ When your company needs another company to take part of the work under one of yo
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 - **The subcontractor registered** — the company you subcontract to must exist on the platform. If it does not, create it with `POST /v1/companies/{id}/contractors`.
 - **Subcontracting allowed** — the parent contract's `subcontracting` configuration must allow it (`allowed: true` and the chain below `maxLevel`). Check it in the contract detail (Step 1).
 
@@ -15,12 +15,12 @@ Before you start, ensure you have the following:
 
 Fetch the parent contract detail to confirm the subcontracting rules and pick the site and activities to delegate.
 
-[`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
+[`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
 
 ### Example: Check the contract before requesting
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -53,7 +53,7 @@ Submit one request per subcontractor: the body takes the subcontractor company i
 ### Example: Request a subcontract
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/subcontracts/requests" \
+curl -X POST "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/subcontracts/requests" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -84,7 +84,7 @@ List the requests your company has submitted. While the client decides, the requ
 ### Example: List submitted requests
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/subcontracts/requests/as-contractor?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/subcontracts/requests/as-contractor?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

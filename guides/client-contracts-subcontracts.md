@@ -7,7 +7,7 @@ When a contractor needs another company to take part of the work, it submits a *
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 - **Subcontracting enabled** — requests only arrive for contracts whose `subcontracting` configuration allows subcontracting with authorization (see [Create a Contract with a Contractor](client-contracts-create.md)).
 
 ## Step 1: List pending subcontract requests
@@ -19,7 +19,7 @@ List the subcontract requests waiting for your decision. Narrow the list with th
 ### Example: List pending requests
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -56,7 +56,7 @@ Approving creates a child contract for the subcontractor under the parent contra
 ### Example: Approve a request
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/approve" \
+curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/approve" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -73,7 +73,7 @@ Response (`200 OK`) — the id(s) of the child contract(s) created:
 ### Example: Reject a request
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/reject" \
+curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/reject" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -83,14 +83,14 @@ Response: `204 No Content` — the pending request is removed.
 
 ## Step 3: Audit the subcontracts at a site
 
-At any time you can list the subcontracts hanging from one site of a contract, with their activities and approval status. Site ids come from the contract detail, [`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId}).
+At any time you can list the subcontracts hanging from one site of a contract, with their activities and approval status. Site ids come from the contract detail, [`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId}).
 
 `GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/subcontracts`
 
 ### Example: List subcontracts at a site
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/subcontracts" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/subcontracts" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

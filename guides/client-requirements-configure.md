@@ -7,19 +7,19 @@ Requirements are the heart of your compliance policy: each one defines a documen
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
-- **Rule ids (optional)** — rules scope a requirement by activity, site, contract, contractor, risk or resource type. Get the ids from the corresponding lookups (e.g. [`GET /v1/companies/{companyId}/sites`](../index.html#tag/lookups/GET/v1/companies/{companyId}/sites), [`GET .../activities`](../index.html#tag/lookups/GET/v1/companies/{companyId}/activities)).
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
+- **Rule ids (optional)** — rules scope a requirement by activity, site, contract, contractor, risk or resource type. Get the ids from the corresponding lookups (e.g. [`GET /v1/companies/{companyId}/sites`](#tag/lookups/GET/v1/companies/{companyId}/sites), [`GET .../activities`](#tag/lookups/GET/v1/companies/{companyId}/activities)).
 
 ## Step 1: Create the requirement
 
 The body defines what you demand (`name`, `subject`, `evidenceType`), from whom (`appliedTo` + `rules`), and how it expires (`expirationType`). `acceptanceCriteria` is the checklist your reviewers will validate evidences against. If the contractor must fill in a template file, upload it first — see [Upload a Requirement Template](requirement-upload-api.md) — and pass the resulting key in `templateFile`.
 
-[`POST /v1/companies/{companyId}/requirements`](../index.html#tag/configuration/POST/v1/companies/{companyId}/requirements)
+[`POST /v1/companies/{companyId}/requirements`](#tag/configuration/POST/v1/companies/{companyId}/requirements)
 
 ### Example: Create a periodic employee requirement
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -63,12 +63,12 @@ With this configuration, every employee assigned with the *Work at height* risk 
 
 List your requirements (filters include `name`, `subject`, `evidenceType`, `disabled`, `critical`, and rule-based ones like `riskIds` or `siteIds`), fetch the full configuration of one, and check how many contractors a requirement affects before changing it.
 
-[`GET /v1/companies/{companyId}/requirements`](../index.html#tag/configuration/GET/v1/companies/{companyId}/requirements) · [`GET .../requirements/{requirementId}`](../index.html#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}) · [`GET .../requirements/{requirementId}/stats`](../index.html#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}/stats)
+[`GET /v1/companies/{companyId}/requirements`](#tag/configuration/GET/v1/companies/{companyId}/requirements) · [`GET .../requirements/{requirementId}`](#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}) · [`GET .../requirements/{requirementId}/stats`](#tag/configuration/GET/v1/companies/{companyId}/requirements/{requirementId}/stats)
 
 ### Example: Check the impact of a requirement
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -86,12 +86,12 @@ The update is a **full replace** of the configuration (same body shape as the cr
 
 > **Note:** If the requirement is reviewed by CTAIMA (document management delegated), some updates are rejected: changing `gracePeriod` returns **403** "Modification of fields reviewed by CTAIMA are not allowed", and changing `name` can return **400** "Last evidence status is required". Resending the current configuration unchanged succeeds.
 
-[`PUT /v1/companies/{companyId}/requirements/{requirementId}`](../index.html#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}) · [`PUT .../disable`](../index.html#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}/disable) · [`PUT .../enable`](../index.html#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}/enable)
+[`PUT /v1/companies/{companyId}/requirements/{requirementId}`](#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}) · [`PUT .../disable`](#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}/disable) · [`PUT .../enable`](#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}/enable)
 
 ### Example: Disable a requirement
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/disable" \
+curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/disable" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

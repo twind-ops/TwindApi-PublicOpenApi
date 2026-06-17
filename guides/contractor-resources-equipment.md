@@ -7,7 +7,7 @@ When machinery or tools are used on client sites, they must exist in Twind so th
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: Get the type ids
 
@@ -18,7 +18,7 @@ Creating equipment requires a **standard equipment type** from the platform cata
 ### Example: Browse the standard types
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/standard-equipment-types?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/standard-equipment-types?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -45,7 +45,7 @@ Required fields: `name`, `serialNumber`, `equipmentType` (a standard type id fro
 ### Example: Create an equipment item
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -70,12 +70,12 @@ The returned `id` is the **resource id** of the equipment — the one used to as
 
 ## Step 3: Keep the record up to date
 
-List your equipment with the public [`GET /v1/companies/{companyId}/equipment`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/equipment) (supports `q` text search; `isAssignable` tells you whether the item can be assigned). Fetch one with `GET .../equipment/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
+List your equipment with the public [`GET /v1/companies/{companyId}/equipment`](#tag/resource-lists/GET/v1/companies/{companyId}/equipment) (supports `q` text search; `isAssignable` tells you whether the item can be assigned). Fetch one with `GET .../equipment/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
 
 ### Example: Update the model information
 
 ```bash
-curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
+curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -85,12 +85,12 @@ curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000
 
 Response: `204 No Content`.
 
-When a piece of equipment is retired, soft-delete the record using [`DELETE /v1/companies/{companyId}/equipment/{id}`](../index.html#tag/resources/DELETE/v1/companies/{companyId}/equipment/{id}). The equipment is removed from future assignments but its historical data is preserved.
+When a piece of equipment is retired, soft-delete the record using [`DELETE /v1/companies/{companyId}/equipment/{id}`](#tag/resources/DELETE/v1/companies/{companyId}/equipment/{id}). The equipment is removed from future assignments but its historical data is preserved.
 
 ### Example: Delete equipment
 
 ```bash
-curl -X DELETE "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
+curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

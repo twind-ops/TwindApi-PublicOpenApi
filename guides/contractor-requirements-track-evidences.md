@@ -13,12 +13,12 @@ Before you start, ensure you have the following:
 
 The evidence detail shows the current `status`, and — when rejected — the reviewer's `reason` and the specific `rejectedAcceptanceCriteria` that failed.
 
-[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](../index.html#tag/evidence/GET/v1/companies/{companyId}/evidences/{evidenceId})
+[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/evidence/GET/v1/companies/{companyId}/evidences/{evidenceId})
 
 ### Example: Get the evidence status
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -30,7 +30,7 @@ Response (`200 OK`, trimmed):
   "status": "REJECTED",
   "reason": "The certificate does not name the employee.",
   "rejectedAcceptanceCriteria": ["Employee name matches the assigned resource"],
-  "files": ["https://storage.twinddev.com/evidences/2026/06/certificate-john-smith.pdf"],
+  "files": ["https://storage.twind.io/evidences/2026/06/certificate-john-smith.pdf"],
   "dateOfIssue": "2026-06-01",
   "createdAt": "2026-06-10T11:20:00Z",
   "revisedAt": "2026-06-10T16:45:00Z"
@@ -43,12 +43,12 @@ A rejected evidence is fixed by submitting a **new** evidence for the same insta
 
 The evidence update currently covers the `expressValidation` flag (when your client allows express-validated submissions).
 
-[`PATCH /v1/companies/{companyId}/evidences/{evidenceId}`](../index.html#tag/evidence/PATCH/v1/companies/{companyId}/evidences/{evidenceId})
+[`PATCH /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/evidence/PATCH/v1/companies/{companyId}/evidences/{evidenceId})
 
 ### Example: Mark an evidence for express validation
 
 ```bash
-curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
+curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{ "expressValidation": true }'
@@ -60,12 +60,12 @@ Response: `204 No Content`.
 
 When a requirement allows **single submission**, one evidence (e.g. a company-level insurance policy) can satisfy several requirement instances across contracts or clients. Apply the source evidence to the matching instances in one call — only instances allowed by the single-submission rules and your visibility are accepted.
 
-[`POST /v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances`](../index.html#tag/evidence/POST/v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances)
+[`POST /v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances`](#tag/evidence/POST/v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances)
 
 ### Example: Apply one evidence to two more instances
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071/matching-requirement-instances" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071/matching-requirement-instances" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{

@@ -445,13 +445,14 @@
           }
         });
 
-        container.addEventListener("click", function(e) {
-          const link = e.target.closest("a[data-guide-file]");
-          if (!link) return;
-          e.preventDefault();
-          showGuide(link.dataset.guideFile, link.dataset.guideId);
-        });
       }
+
+      document.getElementById("guides-list").addEventListener("click", function(e) {
+        const link = e.target.closest("a[data-guide-file]");
+        if (!link) return;
+        e.preventDefault();
+        showGuide(link.dataset.guideFile, link.dataset.guideId);
+      });
 
       function showGuide(file, guideId) {
         const apiContainer = document.getElementById("api-container");

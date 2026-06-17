@@ -7,18 +7,18 @@ Every requirement a client demands from you materializes as a **requirement inst
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: List what is pending and for when
 
 Filter by `status` (`PENDING_UPLOAD`, `REJECTED`, `EXPIRED`, `UNDER_GRACE_PERIOD`…) or use `excludeStatus=APPROVED` for everything unresolved. `onlyExpiringInFifteenDays=true` gives you the short-term risk; `clientIds` and `contractIds` narrow by client or contract.
 
-[`GET /v1/companies/{companyId}/requirement-instances/as-contractor`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-contractor)
+[`GET /v1/companies/{companyId}/requirement-instances/as-contractor`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/as-contractor)
 
 ### Example: Everything unresolved, by client
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/as-contractor?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/as-contractor?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -49,12 +49,12 @@ The instance `id` is what you need to submit evidence; the `evidences[].id` is w
 
 The detail returns the requirement's full configuration — the `acceptanceCriteria` your evidence will be validated against, the expiration rules, and the `templateFile` to fill in, if any — plus the current evidence with its `reason` when rejected.
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
 
 ### Example: Get instance details
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -81,7 +81,7 @@ Response (`200 OK`, trimmed):
     "id": "00000000-0000-0000-0000-000000000071",
     "status": "REJECTED",
     "reason": "The certificate does not name the employee.",
-    "files": ["https://storage.twinddev.com/evidences/2026/06/certificate-john-smith.pdf"],
+    "files": ["https://storage.twind.io/evidences/2026/06/certificate-john-smith.pdf"],
     "createdAt": "2026-06-10T11:20:00Z",
     "revisedAt": "2026-06-10T16:45:00Z"
   },
@@ -95,12 +95,12 @@ Response (`200 OK`, trimmed):
 
 The audit log lists every event on the instance — submissions, approvals, rejections, status changes — with who did what and when.
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/logs`](../index.html#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/logs)
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/logs`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/logs)
 
 ### Example: Get the audit log of an instance
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

@@ -7,20 +7,20 @@ When you hire a contractor company, you register it on the platform and create a
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your client company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
-- **Site and activity ids** — each site in the contract carries its own list of activities. List them with [`GET /v1/companies/{companyId}/sites`](../index.html#tag/lookups/GET/v1/companies/{companyId}/sites) and [`GET /v1/companies/{companyId}/activities`](../index.html#tag/lookups/GET/v1/companies/{companyId}/activities).
-- **A contract manager** — the create call requires a `managerId`: the id of a user of your company, from [`GET /v1/companies/{companyId}/users`](../index.html#tag/companies/GET/v1/companies/{companyId}/users). API-key users may get **403 Forbidden** on that endpoint; in that case use your own user id from [`GET /v1/users/me`](../index.html#tag/user/GET/v1/users/me) as `managerId`.
+- **Your client company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
+- **Site and activity ids** — each site in the contract carries its own list of activities. List them with [`GET /v1/companies/{companyId}/sites`](#tag/lookups/GET/v1/companies/{companyId}/sites) and [`GET /v1/companies/{companyId}/activities`](#tag/lookups/GET/v1/companies/{companyId}/activities).
+- **A contract manager** — the create call requires a `managerId`: the id of a user of your company, from [`GET /v1/companies/{companyId}/users`](#tag/companies/GET/v1/companies/{companyId}/users). API-key users may get **403 Forbidden** on that endpoint; in that case use your own user id from [`GET /v1/users/me`](#tag/user/GET/v1/users/me) as `managerId`.
 
 ## Step 1: Register the contractor company
 
-If the contractor already works with you, skip this step and find its id with [`GET /v1/companies/{companyId}/contracts/my-contractors`](../index.html#tag/companies/GET/v1/companies/{companyId}/contracts/my-contractors). Otherwise, create the contractor company and link it to your client company. The contact person receives an invitation to manage the new company.
+If the contractor already works with you, skip this step and find its id with [`GET /v1/companies/{companyId}/contracts/my-contractors`](#tag/companies/GET/v1/companies/{companyId}/contracts/my-contractors). Otherwise, create the contractor company and link it to your client company. The contact person receives an invitation to manage the new company.
 
 `POST /v1/companies/{companyId}/contractors`
 
 ### Example: Create a contractor company
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000001/contractors" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/contractors" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -42,7 +42,7 @@ Response (`201 Created`):
 }
 ```
 
-The returned `id` is the **contractor company id** — you will use it as `contractorId` in the next step. Country ids come from [`GET /v1/countries`](../index.html#tag/lookups/GET/v1/countries) and language ids (the invited contact's platform language) from [`GET /v1/languages`](../index.html#tag/lookups/GET/v1/languages) — both filterable by partial name (`?name=Spain`, `?name=Spanish`).
+The returned `id` is the **contractor company id** — you will use it as `contractorId` in the next step. Country ids come from [`GET /v1/countries`](#tag/lookups/GET/v1/countries) and language ids (the invited contact's platform language) from [`GET /v1/languages`](#tag/lookups/GET/v1/languages) — both filterable by partial name (`?name=Spain`, `?name=Spanish`).
 
 ## Step 2: Create the contract with its sites and activities
 
@@ -53,7 +53,7 @@ Create the contract between your client company (path `companyId`) and the contr
 ### Example: Create a contract covering two sites
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts" \
+curl -X POST "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -98,12 +98,12 @@ The returned `id` is the **contract id**. From this moment the platform generate
 
 Fetch the contract detail to confirm its sites, activities and subcontracting setup. This is also where the contractor finds the site ids needed to assign resources.
 
-[`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
+[`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
 
 ### Example: Get the contract detail
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

@@ -9,12 +9,12 @@ Some requirements ask your company to accept a set of terms or policies rather t
 
 ## Submit the acceptance
 
-[`POST /v1/companies/{companyId}/evidences/agreement`](../index.html#tag/evidence/POST/v1/companies/{companyId}/evidences/agreement)
+[`POST /v1/companies/{companyId}/evidences/agreement`](#tag/evidence/POST/v1/companies/{companyId}/evidences/agreement)
 
 ### Example: Accept an agreement requirement
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/agreement" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/agreement" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{

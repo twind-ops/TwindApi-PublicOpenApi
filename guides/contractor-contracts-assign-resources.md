@@ -7,19 +7,19 @@ When work at a contract site starts, you assign your employees, vehicles and equ
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 - **Resources registered** — your employees, vehicles or equipment must already exist in Twind.
 
 ## Step 1: Find the contract's sites
 
-Get the contract detail to see its sites. Each `siteId` is a possible assignment target; the activities tell you what work is expected there. Contract ids come from [`GET /v1/companies/{companyId}/contracts/with-clients`](../index.html#tag/contract-listings/GET/v1/companies/{companyId}/contracts/with-clients) (see [View Your Contracts and Clients](contractor-contracts-view.md)).
+Get the contract detail to see its sites. Each `siteId` is a possible assignment target; the activities tell you what work is expected there. Contract ids come from [`GET /v1/companies/{companyId}/contracts/with-clients`](#tag/contract-listings/GET/v1/companies/{companyId}/contracts/with-clients) (see [View Your Contracts and Clients](contractor-contracts-view.md)).
 
-[`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
+[`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
 
 ### Example: Get the sites of a contract
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -48,12 +48,12 @@ List your resources to obtain their ids. Only resources with `isAssignable: true
 
 > **`isAssignable: false`?** The usual cause is a resource created with `classifications: []` for a client that mandates resource types: the PUT in Step 3 then fails with a clear **400**. Set a classification per client on the resource first — see [Register and Maintain Your Employees](contractor-resources-employees.md), [Vehicles](contractor-resources-vehicles.md) or [Equipment](contractor-resources-equipment.md).
 
-[`GET /v1/companies/{companyId}/employees`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/employees) · [`GET .../vehicles`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/vehicles) · [`GET .../equipment`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/equipment)
+[`GET /v1/companies/{companyId}/employees`](#tag/resource-lists/GET/v1/companies/{companyId}/employees) · [`GET .../vehicles`](#tag/resource-lists/GET/v1/companies/{companyId}/vehicles) · [`GET .../equipment`](#tag/resource-lists/GET/v1/companies/{companyId}/equipment)
 
 ### Example: Find an employee
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/employees?q=John&page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees?q=John&page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -85,7 +85,7 @@ This endpoint replaces the **complete assignment** for the (contract, site) pair
 ### Example: Assign an employee (with risks) and a vehicle
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources" \
+curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '[
@@ -109,7 +109,7 @@ To adjust the risks of one resource that is already assigned — without resendi
 ### Example: Update risks for an assigned resource
 
 ```bash
-curl -X PUT "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources/00000000-0000-0000-0000-000000000030/risks" \
+curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources/00000000-0000-0000-0000-000000000030/risks" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{ "riskIds": ["00000000-0000-0000-0000-000000000080", "00000000-0000-0000-0000-000000000081"] }'

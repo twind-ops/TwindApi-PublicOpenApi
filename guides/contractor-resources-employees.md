@@ -7,8 +7,8 @@ When your company is hired, your employees must exist in Twind before they can b
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
-- **Country id** — employee identity documents reference a country, from [`GET /v1/countries`](../index.html#tag/lookups/GET/v1/countries).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
+- **Country id** — employee identity documents reference a country, from [`GET /v1/countries`](#tag/lookups/GET/v1/countries).
 
 ## Step 1: Check your clients' classification requirements
 
@@ -19,7 +19,7 @@ Some clients mandate an **employee classification** (their own categorization of
 ### Example: List client classifications
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/classification/employee-types" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/classification/employee-types" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -49,7 +49,7 @@ Required fields: `firstName`, `lastName`, `identityType` (`PASSPORT`, `IDENTITY_
 ### Example: Create an employee
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/employees" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -81,12 +81,12 @@ The returned `id` is the **resource id** of the employee — the one used to ass
 
 ## Step 3: Keep the record up to date
 
-List your employees with the public [`GET /v1/companies/{companyId}/employees`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/employees) (supports `q` text search; `isAssignable` tells you whether the employee can be assigned). Fetch one with `GET .../employees/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
+List your employees with the public [`GET /v1/companies/{companyId}/employees`](#tag/resource-lists/GET/v1/companies/{companyId}/employees) (supports `q` text search; `isAssignable` tells you whether the employee can be assigned). Fetch one with `GET .../employees/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
 
 ### Example: Update an employee's contact data
 
 ```bash
-curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
+curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -98,12 +98,12 @@ curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000
 
 Response: `204 No Content`.
 
-When an employee leaves the company, soft-delete the record using [`DELETE /v1/companies/{companyId}/employees/{id}`](../index.html#tag/resources/DELETE/v1/companies/{companyId}/employees/{id}). The employee is removed from future assignments but their historical data is preserved.
+When an employee leaves the company, soft-delete the record using [`DELETE /v1/companies/{companyId}/employees/{id}`](#tag/resources/DELETE/v1/companies/{companyId}/employees/{id}). The employee is removed from future assignments but their historical data is preserved.
 
 ### Example: Delete an employee
 
 ```bash
-curl -X DELETE "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
+curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

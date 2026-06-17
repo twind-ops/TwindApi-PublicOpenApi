@@ -7,7 +7,7 @@ When vehicles need to enter client sites, they must exist in Twind so they can b
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: Get the type ids
 
@@ -18,7 +18,7 @@ Creating a vehicle requires a **standard vehicle type** from the platform catalo
 ### Example: Browse the standard types
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/standard-vehicle-types?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/standard-vehicle-types?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -45,7 +45,7 @@ Required fields: `name`, `registrationPlate`, `vehicleType` (a standard type id 
 ### Example: Create a vehicle
 
 ```bash
-curl -X POST "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -71,12 +71,12 @@ The returned `id` is the **resource id** of the vehicle — the one used to assi
 
 ## Step 3: Keep the record up to date
 
-List your vehicles with the public [`GET /v1/companies/{companyId}/vehicles`](../index.html#tag/resource-lists/GET/v1/companies/{companyId}/vehicles) (supports `q` text search; `isAssignable` tells you whether the vehicle can be assigned). Fetch one with `GET .../vehicles/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
+List your vehicles with the public [`GET /v1/companies/{companyId}/vehicles`](#tag/resource-lists/GET/v1/companies/{companyId}/vehicles) (supports `q` text search; `isAssignable` tells you whether the vehicle can be assigned). Fetch one with `GET .../vehicles/{id}` and update with `PATCH` — only the fields you send are modified, except `classifications`, which **replaces the whole set** when provided.
 
 ### Example: Update the registration plate
 
 ```bash
-curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
+curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -86,12 +86,12 @@ curl -X PATCH "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000
 
 Response: `204 No Content`.
 
-When a vehicle leaves the fleet, soft-delete the record using [`DELETE /v1/companies/{companyId}/vehicles/{id}`](../index.html#tag/resources/DELETE/v1/companies/{companyId}/vehicles/{id}). The vehicle is removed from future assignments but its historical data is preserved.
+When a vehicle leaves the fleet, soft-delete the record using [`DELETE /v1/companies/{companyId}/vehicles/{id}`](#tag/resources/DELETE/v1/companies/{companyId}/vehicles/{id}). The vehicle is removed from future assignments but its historical data is preserved.
 
 ### Example: Delete a vehicle
 
 ```bash
-curl -X DELETE "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
+curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
   -H "X-Api-Key: your-api-key-here"
 ```
 

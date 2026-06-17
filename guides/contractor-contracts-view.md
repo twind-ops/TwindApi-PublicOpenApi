@@ -7,18 +7,18 @@ When your company works for several clients, the first thing any integration nee
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **Your contractor company id** — from [`GET /v1/users/me/companies`](../index.html#tag/user/GET/v1/users/me/companies).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
 
 ## Step 1: List your client companies
 
 Returns the client companies your contractor company works with. Use it to obtain client ids for filtering in other endpoints (access control, contracts, requirement instances).
 
-[`GET /v1/companies/{contractorId}/clients`](../index.html#tag/companies/GET/v1/companies/{contractorId}/clients)
+[`GET /v1/companies/{contractorId}/clients`](#tag/companies/GET/v1/companies/{contractorId}/clients)
 
 ### Example: List clients
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/clients?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/clients?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -41,12 +41,12 @@ Response (`200 OK`):
 
 Returns the contracts where your company acts as contractor, with the client, dates, sites and resource counts of each one. Useful filters: `q` (text search), `clientIds`, `showExpired` (default `false`), `siteIds` and `activityIds`.
 
-[`GET /v1/companies/{companyId}/contracts/with-clients`](../index.html#tag/contract-listings/GET/v1/companies/{companyId}/contracts/with-clients)
+[`GET /v1/companies/{companyId}/contracts/with-clients`](#tag/contract-listings/GET/v1/companies/{companyId}/contracts/with-clients)
 
 ### Example: List active contracts
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v1/companies/00000000-0000-0000-0000-000000000002/contracts/with-clients?page=0&size=10" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/contracts/with-clients?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -80,12 +80,12 @@ The `id` of each entry is the **contract id**. The `requirements` block gives yo
 
 The contract detail returns the full scope: each site with its activities, the subcontracting rules, and a `resourceCount` per site. The `siteId` values here are what you need to assign resources.
 
-[`GET /v2/companies/{companyId}/contracts/{contractId}`](../index.html#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
+[`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId})
 
 ### Example: Get the contract detail
 
 ```bash
-curl -X GET "https://app.twinddev.com/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
+curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -118,7 +118,7 @@ Response (`200 OK`, trimmed):
 
 See which of your employees, vehicles and equipment are currently assigned across all your contracts, along with the risks applied to each deployment.
 
-[`GET /v2/companies/{id}/assigned-resources-detailed/as-contractor`](../index.html#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-contractor)
+[`GET /v2/companies/{id}/assigned-resources-detailed/as-contractor`](#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-contractor)
 
 Supports filtering by `q`, `resourceTypes`, and `companyScope` (`MY_COMPANY`, `MY_SUBCONTRACTORS`, `ALL` — use `ALL` to include resources from your own subcontractors). Max page size: 100.
 
