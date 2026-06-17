@@ -133,7 +133,7 @@ Response: `204 No Content`.
 - [View Your Contracts and Clients](contractor-contracts-view.md) — where the contract and site ids come from, and how to list your deployed resources across all contracts.
 - [Request to Subcontract Part of the Work](contractor-contracts-request-subcontract.md) — when another company takes part of the job.
 - [See Assigned Resources and Their Risks](client-contracts-assigned-resources.md) — how your client sees these assignments.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

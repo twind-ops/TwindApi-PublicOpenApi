@@ -50,14 +50,14 @@ A `200` response with your user details confirms everything is set up correctly.
 
 ## Next Steps
 
-- Explore the [API Reference](../index.html) for all available endpoints
+- Explore the [API Reference](../index.html?section=api) for all available endpoints
 - See the [Get API Key](get-api-token.md) guide if you need to create or manage your API keys
 
 ## Using a different API client
 
 If you use Insomnia, Bruno, or another OpenAPI-compatible tool, you can import the spec directly — these tools organise requests by tag automatically, so no pre-built collection is needed.
 
-Import via URL directly from [api-doc.twind.io](https://api-doc.twind.io/openapi-public-api.yaml), or use the **Download** button in the [API Reference](../index.html) to save the file and import it from disk.
+Import via URL directly from [api-doc.twind.io](https://api-doc.twind.io/openapi-public-api.yaml), or use the **Download** button in the [API Reference](../index.html?section=api) to save the file and import it from disk.
 
 ---
 

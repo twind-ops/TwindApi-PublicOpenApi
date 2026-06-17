@@ -124,7 +124,7 @@ Response (`200 OK`, trimmed):
 
 - [Create a Contract with a Contractor](client-contracts-create.md) — where the subcontracting rules (`allowed`, `maxLevel`, `needsAuthorization`) are set.
 - [See Assigned Resources and Their Risks](client-contracts-assigned-resources.md) — the approved subcontractor's resources appear in your assigned-resources views.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

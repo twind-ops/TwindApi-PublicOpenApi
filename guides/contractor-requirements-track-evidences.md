@@ -92,7 +92,7 @@ Response: `200 OK` (no body). The target instances now carry the same evidence.
 - [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md) — submit the corrected document after a rejection.
 - [Track Your Pending Requirements](contractor-requirements-track-instances.md) — see the instance-level picture.
 - [Upload Documents for a Requirement](contractor-requirements-upload-documents.md) — presigned upload mechanics when resubmitting a corrected document.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

@@ -133,7 +133,7 @@ Response: `200 OK` (no body). The instance returns to `PENDING_UPLOAD` and the c
 - [Monitor Contractor Compliance](client-requirements-monitor-compliance.md) — the broader view these decisions feed into.
 - [Configure the Requirements You Demand from Contractors](client-requirements-configure.md) — where the acceptance criteria come from.
 - [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md) — the contractor-side flow that produces what you review here.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

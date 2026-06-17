@@ -171,7 +171,7 @@ Each resource entry includes an `assignments` array listing every (contract, sit
 
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — put your employees, vehicles and equipment to work on the contract.
 - [Request to Subcontract Part of the Work](contractor-contracts-request-subcontract.md) — when another company takes part of the job.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

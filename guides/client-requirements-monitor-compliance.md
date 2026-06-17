@@ -117,7 +117,7 @@ Response (`200 OK`):
 - [Review and Approve Evidences](client-requirements-review-evidences.md) — act on the `PENDING_REVIEW` instances you find here.
 - [Configure the Requirements You Demand from Contractors](client-requirements-configure.md) — adjust the requirements behind the numbers.
 - [Track Your Pending Requirements](contractor-requirements-track-instances.md) — the same instances, seen from the contractor's side.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

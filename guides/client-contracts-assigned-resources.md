@@ -143,7 +143,7 @@ If a resource is missing a risk it should carry, ask the contractor to update th
 - [Create a Contract with a Contractor](client-contracts-create.md) — where contracts and their sites come from.
 - [Review and Approve Subcontract Requests](client-contracts-subcontracts.md) — subcontractor resources also show up in these views.
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — the contractor-side flow that creates the assignments (and risks) you see here.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

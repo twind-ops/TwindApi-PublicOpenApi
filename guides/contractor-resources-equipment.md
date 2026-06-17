@@ -109,7 +109,7 @@ Response: `204 No Content`.
 
 - [Register and Maintain Your Employees](contractor-resources-employees.md) and [Vehicles](contractor-resources-vehicles.md) — same flow for your other resources.
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — put the new equipment to work on a contract.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

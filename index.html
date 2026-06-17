@@ -300,7 +300,18 @@
         container.querySelectorAll("a[href]").forEach((a) => {
           const href = a.getAttribute("href");
           if (!href || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) return;
-          if (href.includes("..")) return;
+          if (href.includes("..")) {
+            const url = new URL(href, "http://x/guides/");
+            const section = url.searchParams.get("section");
+            if (section) {
+              a.setAttribute("href", "#");
+              a.addEventListener("click", function (e) {
+                e.preventDefault();
+                showSection(section);
+              });
+            }
+            return;
+          }
           const hashIndex = href.indexOf("#");
           const pathPart = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
           if (!pathPart.toLowerCase().endsWith(".md")) return;

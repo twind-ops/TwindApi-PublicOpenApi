@@ -150,7 +150,7 @@ To change the scope later, use [`PATCH /v2/companies/{companyId}/contracts/{cont
 - [Review and Approve Subcontract Requests](client-contracts-subcontracts.md) — control who works under this contract's chain.
 - [See Assigned Resources and Their Risks](client-contracts-assigned-resources.md) — follow who and what is deployed on your contracts.
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — the contractor-side flow that puts resources on the contract's sites.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

@@ -111,7 +111,7 @@ Response: `204 No Content` (both `disable` and `enable`).
 - [Review and Approve Evidences](client-requirements-review-evidences.md) — what happens when contractors respond to your requirements.
 - [Monitor Contractor Compliance](client-requirements-monitor-compliance.md) — follow the instances this configuration generates.
 - [Upload a Requirement Template](requirement-upload-api.md) — upload mechanics for template files.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

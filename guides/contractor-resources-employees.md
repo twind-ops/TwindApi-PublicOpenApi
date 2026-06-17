@@ -122,7 +122,7 @@ Response: `204 No Content`. (`GET .../employees/total` returns your current head
 
 - [Register and Maintain Your Vehicles](contractor-resources-vehicles.md) and [Equipment](contractor-resources-equipment.md) — same flow for your other resources.
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — put the new employee to work on a contract.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

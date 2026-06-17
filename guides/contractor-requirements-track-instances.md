@@ -120,7 +120,7 @@ Response: paginated event list (`eventName`, `createdBy`, `createdByCompany`, `c
 - [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md) — resolve the pending instances you found here.
 - [Track and Reuse Submitted Evidences](contractor-requirements-track-evidences.md) — follow the review outcome of what you submitted.
 - [Monitor Contractor Compliance](client-requirements-monitor-compliance.md) — the same instances, seen from the client's side.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 

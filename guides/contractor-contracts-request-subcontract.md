@@ -124,7 +124,7 @@ Response (`200 OK`, trimmed):
 - [Review and Approve Subcontract Requests](client-contracts-subcontracts.md) — the client-side flow that decides your request.
 - [View Your Contracts and Clients](contractor-contracts-view.md) — where the parent contract ids come from.
 - [Assign Resources to a Contract Site](contractor-contracts-assign-resources.md) — once approved, the subcontractor assigns its resources the same way.
-- Explore the [API Reference](../index.html) for all available endpoints.
+- Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
 
