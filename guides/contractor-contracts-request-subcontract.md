@@ -48,7 +48,7 @@ Response (`200 OK`, trimmed):
 
 Submit one request per subcontractor: the body takes the subcontractor company ids, the site, the activities to delegate there, and the date range. The path `contractorId` is **your** company; `parentContractId` is the contract you are delegating from.
 
-`POST /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts/requests`
+[`POST /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts/requests`](#tag/subcontracts/POST/v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts/requests)
 
 ### Example: Request a subcontract
 
@@ -73,13 +73,13 @@ Response (`200 OK`) — one request id per subcontractor in `contractorIds`:
 }
 ```
 
-> **Note:** If the parent contract does **not** require authorization (`needsAuthorization: false`), you can create the subcontract directly with `POST /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts` (same body) — the response ids are then the child contracts themselves.
+> **Note:** If the parent contract does **not** require authorization (`needsAuthorization: false`), you can create the subcontract directly with [`POST /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts`](#tag/subcontracts/POST/v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts) (same body) — the response ids are then the child contracts themselves.
 
 ## Step 3: Track your requests
 
 List the requests your company has submitted. While the client decides, the request appears with `status: "PENDING"`; once approved it becomes a child contract and leaves this list (a rejected request is removed as well — the client does not record a reason via the API).
 
-`GET /v2/companies/{companyId}/subcontracts/requests/as-contractor`
+[`GET /v2/companies/{companyId}/subcontracts/requests/as-contractor`](#tag/subcontracts/GET/v2/companies/{companyId}/subcontracts/requests/as-contractor)
 
 ### Example: List submitted requests
 

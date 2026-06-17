@@ -13,7 +13,7 @@ Before you start, ensure you have the following:
 
 Creating a vehicle requires a **standard vehicle type** from the platform catalog. Additionally, some clients mandate their own **vehicle classification** before the vehicle can be assigned to their contracts — check both before creating.
 
-`GET /v1/standard-vehicle-types` · `GET /v1/companies/{companyId}/classification/vehicle-types`
+[`GET /v1/standard-vehicle-types`](#tag/vehicles/GET/v1/standard-vehicle-types) · [`GET /v1/companies/{companyId}/classification/vehicle-types`](#tag/vehicles/GET/v1/companies/{companyId}/classification/vehicle-types)
 
 ### Example: Browse the standard types
 
@@ -40,7 +40,7 @@ The client classifications endpoint returns one entry per active client, each wi
 
 Required fields: `name`, `registrationPlate`, `vehicleType` (a standard type id from Step 1) and `classifications` (send `[]` if none of your clients mandates one).
 
-`POST /v1/companies/{companyId}/vehicles`
+[`POST /v1/companies/{companyId}/vehicles`](#tag/vehicles/POST/v1/companies/{companyId}/vehicles)
 
 ### Example: Create a vehicle
 

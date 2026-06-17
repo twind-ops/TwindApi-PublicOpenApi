@@ -98,7 +98,7 @@ Response (`200 OK`, trimmed):
 
 To focus on a single site — its activities, scope and the resources deployed there with their risks — fetch the site detail.
 
-`GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}`
+[`GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}`](#tag/assignments/GET/v2/companies/{companyId}/contracts/{contractId}/sites/{siteId})
 
 ### Example: Site detail
 

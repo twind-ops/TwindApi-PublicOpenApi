@@ -80,7 +80,7 @@ For **employees** you also choose the risks of the assignment — they determine
 
 This endpoint replaces the **complete assignment** for the (contract, site) pair: the body is a JSON array with the desired state, and resources currently assigned but absent from it are unassigned. To remove everything, send `[]`; to add one resource, resend all current ones plus the new one.
 
-`PUT /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources`
+[`PUT /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources`](#tag/assignments/PUT/v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources)
 
 ### Example: Assign an employee (with risks) and a vehicle
 
@@ -104,7 +104,7 @@ Response: `204 No Content`.
 
 To adjust the risks of one resource that is already assigned — without resending the whole list — use:
 
-`PUT /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources/{resourceId}/risks`
+[`PUT /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources/{resourceId}/risks`](#tag/assignments/PUT/v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources/{resourceId}/risks)
 
 ### Example: Update risks for an assigned resource
 

@@ -14,7 +14,7 @@ Before you start, ensure you have the following:
 
 List the subcontract requests waiting for your decision. Narrow the list with the optional `contractId` and `siteId` query parameters.
 
-`GET /v2/companies/{companyId}/subcontracts/requests`
+[`GET /v2/companies/{companyId}/subcontracts/requests`](#tag/subcontracts/GET/v2/companies/{companyId}/subcontracts/requests)
 
 ### Example: List pending requests
 
@@ -51,7 +51,7 @@ Each request tells you who wants to subcontract (`contractor`), to whom (`subcon
 
 Approving creates a child contract for the subcontractor under the parent contract — its resources become subject to your requirements and access control like any direct contractor.
 
-`PUT /v2/companies/{companyId}/subcontracts/requests/{requestId}/approve`
+[`PUT /v2/companies/{companyId}/subcontracts/requests/{requestId}/approve`](#tag/subcontracts/PUT/v2/companies/{companyId}/subcontracts/requests/{requestId}/approve)
 
 ### Example: Approve a request
 
@@ -68,7 +68,7 @@ Response (`200 OK`) — the id(s) of the child contract(s) created:
 }
 ```
 
-`PUT /v2/companies/{companyId}/subcontracts/requests/{requestId}/reject`
+[`PUT /v2/companies/{companyId}/subcontracts/requests/{requestId}/reject`](#tag/subcontracts/PUT/v2/companies/{companyId}/subcontracts/requests/{requestId}/reject)
 
 ### Example: Reject a request
 
@@ -85,7 +85,7 @@ Response: `204 No Content` — the pending request is removed.
 
 At any time you can list the subcontracts hanging from one site of a contract, with their activities and approval status. Site ids come from the contract detail, [`GET /v2/companies/{companyId}/contracts/{contractId}`](#tag/contract-listings/GET/v2/companies/{companyId}/contracts/{contractId}).
 
-`GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/subcontracts`
+[`GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/subcontracts`](#tag/subcontracts/GET/v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/subcontracts)
 
 ### Example: List subcontracts at a site
 

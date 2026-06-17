@@ -13,7 +13,7 @@ Before you start, ensure you have the following:
 
 Creating equipment requires a **standard equipment type** from the platform catalog. Additionally, some clients mandate their own **equipment classification** before the equipment can be assigned to their contracts — check both before creating.
 
-`GET /v1/standard-equipment-types` · `GET /v1/companies/{companyId}/classification/equipment-types`
+[`GET /v1/standard-equipment-types`](#tag/equipment/GET/v1/standard-equipment-types) · [`GET /v1/companies/{companyId}/classification/equipment-types`](#tag/equipment/GET/v1/companies/{companyId}/classification/equipment-types)
 
 ### Example: Browse the standard types
 
@@ -40,7 +40,7 @@ The client classifications endpoint returns one entry per active client, each wi
 
 Required fields: `name`, `serialNumber`, `equipmentType` (a standard type id from Step 1) and `classifications` (send `[]` if none of your clients mandates one).
 
-`POST /v1/companies/{companyId}/equipment`
+[`POST /v1/companies/{companyId}/equipment`](#tag/equipment/POST/v1/companies/{companyId}/equipment)
 
 ### Example: Create an equipment item
 

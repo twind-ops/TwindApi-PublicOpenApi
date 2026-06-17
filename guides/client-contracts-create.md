@@ -15,7 +15,7 @@ Before you start, ensure you have the following:
 
 If the contractor already works with you, skip this step and find its id with [`GET /v1/companies/{companyId}/contracts/my-contractors`](#tag/companies/GET/v1/companies/{companyId}/contracts/my-contractors). Otherwise, create the contractor company and link it to your client company. The contact person receives an invitation to manage the new company.
 
-`POST /v1/companies/{companyId}/contractors`
+[`POST /v1/companies/{id}/contractors`](#tag/company/POST/v1/companies/{id}/contractors)
 
 ### Example: Create a contractor company
 
@@ -48,7 +48,7 @@ The returned `id` is the **contractor company id** — you will use it as `contr
 
 Create the contract between your client company (path `companyId`) and the contractor (`contractorId` in the body). The `sites` array is required and defines the scope: each entry is a site with the list of activities the contractor will perform there. The optional `subcontracting` block sets whether and how the contractor may subcontract; when `allowed` is `true`, `onlyClientAllowed` is **required** (set it to `true` to reserve subcontractor creation and authorization for the client).
 
-`POST /v2/companies/{companyId}/contracts`
+[`POST /v2/companies/{companyId}/contracts`](#tag/contracts/POST/v2/companies/{companyId}/contracts)
 
 ### Example: Create a contract covering two sites
 
@@ -134,7 +134,7 @@ Response (`200 OK`, trimmed):
 }
 ```
 
-To change the scope later, use `PATCH /v2/companies/{companyId}/contracts/{contractId}`: the `sites` array you send is the **complete desired state** (sites or activities you omit are removed). If a removal would drop resources already assigned, the API asks for confirmation via `removeAssignedResourcesConfirmed: true`.
+To change the scope later, use [`PATCH /v2/companies/{companyId}/contracts/{contractId}`](#tag/contracts/PATCH/v2/companies/{companyId}/contracts/{contractId}): the `sites` array you send is the **complete desired state** (sites or activities you omit are removed). If a removal would drop resources already assigned, the API asks for confirmation via `removeAssignedResourcesConfirmed: true`.
 
 ## Common errors
 

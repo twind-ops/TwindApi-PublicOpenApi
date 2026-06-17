@@ -14,7 +14,7 @@ Before you start, ensure you have the following:
 
 Some clients mandate an **employee classification** (their own categorization of personnel) before the employee can be assigned to their contracts. This endpoint returns the classifications defined by each of your active clients; if a client appears here, include one of its types in the `classifications` of your employees.
 
-`GET /v1/companies/{companyId}/classification/employee-types`
+[`GET /v1/companies/{companyId}/classification/employee-types`](#tag/employees/GET/v1/companies/{companyId}/classification/employee-types)
 
 ### Example: List client classifications
 
@@ -44,7 +44,7 @@ Each `types[].id` is a `clientResourceTypeId`; the entry `id` is the `clientId` 
 
 Required fields: `firstName`, `lastName`, `identityType` (`PASSPORT`, `IDENTITY_NUMBER`, `SOCIAL_SECURITY_NUMBER` or `OTHER`), `identity`, `countryId` and `classifications` (send `[]` if none of your clients mandates one).
 
-`POST /v1/companies/{companyId}/employees`
+[`POST /v1/companies/{companyId}/employees`](#tag/employees/POST/v1/companies/{companyId}/employees)
 
 ### Example: Create an employee
 
