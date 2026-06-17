@@ -265,6 +265,19 @@
       /**
        * Rewrite relative .md links to call showGuide for in-app navigation.
        */
+      function rewriteApiReferenceLinks(container) {
+        if (!container) return;
+        // Rewrite "#tag/..." hrefs to "?#tag/..." so clicking causes a full page
+        // navigation to the root with that hash. DOMContentLoaded detects the #tag/
+        // hash and shows the API section — the same behaviour as the old
+        // ../index.html#tag/... links that the guides originally used.
+        container.querySelectorAll("a[href]").forEach((a) => {
+          const href = a.getAttribute("href");
+          if (!href || !href.startsWith("#tag/")) return;
+          a.setAttribute("href", "?" + href);
+        });
+      }
+
       function rewriteRelativeMarkdownLinks(container) {
         if (!container) return;
         container.querySelectorAll("a[href]").forEach((a) => {
@@ -485,6 +498,7 @@
             guideContent.innerHTML = DOMPurify.sanitize(marked.parse(md, { renderer }));
             addHeadingIdsToGuideContent(guideContent);
             rewriteRelativeMarkdownLinks(guideContent);
+            rewriteApiReferenceLinks(guideContent);
             makeCurlBlocksCollapsible(guideContent);
             document.querySelectorAll("#guide-content pre code").forEach((block) => {
               hljs.highlightElement(block);
