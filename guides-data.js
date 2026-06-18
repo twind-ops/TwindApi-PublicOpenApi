@@ -104,6 +104,19 @@ const GUIDES_DATA = [
           },
         ],
       },
+      {
+        id: "client-payment-authorization",
+        title: "Payment Authorization",
+        items: [
+          {
+            id: "payment-authorization-api",
+            file: "payment-authorization-api.md",
+            title: "Payment Authorization API",
+            description: "Query the payment authorization status of contractors and contracts, and find the requirements blocking payment.",
+            icon: "assets/icon-payment.svg",
+          },
+        ],
+      },
     ],
   },
   {
