@@ -41,6 +41,17 @@ tags:
 - name: Contract listings
   description: "Read-only views of active contracts: contracts with clients, and contract\
     \ details with sites and activities."
+- name: Employees
+  description: "CRUD operations for contractor employees, employee count, and type\
+    \ classifications."
+- name: Vehicles
+  description: CRUD operations for contractor vehicles and type catalogs (standard
+    and client-specific).
+- name: Equipment
+  description: CRUD operations for contractor equipment and type catalogs (standard
+    and client-specific).
+- name: Assignments
+  description: "Site details, resource assignments to contract sites, and risk assignments."
 - name: Visitors
   description: "Visitor records: create, read, update; upload URL, plate numbers,\
     \ and visitor company lists."
@@ -65,6 +76,19 @@ tags:
 - name: Submissions
   description: "Submission and review: file upload URL, agreement submission, approve,\
     \ reject, and requirement instance matching."
+- name: Company
+  description: "Company profile: update details, create contractors, and subcontractor\
+    \ hierarchy."
+- name: Sites
+  description: "Site management: create, read, update, and contractor views including\
+    \ hierarchy."
+- name: Contracts
+  description: "Contract lifecycle: create, update, soft-delete; sites and activities\
+    \ are managed through the contract body; resource and hierarchy tree views; and\
+    \ contractor contract lists."
+- name: Subcontracts
+  description: "Subcontracting relationships: direct creation, requests (list, create,\
+    \ approve, reject), contractor view, and subcontracts at a contract site."
 paths:
   /v1/users/me:
     get:
@@ -122,47 +146,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/UserCompanyInfo"
-  /v1/companies/{id}:
-    get:
-      tags:
-      - Companies
-      summary: Get my company details
-      description: "Returns my company details. Use GET /v1/companies/{id}/summary\
-        \ when the caller does not belong to that company."
-      operationId: findMyCompany
-      parameters:
-      - name: id
-        in: path
-        description: Company id
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved company
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/CompanyDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "404":
-          description: Company not found
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{id}/summary:
     get:
       tags:
@@ -460,7 +443,7 @@ paths:
       - Lookups
       summary: List countries
       description: Paginated countries catalog. Filter by partial **name** match.
-      operationId: findAll_7
+      operationId: findAll_10
       parameters:
       - name: name
         in: query
@@ -512,7 +495,7 @@ paths:
       summary: List languages
       description: Paginated languages catalog. Filter by partial **name** or **code**
         match.
-      operationId: findAll_6
+      operationId: findAll_9
       parameters:
       - name: name
         in: query
@@ -562,96 +545,6 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/sites:
-    get:
-      tags:
-      - Lookups
-      summary: List sites
-      description: Retrieves paginated list of sites for a company. Use this endpoint
-        to obtain site IDs for filtering in other endpoints.
-      operationId: findAll_1
-      parameters:
-      - name: q
-        in: query
-        required: false
-        schema:
-          type: string
-      - name: selected
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: contractIds
-        in: query
-        description: "Optional: narrow results to sites used by these contracts' engagements.\
-          \ Applied as an additional AND filter that takes precedence over `selected`:\
-          \ selected ids outside the contract scope are excluded."
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: skipTeamFilter
-        in: query
-        required: false
-        schema:
-          type: boolean
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 10
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      - name: companyId
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved sites list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelSiteDto"
   /v1/companies/{companyId}/activities:
     get:
       tags:
@@ -660,7 +553,7 @@ paths:
       description: "Returns a paginated list of activities defined for the company\
         \ (client configuration). **Sort format:** `sort=name,asc` (default: name\
         \ ascending)."
-      operationId: findAll_5
+      operationId: findAll_6
       parameters:
       - name: q
         in: query
@@ -727,302 +620,6 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PagedModelActivityDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/employees:
-    get:
-      tags:
-      - Resource lists
-      summary: List employees
-      description: "Returns a paginated list of employees for a contractor company.\
-        \ Used to locate the internal `resourceId` needed for contract engagement\
-        \ assignment. The `q` parameter performs a partial match against `firstName`,\
-        \ `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:**\
-        \ `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort\
-        \ format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
-      operationId: findAll_4
-      parameters:
-      - name: q
-        in: query
-        description: Search query (partial match on employee fields)
-        required: false
-        schema:
-          type: string
-      - name: clientId
-        in: query
-        description: "When set, restricts results to resources for this client company"
-        required: false
-        schema:
-          type: string
-          format: uuid
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 20
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "firstName,ASC"
-          items:
-            type: string
-      - name: companyId
-        in: path
-        description: Company ID. UUID of the company the employee belongs to. Obtain
-          it from `GET /v1/users/me/companies`.
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: companyScope
-        in: query
-        description: "Subcontractor scope: which contractors' employees to include\
-          \ (requires permission when not MY_COMPANY)"
-        required: false
-        schema:
-          type: string
-          enum:
-          - ALL
-          - MY_COMPANY
-          - MY_SUBCONTRACTORS
-      - name: contractorIds
-        in: query
-        description: Filter to employees belonging to these contractor company IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: selected
-        in: query
-        description: Optional employee resource IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelEmployeeResponseDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/vehicles:
-    get:
-      tags:
-      - Resource lists
-      summary: List vehicles
-      description: "Returns a paginated list of vehicles for the company. Supports\
-        \ optional text search (q), subcontractor scope, and contractor filters."
-      operationId: findAll
-      parameters:
-      - name: q
-        in: query
-        description: Search query (partial match on vehicle fields)
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 20
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      - name: companyId
-        in: path
-        description: Company ID. UUID of the company the vehicle belongs to. Obtain
-          it from `GET /v1/users/me/companies`.
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: companyScope
-        in: query
-        description: "Subcontractor scope: which contractors' vehicles to include\
-          \ (requires permission when not MY_COMPANY)"
-        required: false
-        schema:
-          type: string
-          enum:
-          - ALL
-          - MY_COMPANY
-          - MY_SUBCONTRACTORS
-      - name: contractorIds
-        in: query
-        description: Filter to vehicles belonging to these contractor company IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      - name: selected
-        in: query
-        description: Optional vehicle resource IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelVehicleResponseDto"
-        "401":
-          description: "Unauthorized: authentication required"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-        "403":
-          description: "Access denied: insufficient permissions"
-          content:
-            application/problem+json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetail"
-  /v1/companies/{companyId}/equipment:
-    get:
-      tags:
-      - Resource lists
-      summary: List equipment
-      description: "Returns a paginated list of equipment for the company. Supports\
-        \ optional text search (q), subcontractor scope, and contractor filters."
-      operationId: findAll_3
-      parameters:
-      - name: q
-        in: query
-        description: Search query (partial match on equipment fields)
-        required: false
-        schema:
-          type: string
-      - name: page
-        in: query
-        description: Zero-based page index (0..N)
-        required: false
-        schema:
-          type: integer
-          default: 0
-          minimum: 0
-      - name: size
-        in: query
-        description: The size of the page to be returned
-        required: false
-        schema:
-          type: integer
-          default: 20
-          minimum: 1
-      - name: sort
-        in: query
-        description: "Sorting criteria in the format: property,(asc|desc). Default\
-          \ sort order is ascending. Multiple sort criteria are supported."
-        required: false
-        schema:
-          type: array
-          default:
-          - "name,ASC"
-          items:
-            type: string
-      - name: companyId
-        in: path
-        description: Company ID. UUID of the company the equipment belongs to. Obtain
-          it from `GET /v1/users/me/companies`.
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: companyScope
-        in: query
-        description: "Subcontractor scope: which contractors' equipment to include\
-          \ (requires permission when not MY_COMPANY)"
-        required: false
-        schema:
-          type: string
-          enum:
-          - ALL
-          - MY_COMPANY
-          - MY_SUBCONTRACTORS
-      - name: contractorIds
-        in: query
-        description: Filter to equipment belonging to these contractor company IDs
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: uuid
-      responses:
-        "200":
-          description: Successfully retrieved list
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/PagedModelEquipmentResponseDto"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -1526,13 +1123,1237 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseContractData"
-  /v2/companies/{companyId}/contracts/{contractId}:
+  /v1/companies/{companyId}/employees:
     get:
       tags:
-      - Contract listings
-      summary: Get contract
-      description: Returns contract details with sites and their activities.
-      operationId: getContract
+      - Resource lists
+      summary: List employees
+      description: "Returns a paginated list of employees for a contractor company.\
+        \ Used to locate the internal `resourceId` needed for contract engagement\
+        \ assignment. The `q` parameter performs a partial match against `firstName`,\
+        \ `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:**\
+        \ `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort\
+        \ format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
+      operationId: findAll_5
+      parameters:
+      - name: q
+        in: query
+        description: Search query (partial match on employee fields)
+        required: false
+        schema:
+          type: string
+      - name: clientId
+        in: query
+        description: "When set, restricts results to resources for this client company"
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "firstName,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the employee belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        description: "Subcontractor scope: which contractors' employees to include\
+          \ (requires permission when not MY_COMPANY)"
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        description: Filter to employees belonging to these contractor company IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: selected
+        in: query
+        description: Optional employee resource IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelEmployeeResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    post:
+      tags:
+      - Employees
+      summary: Create employee
+      description: Creates a new employee resource for the company.
+      operationId: create_2
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the employee belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEmployeeDto"
+        required: true
+      responses:
+        "201":
+          description: Successfully created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/employees/{id}:
+    get:
+      tags:
+      - Employees
+      summary: Get employee by ID
+      description: Returns a single employee by resource ID for the company.
+      operationId: findOne_3
+      parameters:
+      - name: id
+        in: path
+        description: "Employee resource ID. UUID of the employee to retrieve. Obtain\
+          \ it from `GET /v1/companies/{companyId}/employees` or from the response\
+          \ of `POST /v1/companies/{companyId}/employees`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the employee belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EmployeeResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Employee not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    delete:
+      tags:
+      - Employees
+      summary: Delete employee
+      description: Soft-deletes an employee.
+      operationId: delete_2
+      parameters:
+      - name: id
+        in: path
+        description: "Employee resource ID. UUID of the employee to delete. Obtain\
+          \ it from `GET /v1/companies/{companyId}/employees` or from the response\
+          \ of `POST /v1/companies/{companyId}/employees`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the employee belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successfully deleted
+          content: {}
+        "400":
+          description: "`EMPLOYEE_ASSIGNED_TO_CONTRACT`: employee is still assigned\
+            \ to one or more active contract engagements. To unassign: (1) find active\
+            \ engagements via `GET /v1/companies/{id}/assigned-resources` or `.../as-contractor`;\
+            \ (2) call `PUT .../engagements/{engagementId}/resources` with the full\
+            \ resource list omitting this employee; (3) retry the DELETE. `EMPLOYEE_ON_SITE`:\
+            \ employee has an open access register entry. Register their exit via\
+            \ `PATCH /v1/companies/{companyId}/access-register/{accessRegisterId}`,\
+            \ then retry the DELETE."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Employee not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Employees
+      summary: Update employee
+      description: "Updates an existing employee. Only provided fields are modified;\
+        \ the `classifications` set, when provided, replaces the existing one."
+      operationId: update_2
+      parameters:
+      - name: id
+        in: path
+        description: "Employee resource ID. UUID of the employee to update. Obtain\
+          \ it from `GET /v1/companies/{companyId}/employees` or from the response\
+          \ of `POST /v1/companies/{companyId}/employees`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the employee belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEmployeeDto"
+        required: true
+      responses:
+        "204":
+          description: Successfully updated
+          content: {}
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Employee not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/employees/total:
+    get:
+      tags:
+      - Employees
+      summary: Count employees
+      description: Returns the total number of employees for the company.
+      operationId: getTotalCount
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company whose employees are counted.
+          Obtain it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved count
+          content:
+            '*/*':
+              schema:
+                type: integer
+                format: int64
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/classification/employee-types:
+    get:
+      tags:
+      - Employees
+      summary: List client employee type classifications
+      description: Returns client-specific employee type classifications grouped by
+        active client. Required when a client mandates an employee classification
+        before the employee can be assigned to their contracts.
+      operationId: getEmployees
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the contractor company. Obtain it from `GET
+          /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractorClient"
+  /v1/standard-vehicle-types:
+    get:
+      tags:
+      - Vehicles
+      summary: List standard vehicle types
+      description: Returns the platform-level catalog of standard vehicle types. The
+        standard vehicle type is a mandatory field when creating a vehicle.
+      operationId: findAll_7
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSystemStandardVehicleType"
+  /v1/companies/{companyId}/vehicles:
+    get:
+      tags:
+      - Resource lists
+      summary: List vehicles
+      description: "Returns a paginated list of vehicles for the company. Supports\
+        \ optional text search (q), subcontractor scope, and contractor filters."
+      operationId: findAll
+      parameters:
+      - name: q
+        in: query
+        description: Search query (partial match on vehicle fields)
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the vehicle belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        description: "Subcontractor scope: which contractors' vehicles to include\
+          \ (requires permission when not MY_COMPANY)"
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        description: Filter to vehicles belonging to these contractor company IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: selected
+        in: query
+        description: Optional vehicle resource IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelVehicleResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    post:
+      tags:
+      - Vehicles
+      summary: Create vehicle
+      description: Creates a new vehicle resource for the company.
+      operationId: create
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the vehicle belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateVehicleDto"
+        required: true
+      responses:
+        "201":
+          description: Successfully created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/vehicles/{id}:
+    get:
+      tags:
+      - Vehicles
+      summary: Get vehicle by ID
+      description: Returns a single vehicle by resource ID for the company.
+      operationId: findOne_1
+      parameters:
+      - name: id
+        in: path
+        description: "Vehicle resource ID. UUID of the vehicle to retrieve. Obtain\
+          \ it from `GET /v1/companies/{companyId}/vehicles` or from the response\
+          \ of `POST /v1/companies/{companyId}/vehicles`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the vehicle belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/VehicleResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Vehicle not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    delete:
+      tags:
+      - Vehicles
+      summary: Delete vehicle
+      description: Soft-deletes a vehicle for the company.
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: "Vehicle resource ID. UUID of the vehicle to delete. Obtain it\
+          \ from `GET /v1/companies/{companyId}/vehicles` or from the response of\
+          \ `POST /v1/companies/{companyId}/vehicles`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the vehicle belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successfully deleted
+          content: {}
+        "400":
+          description: "`VEHICLE_ASSIGNED_TO_CONTRACT`: vehicle is still assigned\
+            \ to one or more active contract engagements. To unassign: (1) find active\
+            \ engagements via `GET /v1/companies/{id}/assigned-resources` or `.../as-contractor`;\
+            \ (2) call `PUT .../engagements/{engagementId}/resources` with the full\
+            \ resource list omitting this vehicle; (3) retry the DELETE. `VEHICLE_ON_SITE`:\
+            \ vehicle has an open access register entry. Register its exit via `PATCH\
+            \ /v1/companies/{companyId}/access-register/{accessRegisterId}`, then\
+            \ retry the DELETE."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Vehicle not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Vehicles
+      summary: Update vehicle
+      description: "Updates an existing vehicle for the company. Only provided fields\
+        \ are modified; the `classifications` set, when provided, replaces the existing\
+        \ one."
+      operationId: update
+      parameters:
+      - name: id
+        in: path
+        description: "Vehicle resource ID. UUID of the vehicle to update. Obtain it\
+          \ from `GET /v1/companies/{companyId}/vehicles` or from the response of\
+          \ `POST /v1/companies/{companyId}/vehicles`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the vehicle belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateVehicleDto"
+        required: true
+      responses:
+        "204":
+          description: Successfully updated
+          content: {}
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Vehicle not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/classification/vehicle-types:
+    get:
+      tags:
+      - Vehicles
+      summary: List client vehicle type classifications
+      description: Returns client-specific vehicle type classifications grouped by
+        active client. Required when a client mandates a vehicle classification before
+        the vehicle can be assigned to their contracts.
+      operationId: getVehicles
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the contractor company. Obtain it from `GET
+          /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractorClient"
+  /v1/standard-equipment-types:
+    get:
+      tags:
+      - Equipment
+      summary: List standard equipment types
+      description: Returns the platform-level catalog of standard equipment types.
+        The standard equipment type is a mandatory field when creating equipment.
+      operationId: findAll_8
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSystemStandardEquipmentType"
+  /v1/companies/{companyId}/equipment:
+    get:
+      tags:
+      - Resource lists
+      summary: List equipment
+      description: "Returns a paginated list of equipment for the company. Supports\
+        \ optional text search (q), subcontractor scope, and contractor filters."
+      operationId: findAll_4
+      parameters:
+      - name: q
+        in: query
+        description: Search query (partial match on equipment fields)
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the equipment belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyScope
+        in: query
+        description: "Subcontractor scope: which contractors' equipment to include\
+          \ (requires permission when not MY_COMPANY)"
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: contractorIds
+        in: query
+        description: Filter to equipment belonging to these contractor company IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelEquipmentResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    post:
+      tags:
+      - Equipment
+      summary: Create equipment
+      description: Creates a new equipment resource for the company.
+      operationId: create_1
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the equipment belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEquipmentDto"
+        required: true
+      responses:
+        "201":
+          description: Successfully created
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/equipment/{id}:
+    get:
+      tags:
+      - Equipment
+      summary: Get equipment by ID
+      description: Returns a single equipment item by resource ID for the company.
+      operationId: findOne_2
+      parameters:
+      - name: id
+        in: path
+        description: "Equipment resource ID. UUID of the equipment to retrieve. Obtain\
+          \ it from `GET /v1/companies/{companyId}/equipment` or from the response\
+          \ of `POST /v1/companies/{companyId}/equipment`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the equipment belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/EquipmentResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Equipment not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    delete:
+      tags:
+      - Equipment
+      summary: Delete equipment
+      description: Soft-deletes equipment for the company.
+      operationId: delete_1
+      parameters:
+      - name: id
+        in: path
+        description: "Equipment resource ID. UUID of the equipment to delete. Obtain\
+          \ it from `GET /v1/companies/{companyId}/equipment` or from the response\
+          \ of `POST /v1/companies/{companyId}/equipment`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the equipment belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Successfully deleted
+          content: {}
+        "400":
+          description: "`EQUIPMENT_ASSIGNED_TO_CONTRACT`: equipment is still assigned\
+            \ to one or more active contract engagements. To unassign: (1) find active\
+            \ engagements via `GET /v1/companies/{id}/assigned-resources` or `.../as-contractor`;\
+            \ (2) call `PUT .../engagements/{engagementId}/resources` with the full\
+            \ resource list omitting this equipment; (3) retry the DELETE. `EQUIPMENT_ON_SITE`:\
+            \ equipment has an open access register entry. Register its exit via `PATCH\
+            \ /v1/companies/{companyId}/access-register/{accessRegisterId}`, then\
+            \ retry the DELETE."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Equipment not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Equipment
+      summary: Update equipment
+      description: "Updates existing equipment for the company. Only provided fields\
+        \ are modified; the `classifications` set, when provided, replaces the existing\
+        \ one."
+      operationId: update_1
+      parameters:
+      - name: id
+        in: path
+        description: "Equipment resource ID. UUID of the equipment to update. Obtain\
+          \ it from `GET /v1/companies/{companyId}/equipment` or from the response\
+          \ of `POST /v1/companies/{companyId}/equipment`."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company the equipment belongs to. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateEquipmentDto"
+        required: true
+      responses:
+        "204":
+          description: Successfully updated
+          content: {}
+        "400":
+          description: Invalid request body or validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Equipment not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/classification/equipment-types:
+    get:
+      tags:
+      - Equipment
+      summary: List client equipment type classifications
+      description: Returns client-specific equipment type classifications grouped
+        by active client. Required when a client mandates an equipment classification
+        before it can be assigned to their contracts.
+      operationId: getEquipments
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the contractor company. Obtain it from `GET
+          /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractorClient"
+  /v1/companies/{companyId}/risks:
+    get:
+      tags:
+      - Assignments
+      summary: List risks for a company
+      description: "Returns paginated risks configured by the company. Risks define\
+        \ potential dangers or safety responsibilities associated with employees in\
+        \ contract engagements, and determine which compliance requirements are triggered\
+        \ when assigned."
+      operationId: findAll_2
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the company whose risks are listed. Obtain
+          it from `GET /v1/users/me/companies`.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Paged risks
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelRiskDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelRiskDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelRiskDto"
+  /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}:
+    get:
+      tags:
+      - Assignments
+      summary: Get site details
+      description: Returns activities and assigned resources for a specific site on
+        a contract.
+      operationId: getContractSiteDetails
       parameters:
       - name: companyId
         in: path
@@ -1548,13 +2369,20 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: siteId
+        in: path
+        description: Site ID
+        required: true
+        schema:
+          type: string
+          format: uuid
       responses:
         "200":
-          description: Contract details
+          description: Site details
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/ContractV2"
+                $ref: "#/components/schemas/ContractSiteDetailsV2"
         "401":
           description: "Unauthorized: authentication required"
           content:
@@ -1568,7 +2396,150 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
         "404":
-          description: Contract not found for this client
+          description: Contract or site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources:
+    put:
+      tags:
+      - Assignments
+      summary: Set site resources
+      description: "Replaces the complete resource assignment for a (contract, site)\
+        \ pair in a single operation. The payload defines the desired state: resources\
+        \ included are assigned, resources currently assigned but absent are unassigned.\
+        \ The same desired state is written to every activity at the site. For employee\
+        \ resources, optional **riskIds** can be included to associate risks at assignment\
+        \ time."
+      operationId: setSiteResources
+      parameters:
+      - name: companyId
+        in: path
+        description: Contractor company ID that owns the resources.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID the site belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: path
+        description: Site ID whose resources to set.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SetSiteResourceDto"
+        required: true
+      responses:
+        "204":
+          description: Resources assigned
+          content: {}
+        "400":
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract or site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources/{resourceId}/risks:
+    put:
+      tags:
+      - Assignments
+      summary: Update risks for a resource at a site
+      description: "Replaces the risk associations for a resource assigned at the\
+        \ (contract, site) pair. The payload defines the complete desired risk set;\
+        \ risks not included are removed. The same risk set is written uniformly to\
+        \ every activity at the site."
+      operationId: setSiteResourceRisks
+      parameters:
+      - name: companyId
+        in: path
+        description: Contractor company ID that owns the resources.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID the site belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: path
+        description: Site ID where the resource is assigned.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceId
+        in: path
+        description: Resource ID whose risks to update.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetSiteResourceRisksDto"
+        required: true
+      responses:
+        "204":
+          description: Risks updated
+          content: {}
+        "400":
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: "Contract, site, or resource not found"
           content:
             application/problem+json:
               schema:
@@ -3847,7 +4818,7 @@ paths:
         \ Rule-based list parameters use OR within the same parameter and AND across\
         \ different parameters. **Sort format:** use query parameter `sort=field,direction`\
         \ (e.g. `?sort=name,asc`)."
-      operationId: findAll_2
+      operationId: findAll_3
       parameters:
       - name: companyId
         in: path
@@ -5374,6 +6345,1336 @@ paths:
         "200":
           description: OK
           content: {}
+  /v1/companies/{id}:
+    get:
+      tags:
+      - Companies
+      summary: Get my company details
+      description: "Returns my company details. Use GET /v1/companies/{id}/summary\
+        \ when the caller does not belong to that company."
+      operationId: findMyCompany
+      parameters:
+      - name: id
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved company
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CompanyDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Company not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Company
+      summary: Update company details
+      description: "Update the information of an existing contractor company. **Body:**\
+        \ fields such as name, contact, address, products, and access-control configuration."
+      operationId: updateMyCompanyDetails
+      parameters:
+      - name: id
+        in: path
+        description: Company id to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCompanyDto"
+        required: true
+      responses:
+        "204":
+          description: Company updated successfully
+          content: {}
+        "400":
+          description: Validation error or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Company not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{id}/contractors:
+    post:
+      tags:
+      - Company
+      summary: Create contractor company for a client
+      description: Creates a new **contractor** company and links it to the client
+        company.
+      operationId: createContractor
+      parameters:
+      - name: id
+        in: path
+        description: Client company id that will own the relationship to the new contractor
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCompanyDto"
+        required: true
+      responses:
+        "201":
+          description: Created; response body contains new company id
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "400":
+          description: Validation error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{id}/all-child-subcontractors:
+    get:
+      tags:
+      - Company
+      summary: List child subcontractors
+      description: "Paginated child subcontractor companies under the caller’s contract\
+        \ network. **Search:** optional `q` filters by name. **Scope:** `companyScope`\
+        \ (`ALL`, `MY_COMPANY`, `MY_SUBCONTRACTORS`). **Contracts:** `activeContractOnly`\
+        \ limits to active relationships. **Selection:** `selected` restricts to given\
+        \ subcontractor IDs."
+      operationId: findAllActiveChildSubcontractors
+      parameters:
+      - name: id
+        in: path
+        description: Company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Optional search on subcontractor name
+        required: false
+        schema:
+          type: string
+      - name: activeContractOnly
+        in: query
+        description: "When true, only entries with an active contract"
+        required: false
+        schema:
+          type: boolean
+          default: true
+      - name: companyScope
+        in: query
+        description: Subcontractor visibility scope
+        required: false
+        schema:
+          type: string
+          enum:
+          - ALL
+          - MY_COMPANY
+          - MY_SUBCONTRACTORS
+      - name: selected
+        in: query
+        description: Optional restrict to these subcontractor company IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved subcontractors
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseSubcontractorResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/sites:
+    get:
+      tags:
+      - Lookups
+      summary: List sites
+      description: Retrieves paginated list of sites for a company. Use this endpoint
+        to obtain site IDs for filtering in other endpoints.
+      operationId: findAll_1
+      parameters:
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: selected
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contractIds
+        in: query
+        description: "Optional: narrow results to sites used by these contracts' engagements.\
+          \ Applied as an additional AND filter that takes precedence over `selected`:\
+          \ selected ids outside the contract scope are excluded."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved sites list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSiteDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSiteDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSiteDto"
+    post:
+      tags:
+      - Sites
+      summary: Create site
+      description: "Creates a new site under the company. **Body:** `CreateSiteDto`\
+        \ — name, optional phone, photo, address, optional `parentId` / hierarchy\
+        \ (`childrenIds`, `level`), and timestamps as applicable. Returns the new\
+        \ site **id**."
+      operationId: createSite
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id under which the site is created
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSiteDto"
+        required: true
+      responses:
+        "201":
+          description: Site created; response body contains the new id
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Validation error or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/sites/{id}:
+    get:
+      tags:
+      - Sites
+      summary: Get site by id
+      description: Returns a single site for a company.
+      operationId: findOne
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id owning the site
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Site id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: Successfully retrieved site
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SiteDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    put:
+      tags:
+      - Sites
+      summary: Update site
+      description: "Updates an existing site. **Body:** mutable fields (name, contact,\
+        \ address, hierarchy links)."
+      operationId: updateSite
+      parameters:
+      - name: companyId
+        in: path
+        description: Company id owning the site
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Site id to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: skipTeamFilter
+        in: query
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSiteDto"
+        required: true
+      responses:
+        "204":
+          description: Site updated successfully
+          content: {}
+        "400":
+          description: Validation error or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/sites/as-contractor:
+    get:
+      tags:
+      - Sites
+      summary: List client sites as contractor
+      description: "Paginated sites of **client** companies the contractor works with.\
+        \ **Search:** optional `q` filters sites by text. **Pagination:** `page`,\
+        \ `size`. **Sort:** default **name** ascending."
+      operationId: findAllAsContractor
+      parameters:
+      - name: q
+        in: query
+        description: Optional search on site name or related text handled by the query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      - name: companyId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved sites
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelSiteDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/sites/as-contractor/hierarchy:
+    get:
+      tags:
+      - Sites
+      summary: Client site hierarchy as contractor
+      description: Returns site hierarchy trees for each **client** company the contractor
+        has active contracts with. Sites are expanded to full hierarchy branches from
+        the engagement scope. **Search:** optional `q` filters sites by name.
+      operationId: findHierarchyAsContractor
+      parameters:
+      - name: q
+        in: query
+        description: Optional search on site name
+        required: false
+        schema:
+          type: string
+      - name: companyId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved site hierarchies
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContractorSiteHierarchyDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts:
+    post:
+      tags:
+      - Contracts
+      summary: Create contract
+      description: Creates a contract. Each site in the body carries its own activity
+        list.
+      operationId: createContract
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContractDtoV2"
+        required: true
+      responses:
+        "200":
+          description: Contract created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdValue"
+        "400":
+          description: Validation or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts/{contractId}:
+    get:
+      tags:
+      - Contract listings
+      summary: Get contract
+      description: Returns contract details with sites and their activities.
+      operationId: getContract
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Contract details
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractV2"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract not found for this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    delete:
+      tags:
+      - Contracts
+      summary: Delete contract
+      description: Soft-deletes the contract and all its subcontracts.
+      operationId: deleteContract
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID to delete
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Contract deleted successfully
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract not found for this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Contracts
+      summary: Update contract
+      description: Partially updates a contract. When sites or activities are provided
+        they represent the full desired state; the server diffs against the current
+        state and applies adds/removes. Sites are immutable for subcontracts.
+      operationId: updateContract
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract or subcontract ID to update
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContractDtoV2"
+        required: true
+      responses:
+        "204":
+          description: Contract updated successfully
+          content: {}
+        "400":
+          description: Validation or business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract not found for this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts/{contractId}/resources:
+    put:
+      tags:
+      - Contracts
+      summary: Set contract resources (batch)
+      description: "Replaces the complete resource assignment for multiple (contract,\
+        \ site) pairs in a single atomic operation. Each entry defines the desired\
+        \ state for one site: resources included are assigned, resources currently\
+        \ assigned but absent are unassigned. All site assignments commit or roll\
+        \ back as a unit. Requires the 'assign-resources-batch' feature flag to be\
+        \ active."
+      operationId: setContractResources
+      parameters:
+      - name: companyId
+        in: path
+        description: Contractor company ID that owns the resources.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID whose resources to set.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/SetContractSiteResourcesDto"
+        required: true
+      responses:
+        "204":
+          description: Resources assigned
+          content:
+            '*/*':
+              schema:
+                type: object
+        "400":
+          description: Invalid request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions or feature flag inactive"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract or site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v2/companies/{companyId}/contracts/{contractId}/tree:
+    get:
+      tags:
+      - Contracts
+      summary: Get contract tree
+      description: Returns the full contract hierarchy tree. Each node shows sites
+        with their activities bundle.
+      operationId: getContractTree
+      parameters:
+      - name: companyId
+        in: path
+        description: Client company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Contract hierarchy tree
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractTreeNodeV2"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract not found for this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{companyId}/contracts/with-contractors:
+    get:
+      tags:
+      - Contracts
+      summary: Get contracts where my company is client
+      description: "Returns paginated contracts where the specified company acts as\
+        \ client. **Allowed sort fields:** `name` (contract name, default ascending);\
+        \ `client.name` (client company name); `contractor.name` (contractor company\
+        \ name); `mainContractor.name` (main contractor company name); `dateFrom`\
+        \ (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction`\
+        \ (e.g. `?sort=name,asc`)."
+      operationId: contractsWhereMyCompanyIsClient
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: contractName
+        in: query
+        description: Deprecated — use 'contractNames' instead.
+        required: false
+        deprecated: true
+        schema:
+          type: string
+      - name: contractNames
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: contractorIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: showSubcontracts
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: dateFrom
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: siteIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: showExpired
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: showOnlyInternalManagement
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: managerIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: contractorTaxId
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: projectIds
+        in: query
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractData"
+  /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts:
+    post:
+      tags:
+      - Subcontracts
+      summary: Create subcontract
+      description: Direct subcontract creation. Fails if the parent contract requires
+        authorisation. Returns one child-contract ID per contractorId in the body.
+      operationId: createSubcontract
+      parameters:
+      - name: contractorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: parentContractId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubcontractDtoV2"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdsResponse"
+  /v2/companies/{contractorId}/contracts/{parentContractId}/subcontracts/requests:
+    post:
+      tags:
+      - Subcontracts
+      summary: Request subcontract
+      description: "Creates a pending subcontract request per contractorId in the\
+        \ body, bundling all activityIds into one row."
+      operationId: requestSubcontract
+      parameters:
+      - name: contractorId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: parentContractId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSubcontractDtoV2"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdsResponse"
+  /v2/companies/{companyId}/subcontracts/requests:
+    get:
+      tags:
+      - Subcontracts
+      summary: List subcontract requests
+      description: Returns paginated V2 subcontract requests for the client company.
+        Filter by contractId and/or siteId.
+      operationId: listSubcontractRequests
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseSubcontractRequestV2"
+  /v2/companies/{companyId}/subcontracts/requests/{requestId}/approve:
+    put:
+      tags:
+      - Subcontracts
+      summary: Approve subcontract request
+      description: Approves the bundle request and materialises the child contract
+        with one engagement per activity.
+      operationId: approveSubcontractRequest
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/IdsResponse"
+  /v2/companies/{companyId}/subcontracts/requests/{requestId}/reject:
+    put:
+      tags:
+      - Subcontracts
+      summary: Reject subcontract request
+      description: Rejects the bundle request and deletes the pending row.
+      operationId: rejectSubcontractRequest
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content: {}
+  /v2/companies/{companyId}/subcontracts/requests/as-contractor:
+    get:
+      tags:
+      - Subcontracts
+      summary: List subcontract requests as contractor
+      description: Returns paginated V2 subcontract requests where the path company
+        is the requesting contractor.
+      operationId: listSubcontractRequestsAsContractor
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseSubcontractRequestV2"
+  /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/subcontracts:
+    get:
+      tags:
+      - Subcontracts
+      summary: List subcontracts at site
+      description: "Returns all subcontracts at the given (contract, site) pair. Each\
+        \ entry groups activities by child contract."
+      operationId: listSubcontractsForSite
+      parameters:
+      - name: companyId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SubcontractV2"
   /v1/cm/companies/{companyId}/evidences/upload:
     post:
       tags:
@@ -5472,6 +7773,89 @@ paths:
                 id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
 components:
   schemas:
+    IdsResponse:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - ids
+    SetSiteResourceDto:
+      type: object
+      description: "A resource to assign at a (contract, site) pair, with optional\
+        \ risks for employee resources."
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+          description: "Contractor resource id to assign. Obtain the UUID from `GET\
+            \ /v1/companies/{companyId}/employees`, `.../vehicles`, or `.../equipment`."
+        riskIds:
+          type: array
+          description: "Risk ids to associate with this resource at assignment time\
+            \ (employees only). Obtain from `GET /v1/companies/{companyId}/risks`.\
+            \ Omit or pass an empty list for non-employee resources."
+          items:
+            type: string
+            format: uuid
+      required:
+      - resourceId
+      - riskIds
+    ProblemDetail:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        properties:
+          type: object
+          additionalProperties: {}
+    SetSiteResourceRisksDto:
+      type: object
+      description: Complete set of risk ids to associate with a resource assigned
+        at a site.
+      properties:
+        riskIds:
+          type: array
+          description: "Complete set of risk ids to associate with the assigned resource.\
+            \ Obtain from `GET /v1/companies/{companyId}/risks`. Any risk currently\
+            \ associated but not included here is removed."
+          items:
+            type: string
+            format: uuid
+      required:
+      - riskIds
+    SetContractSiteResourcesDto:
+      type: object
+      description: Resource assignment for a single site within a contract.
+      properties:
+        siteId:
+          type: string
+          format: uuid
+          description: Site ID to assign resources to. Must be a site with an active
+            engagement on the contract.
+        resources:
+          type: array
+          description: Complete set of resources to assign at this site. Resources
+            currently assigned but absent from this list are unassigned.
+          items:
+            $ref: "#/components/schemas/SetSiteResourceDto"
+      required:
+      - resources
+      - siteId
     CreateVisitorDto:
       type: object
       description: "Payload to create or update a visitor. Used by [POST /v1/companies/{companyId}/visitor](#tag/visitor-controller/POST/v1/companies/{companyId}/visitor)\
@@ -5524,25 +7908,45 @@ components:
       - visitorIdentityType
       - visitorName
       - visitorSurname
-    ProblemDetail:
+    SiteAddressDto:
       type: object
       properties:
-        type:
+        street:
           type: string
-          format: uri
-        title:
+        city:
           type: string
-        status:
-          type: integer
-          format: int32
-        detail:
+        state:
           type: string
-        instance:
+        county:
           type: string
-          format: uri
-        properties:
-          type: object
-          additionalProperties: {}
+        postalCode:
+          type: string
+        country:
+          type: string
+    UpdateSiteDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+        phonePrefix:
+          type: string
+        phone:
+          type: string
+        photo:
+          type: string
+        address:
+          $ref: "#/components/schemas/SiteAddressDto"
+        parentId:
+          type: string
+          format: uuid
+        childrenIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - name
     CustodyDto:
       type: object
       properties:
@@ -5819,6 +8223,775 @@ components:
           example: 2026-03-25
       required:
       - issueDate
+    CreateSubcontractDtoV2:
+      type: object
+      properties:
+        contractorIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        siteId:
+          type: string
+          format: uuid
+        activityIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - activityIds
+      - contractorIds
+      - dateFrom
+      - dateTo
+      - siteId
+    ContractSiteDtoV2:
+      type: object
+      description: A site assignment with its own activity list and an optional explicit
+        scope. The scope is only applicable when the Site Hierarchy product is enabled.
+      properties:
+        siteId:
+          type: string
+          format: uuid
+          description: Site ID to include in the contract.
+        activities:
+          type: array
+          description: Activities this site covers; must not be empty.
+          items:
+            type: string
+            format: uuid
+        scopeSiteIds:
+          type: array
+          description: Optional explicit scope site IDs. When null the site itself
+            is used as the scope. Only applicable when the Site Hierarchy product
+            is enabled; ignored otherwise.
+          items:
+            type: string
+            format: uuid
+      required:
+      - activities
+      - siteId
+    CreateContractDtoV2:
+      type: object
+      description: Request body to create a contract. Each site carries its own activity
+        list.
+      properties:
+        contractorId:
+          type: string
+          format: uuid
+          description: Contractor company ID.
+        name:
+          type: string
+          description: Contract name.
+          minLength: 1
+        dateFrom:
+          type: string
+          format: date
+          description: Contract start date (inclusive).
+        dateTo:
+          type: string
+          format: date
+          description: Contract end date (inclusive).
+        managerId:
+          type: string
+          description: Internal manager user ID for the contract.
+          minLength: 1
+        sites:
+          type: array
+          description: Sites this contract covers; must not be empty. Each site entry
+            must include its own non-empty activity list.
+          items:
+            $ref: "#/components/schemas/ContractSiteDtoV2"
+        subcontracting:
+          $ref: "#/components/schemas/SubcontractingDto"
+          description: Subcontracting configuration.
+        createdAt:
+          type: string
+          format: date-time
+          description: Optional creation timestamp override for migrations.
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: Optional key-value properties to attach to the contract. Keys
+            are part of the `ContractPropertyKey` enum (e.g. `ORDER_CODE`).
+      required:
+      - contractorId
+      - dateFrom
+      - dateTo
+      - managerId
+      - name
+      - sites
+      - subcontracting
+    SubcontractingDto:
+      type: object
+      description: Subcontracting policy for the contract.
+      properties:
+        allowed:
+          type: boolean
+          description: Whether subcontracting is allowed under this contract.
+        onlyClientAllowed:
+          type: boolean
+          description: "When true, only the client may create or authorize subcontractors."
+        maxLevel:
+          type: integer
+          format: int32
+          description: Maximum subcontract depth when allowed.
+        needsAuthorization:
+          type: boolean
+          description: Whether subcontract creation requires client authorization.
+      required:
+      - allowed
+    AccessControlApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    AutomaticReviewConfig:
+      type: object
+      properties:
+        useSamePrice:
+          type: boolean
+        genericPrice:
+          type: number
+        genericCurrencyId:
+          type: string
+          format: uuid
+        requirementPrices:
+          type: array
+          items:
+            $ref: "#/components/schemas/RequirementReviewConfig"
+      required:
+      - genericCurrencyId
+      - genericPrice
+      - useSamePrice
+    BackupConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    CardConfig:
+      type: object
+      properties:
+        paper:
+          type: string
+          enum:
+          - A4
+          - A5
+          - A3
+          - CUSTOM
+        customPaperWidthMm:
+          type: number
+          format: double
+        customPaperHeightMm:
+          type: number
+          format: double
+        orientation:
+          type: string
+          enum:
+          - PORTRAIT
+          - LANDSCAPE
+        sheetMarginsMm:
+          $ref: "#/components/schemas/MarginsMm"
+        columns:
+          type: integer
+          format: int32
+        rows:
+          type: integer
+          format: int32
+        labelWidthMm:
+          type: number
+          format: double
+        labelHeightMm:
+          type: number
+          format: double
+        labelGapMm:
+          $ref: "#/components/schemas/GapMm"
+        showBorder:
+          type: boolean
+        title:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: "#/components/schemas/CardTextField"
+        qr:
+          $ref: "#/components/schemas/CardQr"
+        photo:
+          $ref: "#/components/schemas/CardPhoto"
+        logo:
+          $ref: "#/components/schemas/CardLogo"
+        risks:
+          $ref: "#/components/schemas/CardRisks"
+      required:
+      - columns
+      - fields
+      - labelGapMm
+      - labelHeightMm
+      - labelWidthMm
+      - orientation
+      - paper
+      - qr
+      - rows
+      - sheetMarginsMm
+      - showBorder
+    CardLogo:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        widthMm:
+          type: number
+          format: double
+        heightMm:
+          type: number
+          format: double
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - heightMm
+      - widthMm
+      - xmm
+      - ymm
+    CardPhoto:
+      type: object
+      properties:
+        policy:
+          type: string
+          enum:
+          - REQUIRED
+          - OPTIONAL
+          - HIDDEN
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        widthMm:
+          type: number
+          format: double
+        heightMm:
+          type: number
+          format: double
+        noPhotoText:
+          type: string
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - heightMm
+      - policy
+      - widthMm
+      - xmm
+      - ymm
+    CardQr:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        sizeMm:
+          type: number
+          format: double
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - sizeMm
+      - xmm
+      - ymm
+    CardRisks:
+      type: object
+      properties:
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        iconSizeMm:
+          type: number
+          format: double
+        columns:
+          type: integer
+          format: int32
+        gapMm:
+          type: number
+          format: double
+        maxIcons:
+          type: integer
+          format: int32
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - columns
+      - gapMm
+      - iconSizeMm
+      - maxIcons
+      - xmm
+      - ymm
+    CardTextField:
+      type: object
+      properties:
+        field:
+          type: string
+          enum:
+          - TITLE
+          - WORKER_NAME
+          - IDENTITY
+          - CONTRACTOR
+          - CLIENT_NAME
+          - SITE
+          - VALIDITY_DATE
+          - SUBCONTRACTING
+        yMm:
+          type: number
+          format: double
+          writeOnly: true
+        fontPt:
+          type: number
+          format: double
+        xMm:
+          type: number
+          format: double
+          writeOnly: true
+        maxWidthMm:
+          type: number
+          format: double
+        style:
+          type: string
+          enum:
+          - REGULAR
+          - BOLD
+          - ITALIC
+          - UNDERLINE
+        centered:
+          type: boolean
+        xmm:
+          type: number
+          format: double
+        ymm:
+          type: number
+          format: double
+      required:
+      - centered
+      - field
+      - fontPt
+      - style
+      - ymm
+    ClientPlanConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          plan:
+            type: string
+          maxSites:
+            type: integer
+            format: int32
+          maxConnections:
+            type: integer
+            format: int32
+    CompaniesContractsApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ContractorPlanConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          plan:
+            type: string
+            enum:
+            - PLAN_0
+            - PLAN_1
+            - PLAN_2
+            - PLAN_3
+          maxNumberOfEmployees:
+            type: integer
+            format: int32
+          trials:
+            type: array
+            items:
+              $ref: "#/components/schemas/ContractorPlanTrial"
+          effectivePlan:
+            type: string
+            enum:
+            - PLAN_0
+            - PLAN_1
+            - PLAN_2
+            - PLAN_3
+      required:
+      - effectivePlan
+      - plan
+      - trials
+    ContractorPlanTrial:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum:
+          - PLAN_0
+          - PLAN_1
+          - PLAN_2
+          - PLAN_3
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+      required:
+      - endDate
+      - plan
+      - startDate
+    CreateCompanyDto:
+      type: object
+      properties:
+        contactEmail:
+          type: string
+          format: email
+          minLength: 1
+        contactName:
+          type: string
+          minLength: 1
+        contactLastName:
+          type: string
+          minLength: 1
+        languageId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+        taxId:
+          type: string
+          minLength: 1
+        spaceCode:
+          type: string
+          maxLength: 50
+          minLength: 1
+        countryId:
+          type: string
+          format: uuid
+        message:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemProductAssignDto"
+        createdAt:
+          type: string
+          format: date-time
+        seedDemoData:
+          type: boolean
+      required:
+      - contactEmail
+      - contactLastName
+      - contactName
+      - countryId
+      - languageId
+      - name
+      - taxId
+    CustomAccessCardsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          mode:
+            type: string
+            enum:
+            - TEMPLATE
+            - CONFIGURABLE
+          templateKey:
+            type: string
+          cardConfig:
+            $ref: "#/components/schemas/CardConfig"
+      required:
+      - mode
+    DocumentalManagementConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          automatic:
+            $ref: "#/components/schemas/AutomaticReviewConfig"
+          standard:
+            $ref: "#/components/schemas/ReviewConfig"
+          custom:
+            $ref: "#/components/schemas/ReviewConfig"
+      required:
+      - automatic
+      - custom
+      - standard
+    EUCategoryConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          maxConnections:
+            type: integer
+            format: int32
+    EmployeeTypeConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ErpPropertiesConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    GapMm:
+      type: object
+      properties:
+        horizontal:
+          type: number
+          format: double
+        vertical:
+          type: number
+          format: double
+      required:
+      - horizontal
+      - vertical
+    InternalManagementConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          autoApproveEvidence:
+            type: boolean
+      required:
+      - autoApproveEvidence
+    LevelConfig:
+      type: object
+      properties:
+        level:
+          type: integer
+          format: int32
+        enabled:
+          type: boolean
+        maxInstances:
+          type: integer
+          format: int32
+        customName:
+          type: string
+      required:
+      - enabled
+      - level
+    MarginsMm:
+      type: object
+      properties:
+        top:
+          type: number
+          format: double
+        bottom:
+          type: number
+          format: double
+        left:
+          type: number
+          format: double
+        right:
+          type: number
+          format: double
+      required:
+      - bottom
+      - left
+      - right
+      - top
+    MobileAppConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    PaymentAuthorizationApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    PaymentAuthorizationConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          calculationMode:
+            type: string
+            enum:
+            - INDIVIDUAL
+            - SUBCONTRACTING_CHAIN
+      required:
+      - calculationMode
+    ProductTypeConfig:
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+      required:
+      - type
+    ProjectsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    PublicApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          apiKeySet:
+            type: array
+            items:
+              $ref: "#/components/schemas/PublicApiKeyDetails"
+            uniqueItems: true
+      required:
+      - apiKeySet
+    PublicApiKeyDetails:
+      type: object
+      properties:
+        displayName:
+          type: string
+        internalName:
+          type: string
+        publicApiKey:
+          type: string
+      required:
+      - displayName
+      - internalName
+      - publicApiKey
+    RequirementReviewConfig:
+      type: object
+      properties:
+        requirementId:
+          type: string
+          format: uuid
+        price:
+          type: number
+        currencyId:
+          type: string
+          format: uuid
+        critical:
+          type: boolean
+          readOnly: true
+        documentType:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        subjectType:
+          type: string
+          readOnly: true
+      required:
+      - requirementId
+    RequirementsApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ResourcesApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ReviewConfig:
+      type: object
+      properties:
+        useSamePrice:
+          type: boolean
+        approvalPrice:
+          type: number
+        approvalCurrencyId:
+          type: string
+          format: uuid
+        rejectionPrice:
+          type: number
+        rejectionCurrencyId:
+          type: string
+          format: uuid
+      required:
+      - approvalCurrencyId
+      - approvalPrice
+      - rejectionCurrencyId
+      - rejectionPrice
+      - useSamePrice
+    ScheduledLinksConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    SiteHierarchyConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          levels:
+            type: array
+            items:
+              $ref: "#/components/schemas/LevelConfig"
+      required:
+      - levels
+    SsoConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    SystemProductAssignDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        config:
+          oneOf:
+          - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/BackupConfig"
+          - $ref: "#/components/schemas/ClientPlanConfig"
+          - $ref: "#/components/schemas/CompaniesContractsApiConfig"
+          - $ref: "#/components/schemas/ContractorPlanConfig"
+          - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/DocumentalManagementConfig"
+          - $ref: "#/components/schemas/EUCategoryConfig"
+          - $ref: "#/components/schemas/EmployeeTypeConfig"
+          - $ref: "#/components/schemas/ErpPropertiesConfig"
+          - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MobileAppConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
+          - $ref: "#/components/schemas/PaymentAuthorizationConfig"
+          - $ref: "#/components/schemas/ProjectsConfig"
+          - $ref: "#/components/schemas/PublicApiConfig"
+          - $ref: "#/components/schemas/RequirementsApiConfig"
+          - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ScheduledLinksConfig"
+          - $ref: "#/components/schemas/SiteHierarchyConfig"
+          - $ref: "#/components/schemas/SsoConfig"
+          - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/WorkPermitsConfig"
+      required:
+      - id
+    TrainingConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    WorkPermitsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     CreateVisitDto:
       type: object
       description: "Body for [POST /v1/companies/{companyId}/visit-register](#tag/visit-register-controller/POST/v1/companies/{companyId}/visit-register).\
@@ -5990,21 +9163,18 @@ components:
           - AREA
       required:
       - name
-    SiteAddressDto:
+    CreateRiskDto:
       type: object
       properties:
-        street:
+        name:
           type: string
-        city:
+          minLength: 1
+        description:
           type: string
-        state:
+        photo:
           type: string
-        county:
-          type: string
-        postalCode:
-          type: string
-        country:
-          type: string
+      required:
+      - name
     CreateRequirementDto:
       type: object
       properties:
@@ -6403,51 +9573,6 @@ components:
       - resourceIds
       - siteIds
       - status
-    ContractSiteDtoV2:
-      type: object
-      description: A site assignment with its own activity list and an optional explicit
-        scope. The scope is only applicable when the Site Hierarchy product is enabled.
-      properties:
-        siteId:
-          type: string
-          format: uuid
-          description: Site ID to include in the contract.
-        activities:
-          type: array
-          description: Activities this site covers; must not be empty.
-          items:
-            type: string
-            format: uuid
-        scopeSiteIds:
-          type: array
-          description: Optional explicit scope site IDs. When null the site itself
-            is used as the scope. Only applicable when the Site Hierarchy product
-            is enabled; ignored otherwise.
-          items:
-            type: string
-            format: uuid
-      required:
-      - activities
-      - siteId
-    SubcontractingDto:
-      type: object
-      description: Subcontracting policy for the contract.
-      properties:
-        allowed:
-          type: boolean
-          description: Whether subcontracting is allowed under this contract.
-        onlyClientAllowed:
-          type: boolean
-          description: "When true, only the client may create or authorize subcontractors."
-        maxLevel:
-          type: integer
-          format: int32
-          description: Maximum subcontract depth when allowed.
-        needsAuthorization:
-          type: boolean
-          description: Whether subcontract creation requires client authorization.
-      required:
-      - allowed
     UpdateContractDtoV2:
       type: object
       description: Partial update for PATCH contract. Omitted fields are left unchanged.
@@ -6508,9 +9633,6 @@ components:
           format: uuid
         photo:
           type: string
-    AccessControlApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
     AddressDto:
       type: object
       properties:
@@ -6524,593 +9646,6 @@ components:
           type: string
         postalCode:
           type: string
-    AutomaticReviewConfig:
-      type: object
-      properties:
-        useSamePrice:
-          type: boolean
-        genericPrice:
-          type: number
-        genericCurrencyId:
-          type: string
-          format: uuid
-        requirementPrices:
-          type: array
-          items:
-            $ref: "#/components/schemas/RequirementReviewConfig"
-      required:
-      - genericCurrencyId
-      - genericPrice
-      - useSamePrice
-    BackupConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    CardConfig:
-      type: object
-      properties:
-        paper:
-          type: string
-          enum:
-          - A4
-          - A5
-          - A3
-          - CUSTOM
-        customPaperWidthMm:
-          type: number
-          format: double
-        customPaperHeightMm:
-          type: number
-          format: double
-        orientation:
-          type: string
-          enum:
-          - PORTRAIT
-          - LANDSCAPE
-        sheetMarginsMm:
-          $ref: "#/components/schemas/MarginsMm"
-        columns:
-          type: integer
-          format: int32
-        rows:
-          type: integer
-          format: int32
-        labelWidthMm:
-          type: number
-          format: double
-        labelHeightMm:
-          type: number
-          format: double
-        labelGapMm:
-          $ref: "#/components/schemas/GapMm"
-        showBorder:
-          type: boolean
-        title:
-          type: string
-        fields:
-          type: array
-          items:
-            $ref: "#/components/schemas/CardTextField"
-        qr:
-          $ref: "#/components/schemas/CardQr"
-        photo:
-          $ref: "#/components/schemas/CardPhoto"
-        logo:
-          $ref: "#/components/schemas/CardLogo"
-        risks:
-          $ref: "#/components/schemas/CardRisks"
-      required:
-      - columns
-      - fields
-      - labelGapMm
-      - labelHeightMm
-      - labelWidthMm
-      - orientation
-      - paper
-      - qr
-      - rows
-      - sheetMarginsMm
-      - showBorder
-    CardLogo:
-      type: object
-      properties:
-        xMm:
-          type: number
-          format: double
-          writeOnly: true
-        yMm:
-          type: number
-          format: double
-          writeOnly: true
-        widthMm:
-          type: number
-          format: double
-        heightMm:
-          type: number
-          format: double
-        xmm:
-          type: number
-          format: double
-        ymm:
-          type: number
-          format: double
-      required:
-      - heightMm
-      - widthMm
-      - xmm
-      - ymm
-    CardPhoto:
-      type: object
-      properties:
-        policy:
-          type: string
-          enum:
-          - REQUIRED
-          - OPTIONAL
-          - HIDDEN
-        xMm:
-          type: number
-          format: double
-          writeOnly: true
-        yMm:
-          type: number
-          format: double
-          writeOnly: true
-        widthMm:
-          type: number
-          format: double
-        heightMm:
-          type: number
-          format: double
-        noPhotoText:
-          type: string
-        xmm:
-          type: number
-          format: double
-        ymm:
-          type: number
-          format: double
-      required:
-      - heightMm
-      - policy
-      - widthMm
-      - xmm
-      - ymm
-    CardQr:
-      type: object
-      properties:
-        xMm:
-          type: number
-          format: double
-          writeOnly: true
-        yMm:
-          type: number
-          format: double
-          writeOnly: true
-        sizeMm:
-          type: number
-          format: double
-        xmm:
-          type: number
-          format: double
-        ymm:
-          type: number
-          format: double
-      required:
-      - sizeMm
-      - xmm
-      - ymm
-    CardRisks:
-      type: object
-      properties:
-        xMm:
-          type: number
-          format: double
-          writeOnly: true
-        yMm:
-          type: number
-          format: double
-          writeOnly: true
-        iconSizeMm:
-          type: number
-          format: double
-        columns:
-          type: integer
-          format: int32
-        gapMm:
-          type: number
-          format: double
-        maxIcons:
-          type: integer
-          format: int32
-        xmm:
-          type: number
-          format: double
-        ymm:
-          type: number
-          format: double
-      required:
-      - columns
-      - gapMm
-      - iconSizeMm
-      - maxIcons
-      - xmm
-      - ymm
-    CardTextField:
-      type: object
-      properties:
-        field:
-          type: string
-          enum:
-          - TITLE
-          - WORKER_NAME
-          - IDENTITY
-          - CONTRACTOR
-          - CLIENT_NAME
-          - SITE
-          - VALIDITY_DATE
-          - SUBCONTRACTING
-        yMm:
-          type: number
-          format: double
-          writeOnly: true
-        fontPt:
-          type: number
-          format: double
-        xMm:
-          type: number
-          format: double
-          writeOnly: true
-        maxWidthMm:
-          type: number
-          format: double
-        style:
-          type: string
-          enum:
-          - REGULAR
-          - BOLD
-          - ITALIC
-          - UNDERLINE
-        centered:
-          type: boolean
-        xmm:
-          type: number
-          format: double
-        ymm:
-          type: number
-          format: double
-      required:
-      - centered
-      - field
-      - fontPt
-      - style
-      - ymm
-    ClientPlanConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          plan:
-            type: string
-          maxSites:
-            type: integer
-            format: int32
-          maxConnections:
-            type: integer
-            format: int32
-    CompaniesContractsApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ContractorPlanConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          plan:
-            type: string
-            enum:
-            - PLAN_0
-            - PLAN_1
-            - PLAN_2
-            - PLAN_3
-          maxNumberOfEmployees:
-            type: integer
-            format: int32
-          trials:
-            type: array
-            items:
-              $ref: "#/components/schemas/ContractorPlanTrial"
-          effectivePlan:
-            type: string
-            enum:
-            - PLAN_0
-            - PLAN_1
-            - PLAN_2
-            - PLAN_3
-      required:
-      - effectivePlan
-      - plan
-      - trials
-    ContractorPlanTrial:
-      type: object
-      properties:
-        plan:
-          type: string
-          enum:
-          - PLAN_0
-          - PLAN_1
-          - PLAN_2
-          - PLAN_3
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-      required:
-      - endDate
-      - plan
-      - startDate
-    CustomAccessCardsConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          mode:
-            type: string
-            enum:
-            - TEMPLATE
-            - CONFIGURABLE
-          templateKey:
-            type: string
-          cardConfig:
-            $ref: "#/components/schemas/CardConfig"
-      required:
-      - mode
-    DocumentalManagementConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          automatic:
-            $ref: "#/components/schemas/AutomaticReviewConfig"
-          standard:
-            $ref: "#/components/schemas/ReviewConfig"
-          custom:
-            $ref: "#/components/schemas/ReviewConfig"
-      required:
-      - automatic
-      - custom
-      - standard
-    EUCategoryConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          maxConnections:
-            type: integer
-            format: int32
-    EmployeeTypeConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ErpPropertiesConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    GapMm:
-      type: object
-      properties:
-        horizontal:
-          type: number
-          format: double
-        vertical:
-          type: number
-          format: double
-      required:
-      - horizontal
-      - vertical
-    InternalManagementConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          autoApproveEvidence:
-            type: boolean
-      required:
-      - autoApproveEvidence
-    LevelConfig:
-      type: object
-      properties:
-        level:
-          type: integer
-          format: int32
-        enabled:
-          type: boolean
-        maxInstances:
-          type: integer
-          format: int32
-        customName:
-          type: string
-      required:
-      - enabled
-      - level
-    MarginsMm:
-      type: object
-      properties:
-        top:
-          type: number
-          format: double
-        bottom:
-          type: number
-          format: double
-        left:
-          type: number
-          format: double
-        right:
-          type: number
-          format: double
-      required:
-      - bottom
-      - left
-      - right
-      - top
-    MobileAppConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    PaymentAuthorizationApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    PaymentAuthorizationConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          calculationMode:
-            type: string
-            enum:
-            - INDIVIDUAL
-            - SUBCONTRACTING_CHAIN
-      required:
-      - calculationMode
-    ProductTypeConfig:
-      discriminator:
-        propertyName: type
-      properties:
-        type:
-          type: string
-      required:
-      - type
-    ProjectsConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    PublicApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          apiKeySet:
-            type: array
-            items:
-              $ref: "#/components/schemas/PublicApiKeyDetails"
-            uniqueItems: true
-      required:
-      - apiKeySet
-    PublicApiKeyDetails:
-      type: object
-      properties:
-        displayName:
-          type: string
-        internalName:
-          type: string
-        publicApiKey:
-          type: string
-      required:
-      - displayName
-      - internalName
-      - publicApiKey
-    RequirementReviewConfig:
-      type: object
-      properties:
-        requirementId:
-          type: string
-          format: uuid
-        price:
-          type: number
-        currencyId:
-          type: string
-          format: uuid
-        critical:
-          type: boolean
-          readOnly: true
-        documentType:
-          type: string
-          readOnly: true
-        name:
-          type: string
-          readOnly: true
-        subjectType:
-          type: string
-          readOnly: true
-      required:
-      - requirementId
-    RequirementsApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ResourcesApiConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    ReviewConfig:
-      type: object
-      properties:
-        useSamePrice:
-          type: boolean
-        approvalPrice:
-          type: number
-        approvalCurrencyId:
-          type: string
-          format: uuid
-        rejectionPrice:
-          type: number
-        rejectionCurrencyId:
-          type: string
-          format: uuid
-      required:
-      - approvalCurrencyId
-      - approvalPrice
-      - rejectionCurrencyId
-      - rejectionPrice
-      - useSamePrice
-    ScheduledLinksConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    SiteHierarchyConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-      - type: object
-        properties:
-          levels:
-            type: array
-            items:
-              $ref: "#/components/schemas/LevelConfig"
-      required:
-      - levels
-    SsoConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
-    SystemProductAssignDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        config:
-          oneOf:
-          - $ref: "#/components/schemas/AccessControlApiConfig"
-          - $ref: "#/components/schemas/BackupConfig"
-          - $ref: "#/components/schemas/ClientPlanConfig"
-          - $ref: "#/components/schemas/CompaniesContractsApiConfig"
-          - $ref: "#/components/schemas/ContractorPlanConfig"
-          - $ref: "#/components/schemas/CustomAccessCardsConfig"
-          - $ref: "#/components/schemas/DocumentalManagementConfig"
-          - $ref: "#/components/schemas/EUCategoryConfig"
-          - $ref: "#/components/schemas/EmployeeTypeConfig"
-          - $ref: "#/components/schemas/ErpPropertiesConfig"
-          - $ref: "#/components/schemas/InternalManagementConfig"
-          - $ref: "#/components/schemas/MobileAppConfig"
-          - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
-          - $ref: "#/components/schemas/PaymentAuthorizationConfig"
-          - $ref: "#/components/schemas/ProjectsConfig"
-          - $ref: "#/components/schemas/PublicApiConfig"
-          - $ref: "#/components/schemas/RequirementsApiConfig"
-          - $ref: "#/components/schemas/ResourcesApiConfig"
-          - $ref: "#/components/schemas/ScheduledLinksConfig"
-          - $ref: "#/components/schemas/SiteHierarchyConfig"
-          - $ref: "#/components/schemas/SsoConfig"
-          - $ref: "#/components/schemas/TrainingConfig"
-          - $ref: "#/components/schemas/WorkPermitsConfig"
-      required:
-      - id
-    TrainingConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
     UpdateCompanyDto:
       type: object
       properties:
@@ -7168,9 +9703,6 @@ components:
           minLength: 0
         seedDemoData:
           type: boolean
-    WorkPermitsConfig:
-      allOf:
-      - $ref: "#/components/schemas/ProductTypeConfig"
     UpdateVisitExitDto:
       type: object
       description: "Body for [PATCH /v1/companies/{companyId}/visit-register/{visitRegisterId}](#tag/visit-register-controller/PATCH/v1/companies/{companyId}/visit-register/{visitRegisterId}).\
@@ -7197,6 +9729,34 @@ components:
           example: WEB
       required:
       - exitAt
+    UpdateVehicleDto:
+      type: object
+      properties:
+        name:
+          type: string
+        registrationPlate:
+          type: string
+        vehicleType:
+          type: string
+          format: uuid
+          description: Standard vehicle type id. Obtain from `GET /v1/standard-vehicle-types`.
+        manufacturer:
+          type: string
+        model:
+          type: string
+        tareWeight:
+          type: integer
+          format: int32
+        photo:
+          type: string
+        classifications:
+          type: array
+          description: "When provided, replaces the vehicle's existing classifications.\
+            \ See `CreateVehicleDto.classifications` for how to obtain `clientId`\
+            \ and `clientResourceTypeId`."
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
     UpdateEvidenceDto:
       type: object
       properties:
@@ -7204,6 +9764,73 @@ components:
           type: boolean
           description: "When set, toggles express validation for the submission while\
             \ still editable."
+    UpdateEquipmentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        serialNumber:
+          type: string
+        equipmentType:
+          type: string
+          format: uuid
+          description: Standard equipment type id. Obtain from `GET /v1/standard-equipment-types`.
+        manufacturer:
+          type: string
+        model:
+          type: string
+        photo:
+          type: string
+        classifications:
+          type: array
+          description: "When provided, replaces the equipment's existing classifications.\
+            \ See `CreateEquipmentDto.classifications` for how to obtain `clientId`\
+            \ and `clientResourceTypeId`."
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
+    UpdateEmployeeDto:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        identityType:
+          type: string
+          enum:
+          - PASSPORT
+          - IDENTITY_NUMBER
+          - SOCIAL_SECURITY_NUMBER
+          - OTHER
+        identity:
+          type: string
+        countryId:
+          type: string
+          format: uuid
+          description: Country id. Obtain from `GET /v1/countries`.
+        email:
+          type: string
+          format: email
+        phonePrefix:
+          type: string
+        phone:
+          type: string
+        photo:
+          type: string
+        birthDate:
+          type: string
+          format: date
+          description: Omit to leave unchanged; send null to clear; send a date to
+            set.
+        classifications:
+          type: array
+          description: "When provided, replaces the employee's existing classifications.\
+            \ See `CreateEmployeeDto.classifications` for how to obtain `clientId`\
+            \ and `clientResourceTypeId`."
+          items:
+            $ref: "#/components/schemas/ResourceCreateClassificationDto"
+          uniqueItems: true
     UpdateNotesDto:
       type: object
       properties:
@@ -7277,16 +9904,6 @@ components:
       - exitAt
       - ids
       - origin
-    IdsResponse:
-      type: object
-      properties:
-        ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-      required:
-      - ids
     UpdateTemporaryAuthorizationDto:
       type: object
       properties:
@@ -7413,6 +10030,83 @@ components:
       - contract
       - risks
       - site
+    PageData:
+      type: object
+      properties:
+        size:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+      required:
+      - number
+      - size
+      - totalElements
+      - totalPages
+    PageResponseSubcontractRequestV2:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubcontractRequestV2"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    SubcontractRequestV2:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        parentContractId:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        activityIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        contractor:
+          $ref: "#/components/schemas/IdAndNameV2"
+        subcontractor:
+          $ref: "#/components/schemas/IdAndNameV2"
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        status:
+          type: string
+          enum:
+          - PENDING
+        createdAt:
+          type: string
+          format: date-time
+      required:
+      - activityIds
+      - contractor
+      - createdAt
+      - dateFrom
+      - dateTo
+      - parentContractId
+      - requestId
+      - siteId
+      - status
+      - subcontractor
     ContractSiteV2:
       type: object
       properties:
@@ -7553,6 +10247,206 @@ components:
           type: boolean
       required:
       - allowed
+    ContractTreeNodeV2:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        client:
+          $ref: "#/components/schemas/IdAndNameV2"
+        contractor:
+          $ref: "#/components/schemas/IdAndNameV2"
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractTreeSiteV2"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractTreeNodeV2"
+        project:
+          $ref: "#/components/schemas/ProjectRef"
+      required:
+      - children
+      - client
+      - contractor
+      - id
+      - name
+      - sites
+    ContractTreeSiteV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        approvalStatus:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+        hasChildren:
+          type: boolean
+      required:
+      - activities
+      - hasChildren
+      - level
+      - name
+      - siteId
+    AssignedResourceV2:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+          - PRODUCT
+        name:
+          type: string
+        risks:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+      required:
+      - name
+      - resourceId
+      - resourceType
+      - risks
+    ContractSiteDetailsV2:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        siteId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        scopeSites:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScopeSiteRefV2"
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignedResourceV2"
+      required:
+      - activities
+      - contractId
+      - level
+      - name
+      - resources
+      - scopeSites
+      - siteId
+    SubcontractV2:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        subcontractor:
+          $ref: "#/components/schemas/IdAndNameV2"
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        approvalStatus:
+          type: string
+          enum:
+          - PENDING
+          - APPROVED
+        hasSubcontracts:
+          type: boolean
+      required:
+      - activities
+      - contractId
+      - dateFrom
+      - dateTo
+      - hasSubcontracts
+      - subcontractor
+    ContractResourcesV2:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteResourcesV2"
+      required:
+      - contractId
+      - sites
+    SiteResourcesV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignedResourceV2"
+      required:
+      - activities
+      - level
+      - name
+      - resources
+      - siteId
     Company:
       type: object
       properties:
@@ -7647,26 +10541,6 @@ components:
       - name
       - scopeSites
       - siteId
-    PageData:
-      type: object
-      properties:
-        size:
-          type: integer
-          format: int64
-        number:
-          type: integer
-          format: int64
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int64
-      required:
-      - number
-      - size
-      - totalElements
-      - totalPages
     PageResponseContractDataV2:
       type: object
       properties:
@@ -8214,6 +11088,26 @@ components:
       - id
       - name
       - taxId
+    CompanyBasicDataDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PagedModelCompanyBasicDataDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompanyBasicDataDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
     PagedModelResourceBasicData:
       type: object
       properties:
@@ -8242,6 +11136,31 @@ components:
       - id
       - name
       - resourceType
+    PageResponseSubcontractorResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubcontractorResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    SubcontractorResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
     CompanyClientData:
       type: object
       properties:
@@ -8787,6 +11706,50 @@ components:
       required:
       - id
       - level
+      - name
+    ContractorSiteHierarchyDto:
+      type: object
+      properties:
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteHierarchyNodeDto"
+      required:
+      - clientId
+      - clientName
+      - sites
+    PagedModelRiskDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/RiskDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    RiskDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        companyId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        photo:
+          type: string
+      required:
+      - companyId
+      - id
       - name
     Custody:
       type: object
@@ -10586,6 +13549,36 @@ components:
       required:
       - content
       - page
+    ContractorClient:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        types:
+          type: array
+          items:
+            $ref: "#/components/schemas/TypeData"
+      required:
+      - id
+      - name
+      - types
+    TypeData:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        standardTypeId:
+          type: string
+          format: uuid
+      required:
+      - id
+      - name
     ActivityDto:
       type: object
       properties:
@@ -11439,6 +14432,52 @@ components:
       required:
       - id
       - name
+    PagedModelSystemStandardVehicleType:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemStandardVehicleType"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    SystemStandardVehicleType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - id
+      - name
+    PagedModelSystemStandardEquipmentType:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/SystemStandardEquipmentType"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    SystemStandardEquipmentType:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - description
+      - id
+      - name
     PagedModelSystemLanguage:
       type: object
       properties:
@@ -11509,6 +14548,12 @@ x-tagGroups:
   - Resource lists
   - Assigned resources
   - Contract listings
+- name: Resources
+  tags:
+  - Employees
+  - Vehicles
+  - Equipment
+  - Assignments
 - name: Access control
   tags:
   - Visitors
@@ -11521,3 +14566,9 @@ x-tagGroups:
   - Configuration
   - Instances
   - Submissions
+- name: Companies and contracts
+  tags:
+  - Company
+  - Sites
+  - Contracts
+  - Subcontracts

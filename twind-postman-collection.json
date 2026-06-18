@@ -68,23 +68,6 @@
     "name" : "Companies",
     "description" : "Companies in the network: company details and summary, client companies for a contractor, contractors with active contracts, and member user lists.",
     "item" : [ {
-      "name" : "Get my company details",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:id",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":id" ],
-          "variable" : [ {
-            "key" : "id",
-            "value" : "{{id}}",
-            "description" : "Company id"
-          } ]
-        },
-        "description" : "Returns my company details. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
-      }
-    }, {
       "name" : "Get company by id",
       "request" : {
         "method" : "GET",
@@ -245,6 +228,23 @@
         },
         "description" : "Returns a paginated list of users for the company. Supports optional search (q), role filters, and selected user IDs."
       }
+    }, {
+      "name" : "Get my company details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ]
+        },
+        "description" : "Returns my company details. Use GET /v1/companies/{id}/summary when the caller does not belong to that company."
+      }
     } ]
   }, {
     "name" : "Lookups",
@@ -321,6 +321,54 @@
         "description" : "Paginated languages catalog. Filter by partial **name** or **code** match."
       }
     }, {
+      "name" : "List client activities",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/activities",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "activities" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID (client)"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Optional: narrow results to activities used by these contracts' engagements. Applied as an additional AND filter that takes precedence over `selected`: selected ids outside the contract scope are excluded.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
+      }
+    }, {
       "name" : "List sites",
       "request" : {
         "method" : "GET",
@@ -372,54 +420,6 @@
           } ]
         },
         "description" : "Retrieves paginated list of sites for a company. Use this endpoint to obtain site IDs for filtering in other endpoints."
-      }
-    }, {
-      "name" : "List client activities",
-      "request" : {
-        "method" : "GET",
-        "header" : [ ],
-        "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/activities",
-          "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "activities" ],
-          "variable" : [ {
-            "key" : "companyId",
-            "value" : "{{companyId}}",
-            "description" : "Company ID (client)"
-          } ],
-          "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "selected",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
-            "key" : "contractIds",
-            "value" : "",
-            "description" : "Optional: narrow results to activities used by these contracts' engagements. Applied as an additional AND filter that takes precedence over `selected`: selected ids outside the contract scope are excluded.",
-            "disabled" : true
-          }, {
-            "key" : "page",
-            "value" : "",
-            "description" : "Zero-based page index (0..N)",
-            "disabled" : true
-          }, {
-            "key" : "size",
-            "value" : "",
-            "description" : "The size of the page to be returned",
-            "disabled" : true
-          }, {
-            "key" : "sort",
-            "value" : "",
-            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
-            "disabled" : true
-          } ]
-        },
-        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
       }
     } ]
   }, {
@@ -899,6 +899,585 @@
           } ]
         },
         "description" : "Returns contract details with sites and their activities."
+      }
+    } ]
+  }, {
+    "name" : "Employees",
+    "description" : "CRUD operations for contractor employees, employee count, and type classifications.",
+    "item" : [ {
+      "name" : "Create employee",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the employee belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Creates a new employee resource for the company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get employee by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Employee resource ID. UUID of the employee to retrieve. Obtain it from `GET /v1/companies/{companyId}/employees` or from the response of `POST /v1/companies/{companyId}/employees`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the employee belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns a single employee by resource ID for the company."
+      }
+    }, {
+      "name" : "Update employee",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Employee resource ID. UUID of the employee to update. Obtain it from `GET /v1/companies/{companyId}/employees` or from the response of `POST /v1/companies/{companyId}/employees`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the employee belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Updates an existing employee. Only provided fields are modified; the `classifications` set, when provided, replaces the existing one.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete employee",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Employee resource ID. UUID of the employee to delete. Obtain it from `GET /v1/companies/{companyId}/employees` or from the response of `POST /v1/companies/{companyId}/employees`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the employee belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Soft-deletes an employee."
+      }
+    }, {
+      "name" : "Count employees",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/employees/total",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "employees", "total" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company whose employees are counted. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns the total number of employees for the company."
+      }
+    }, {
+      "name" : "List client employee type classifications",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/classification/employee-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "classification", "employee-types" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the contractor company. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns client-specific employee type classifications grouped by active client. Required when a client mandates an employee classification before the employee can be assigned to their contracts."
+      }
+    } ]
+  }, {
+    "name" : "Vehicles",
+    "description" : "CRUD operations for contractor vehicles and type catalogs (standard and client-specific).",
+    "item" : [ {
+      "name" : "List standard vehicle types",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/standard-vehicle-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "standard-vehicle-types" ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns the platform-level catalog of standard vehicle types. The standard vehicle type is a mandatory field when creating a vehicle."
+      }
+    }, {
+      "name" : "Create vehicle",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/vehicles",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "vehicles" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the vehicle belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Creates a new vehicle resource for the company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get vehicle by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/vehicles/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "vehicles", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Vehicle resource ID. UUID of the vehicle to retrieve. Obtain it from `GET /v1/companies/{companyId}/vehicles` or from the response of `POST /v1/companies/{companyId}/vehicles`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the vehicle belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns a single vehicle by resource ID for the company."
+      }
+    }, {
+      "name" : "Update vehicle",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/vehicles/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "vehicles", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Vehicle resource ID. UUID of the vehicle to update. Obtain it from `GET /v1/companies/{companyId}/vehicles` or from the response of `POST /v1/companies/{companyId}/vehicles`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the vehicle belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Updates an existing vehicle for the company. Only provided fields are modified; the `classifications` set, when provided, replaces the existing one.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete vehicle",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/vehicles/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "vehicles", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Vehicle resource ID. UUID of the vehicle to delete. Obtain it from `GET /v1/companies/{companyId}/vehicles` or from the response of `POST /v1/companies/{companyId}/vehicles`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the vehicle belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Soft-deletes a vehicle for the company."
+      }
+    }, {
+      "name" : "List client vehicle type classifications",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/classification/vehicle-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "classification", "vehicle-types" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the contractor company. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns client-specific vehicle type classifications grouped by active client. Required when a client mandates a vehicle classification before the vehicle can be assigned to their contracts."
+      }
+    } ]
+  }, {
+    "name" : "Equipment",
+    "description" : "CRUD operations for contractor equipment and type catalogs (standard and client-specific).",
+    "item" : [ {
+      "name" : "List standard equipment types",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/standard-equipment-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "standard-equipment-types" ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns the platform-level catalog of standard equipment types. The standard equipment type is a mandatory field when creating equipment."
+      }
+    }, {
+      "name" : "Create equipment",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/equipment",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "equipment" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the equipment belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Creates a new equipment resource for the company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get equipment by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/equipment/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "equipment", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Equipment resource ID. UUID of the equipment to retrieve. Obtain it from `GET /v1/companies/{companyId}/equipment` or from the response of `POST /v1/companies/{companyId}/equipment`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the equipment belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns a single equipment item by resource ID for the company."
+      }
+    }, {
+      "name" : "Update equipment",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/equipment/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "equipment", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Equipment resource ID. UUID of the equipment to update. Obtain it from `GET /v1/companies/{companyId}/equipment` or from the response of `POST /v1/companies/{companyId}/equipment`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the equipment belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Updates existing equipment for the company. Only provided fields are modified; the `classifications` set, when provided, replaces the existing one.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete equipment",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/equipment/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "equipment", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Equipment resource ID. UUID of the equipment to delete. Obtain it from `GET /v1/companies/{companyId}/equipment` or from the response of `POST /v1/companies/{companyId}/equipment`."
+          }, {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company the equipment belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Soft-deletes equipment for the company."
+      }
+    }, {
+      "name" : "List client equipment type classifications",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/classification/equipment-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "classification", "equipment-types" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the contractor company. Obtain it from `GET /v1/users/me/companies`."
+          } ]
+        },
+        "description" : "Returns client-specific equipment type classifications grouped by active client. Required when a client mandates an equipment classification before it can be assigned to their contracts."
+      }
+    } ]
+  }, {
+    "name" : "Assignments",
+    "description" : "Site details, resource assignments to contract sites, and risk assignments.",
+    "item" : [ {
+      "name" : "List risks for a company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/risks",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "risks" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID. UUID of the company whose risks are listed. Obtain it from `GET /v1/users/me/companies`."
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated risks configured by the company. Risks define potential dangers or safety responsibilities associated with employees in contract engagements, and determine which compliance requirements are triggered when assigned."
+      }
+    }, {
+      "name" : "Get site details",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/sites/:siteId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "sites", ":siteId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          }, {
+            "key" : "siteId",
+            "value" : "{{siteId}}",
+            "description" : "Site ID"
+          } ]
+        },
+        "description" : "Returns activities and assigned resources for a specific site on a contract."
+      }
+    }, {
+      "name" : "Set site resources",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/sites/:siteId/resources",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "sites", ":siteId", "resources" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID that owns the resources."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID the site belongs to."
+          }, {
+            "key" : "siteId",
+            "value" : "{{siteId}}",
+            "description" : "Site ID whose resources to set."
+          } ]
+        },
+        "description" : "Replaces the complete resource assignment for a (contract, site) pair in a single operation. The payload defines the desired state: resources included are assigned, resources currently assigned but absent are unassigned. The same desired state is written to every activity at the site. For employee resources, optional **riskIds** can be included to associate risks at assignment time.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Update risks for a resource at a site",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/sites/:siteId/resources/:resourceId/risks",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "sites", ":siteId", "resources", ":resourceId", "risks" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID that owns the resources."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID the site belongs to."
+          }, {
+            "key" : "siteId",
+            "value" : "{{siteId}}",
+            "description" : "Site ID where the resource is assigned."
+          }, {
+            "key" : "resourceId",
+            "value" : "{{resourceId}}",
+            "description" : "Resource ID whose risks to update."
+          } ]
+        },
+        "description" : "Replaces the risk associations for a resource assigned at the (contract, site) pair. The payload defines the complete desired risk set; risks not included are removed. The same risk set is written uniformly to every activity at the site.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
       }
     } ]
   }, {
@@ -2947,6 +3526,726 @@
             }
           }
         }
+      }
+    } ]
+  }, {
+    "name" : "Company",
+    "description" : "Company profile: update details, create contractors, and subcontractor hierarchy.",
+    "item" : [ {
+      "name" : "Update company details",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id to update"
+          } ]
+        },
+        "description" : "Update the information of an existing contractor company. **Body:** fields such as name, contact, address, products, and access-control configuration.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Create contractor company for a client",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "contractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Client company id that will own the relationship to the new contractor"
+          } ]
+        },
+        "description" : "Creates a new **contractor** company and links it to the client company.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List child subcontractors",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/all-child-subcontractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "all-child-subcontractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search on subcontractor name",
+            "disabled" : true
+          }, {
+            "key" : "activeContractOnly",
+            "value" : "",
+            "description" : "When true, only entries with an active contract",
+            "disabled" : true
+          }, {
+            "key" : "companyScope",
+            "value" : "",
+            "description" : "Subcontractor visibility scope",
+            "disabled" : true
+          }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional restrict to these subcontractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated child subcontractor companies under the caller’s contract network. **Search:** optional `q` filters by name. **Scope:** `companyScope` (`ALL`, `MY_COMPANY`, `MY_SUBCONTRACTORS`). **Contracts:** `activeContractOnly` limits to active relationships. **Selection:** `selected` restricts to given subcontractor IDs."
+      }
+    } ]
+  }, {
+    "name" : "Sites",
+    "description" : "Site management: create, read, update, and contractor views including hierarchy.",
+    "item" : [ {
+      "name" : "Create site",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id under which the site is created"
+          } ]
+        },
+        "description" : "Creates a new site under the company. **Body:** `CreateSiteDto` — name, optional phone, photo, address, optional `parentId` / hierarchy (`childrenIds`, `level`), and timestamps as applicable. Returns the new site **id**.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get site by id",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id owning the site"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Site id"
+          } ],
+          "query" : [ {
+            "key" : "skipTeamFilter",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a single site for a company."
+      }
+    }, {
+      "name" : "Update site",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company id owning the site"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Site id to update"
+          } ],
+          "query" : [ {
+            "key" : "skipTeamFilter",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Updates an existing site. **Body:** mutable fields (name, contact, address, hierarchy links).",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List client sites as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search on site name or related text handled by the query",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Paginated sites of **client** companies the contractor works with. **Search:** optional `q` filters sites by text. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
+      }
+    }, {
+      "name" : "Client site hierarchy as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/sites/as-contractor/hierarchy",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "sites", "as-contractor", "hierarchy" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search on site name",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns site hierarchy trees for each **client** company the contractor has active contracts with. Sites are expanded to full hierarchy branches from the engagement scope. **Search:** optional `q` filters sites by name."
+      }
+    } ]
+  }, {
+    "name" : "Contracts",
+    "description" : "Contract lifecycle: create, update, soft-delete; sites and activities are managed through the contract body; resource and hierarchy tree views; and contractor contract lists.",
+    "item" : [ {
+      "name" : "Create contract",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          } ]
+        },
+        "description" : "Creates a contract. Each site in the body carries its own activity list.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Update contract",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract or subcontract ID to update"
+          } ]
+        },
+        "description" : "Partially updates a contract. When sites or activities are provided they represent the full desired state; the server diffs against the current state and applies adds/removes. Sites are immutable for subcontracts.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete contract",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID to delete"
+          } ]
+        },
+        "description" : "Soft-deletes the contract and all its subcontracts."
+      }
+    }, {
+      "name" : "Set contract resources (batch)",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/resources",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "resources" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID that owns the resources."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID whose resources to set."
+          } ]
+        },
+        "description" : "Replaces the complete resource assignment for multiple (contract, site) pairs in a single atomic operation. Each entry defines the desired state for one site: resources included are assigned, resources currently assigned but absent are unassigned. All site assignments commit or roll back as a unit. Requires the 'assign-resources-batch' feature flag to be active.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get contract tree",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/tree",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "tree" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Client company ID"
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID"
+          } ]
+        },
+        "description" : "Returns the full contract hierarchy tree. Each node shows sites with their activities bundle."
+      }
+    }, {
+      "name" : "Get contracts where my company is client",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/with-contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", "with-contractors" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractName",
+            "value" : "",
+            "description" : "Deprecated — use 'contractNames' instead.",
+            "disabled" : true
+          }, {
+            "key" : "contractNames",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showSubcontracts",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "showOnlyInternalManagement",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "contractorTaxId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "projectIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated contracts where the specified company acts as client. **Allowed sort fields:** `name` (contract name, default ascending); `client.name` (client company name); `contractor.name` (contractor company name); `mainContractor.name` (main contractor company name); `dateFrom` (contract start date); `dateTo` (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
+      }
+    } ]
+  }, {
+    "name" : "Subcontracts",
+    "description" : "Subcontracting relationships: direct creation, requests (list, create, approve, reject), contractor view, and subcontracts at a contract site.",
+    "item" : [ {
+      "name" : "Create subcontract",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:contractorId/contracts/:parentContractId/subcontracts",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":contractorId", "contracts", ":parentContractId", "subcontracts" ],
+          "variable" : [ {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : ""
+          }, {
+            "key" : "parentContractId",
+            "value" : "{{parentContractId}}",
+            "description" : ""
+          } ]
+        },
+        "description" : "Direct subcontract creation. Fails if the parent contract requires authorisation. Returns one child-contract ID per contractorId in the body.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Request subcontract",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:contractorId/contracts/:parentContractId/subcontracts/requests",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":contractorId", "contracts", ":parentContractId", "subcontracts", "requests" ],
+          "variable" : [ {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : ""
+          }, {
+            "key" : "parentContractId",
+            "value" : "{{parentContractId}}",
+            "description" : ""
+          } ]
+        },
+        "description" : "Creates a pending subcontract request per contractorId in the body, bundling all activityIds into one row.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List subcontract requests",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/subcontracts/requests",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "subcontracts", "requests" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated V2 subcontract requests for the client company. Filter by contractId and/or siteId."
+      }
+    }, {
+      "name" : "Approve subcontract request",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/subcontracts/requests/:requestId/approve",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "subcontracts", "requests", ":requestId", "approve" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          }, {
+            "key" : "requestId",
+            "value" : "{{requestId}}",
+            "description" : ""
+          } ]
+        },
+        "description" : "Approves the bundle request and materialises the child contract with one engagement per activity."
+      }
+    }, {
+      "name" : "Reject subcontract request",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/subcontracts/requests/:requestId/reject",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "subcontracts", "requests", ":requestId", "reject" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          }, {
+            "key" : "requestId",
+            "value" : "{{requestId}}",
+            "description" : ""
+          } ]
+        },
+        "description" : "Rejects the bundle request and deletes the pending row."
+      }
+    }, {
+      "name" : "List subcontract requests as contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/subcontracts/requests/as-contractor",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "subcontracts", "requests", "as-contractor" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          } ],
+          "query" : [ {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns paginated V2 subcontract requests where the path company is the requesting contractor."
+      }
+    }, {
+      "name" : "List subcontracts at site",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/sites/:siteId/subcontracts",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "sites", ":siteId", "subcontracts" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : ""
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : ""
+          }, {
+            "key" : "siteId",
+            "value" : "{{siteId}}",
+            "description" : ""
+          } ]
+        },
+        "description" : "Returns all subcontracts at the given (contract, site) pair. Each entry groups activities by child contract."
       }
     } ]
   } ]
