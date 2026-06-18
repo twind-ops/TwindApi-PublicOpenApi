@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@scalar/api-reference"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <script src="guides-data.js"></script>
   </head>
 
@@ -38,17 +39,8 @@
         </div>
 
         <nav class="sidebar-nav">
-          <!-- API Reference -->
-          <a class="nav-item active" id="nav-api" onclick="showSection('api')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-            </svg>
-            <span>API Reference</span>
-          </a>
-
           <!-- Guides -->
-          <a class="nav-item" id="nav-guides" onclick="showSection('guides')">
+          <a class="nav-item active" id="nav-guides" onclick="showSection('guides')">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
               <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
@@ -58,11 +50,20 @@
           <div class="nav-subitems" id="nav-guides-subitems">
             <!-- Generated dynamically from guides-data.js -->
           </div>
+
+          <!-- API Reference -->
+          <a class="nav-item" id="nav-api" onclick="showSection('api')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+            <span>API Reference</span>
+          </a>
         </nav>
       </aside>
 
       <main class="content">
-        <div id="api-container" class="visible"></div>
+        <div id="api-container"></div>
         <div id="guides-container">
           <div class="guides-wrapper">
             <div class="guides-header">
@@ -95,30 +96,81 @@
         darkMode: true,
       });
 
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
       // Generate navbar subitems from guides data
       function initNavbar() {
         const container = document.getElementById("nav-guides-subitems");
-        container.innerHTML = GUIDES_DATA.map(
-          (guide) => `
-          <a class="nav-subitem" id="nav-guide-${guide.id}" onclick="showGuide('${guide.file}', '${guide.id}')">
-            <img src="${guide.icon}" width="14" height="14" alt="" class="nav-icon" />
-            <span>${guide.title}</span>
+        const renderNavGuide = (guide) => `
+          <a class="nav-subitem" id="nav-guide-${escapeHtml(guide.id)}" href="#" data-guide-file="${escapeHtml(guide.file)}" data-guide-id="${escapeHtml(guide.id)}">
+            <img src="${escapeHtml(guide.icon)}" width="14" height="14" alt="" class="nav-icon" />
+            <span>${escapeHtml(guide.title)}</span>
           </a>
-        `
-        ).join("");
+        `;
+        container.innerHTML = DOMPurify.sanitize(GUIDES_DATA.map((item) => {
+          if (item.type === "group") {
+            const directItems = (item.items || []).map(renderNavGuide).join("");
+            const products = (item.products || [])
+              .filter((product) => product.items.length > 0)
+              .map((product) => `
+                <details class="nav-collapsible nav-product">
+                  <summary class="nav-group-label nav-product-label">${escapeHtml(product.title)}</summary>
+                  ${product.items.map(renderNavGuide).join("")}
+                </details>
+              `).join("");
+            if (!directItems && !products) return "";
+            return `
+              <details class="nav-collapsible nav-group">
+                <summary class="nav-group-label">${item.icon ? `<img src="${escapeHtml(item.icon)}" width="14" height="14" alt="" class="nav-icon" />` : ""}${escapeHtml(item.title)}</summary>
+                ${directItems}${products}
+              </details>
+            `;
+          }
+          return renderNavGuide(item);
+        }).join(""));
+        container.addEventListener("click", function(e) {
+          const link = e.target.closest("a[data-guide-file]");
+          if (!link) return;
+          e.preventDefault();
+          showGuide(link.dataset.guideFile, link.dataset.guideId);
+        });
       }
 
-      // Initialize navbar on page load
+      // Initialize navbar and guides list once on page load
       initNavbar();
+      renderGuidesList();
+
+      // When a nav sidebar collapsible closes, also close any nav collapsibles nested inside it.
+      // Restricted to #sidebar so guides-list and curl-block <details> are not affected.
+      document.addEventListener("toggle", function (e) {
+        const details = e.target;
+        if (!(details instanceof HTMLDetailsElement)) return;
+        if (!details.closest("#sidebar")) return;
+        if (details.open) {
+          details.querySelectorAll("details").forEach((d) => { d.open = true; });
+        } else {
+          details.querySelectorAll("details[open]").forEach((d) => { d.open = false; });
+        }
+      }, true);
 
       // Restore state from URL on load
       document.addEventListener('DOMContentLoaded', function() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('guide')) {
           const guideId = params.get('guide');
-          const guide = GUIDES_DATA.find(g => g.id === guideId);
+          const guide = allGuides().find(g => g.id === guideId);
           if (guide) showGuide(guide.file, guide.id);
-        } else if (params.get('section') === 'guides') {
+          else showSection('guides');
+        } else if (params.get('section') === 'api' || window.location.hash.startsWith('#tag/')) {
+          showSection('api');
+        } else {
           showSection('guides');
         }
       });
@@ -127,12 +179,12 @@
       window.addEventListener('popstate', function() {
         const params = new URLSearchParams(window.location.search);
         if (params.get('guide')) {
-          const guide = GUIDES_DATA.find(g => g.id === params.get('guide'));
+          const guide = allGuides().find(g => g.id === params.get('guide'));
           if (guide) showGuide(guide.file, guide.id);
         } else if (params.get('section') === 'guides') {
           showSection('guides');
         } else {
-          showSection('api');
+          showSection('guides');
         }
       });
 
@@ -146,8 +198,28 @@
         });
         if (elementId) {
           const el = document.getElementById(elementId);
-          if (el) el.classList.add("active");
+          if (el) {
+            el.classList.add("active");
+            let group = el.closest("details.nav-collapsible");
+            while (group) {
+              group.open = true;
+              group = group.parentElement?.closest("details.nav-collapsible");
+            }
+          }
         }
+      }
+
+      // Chromium resets <details open> when an ancestor goes through display:none.
+      // Save/restore the open state around each hide/show cycle.
+      function saveGuidesOpenState() {
+        document.querySelectorAll("#guides-list details").forEach((d) => {
+          d.dataset.savedOpen = d.open ? "1" : "0";
+        });
+      }
+      function restoreGuidesOpenState() {
+        document.querySelectorAll("#guides-list details").forEach((d) => {
+          d.open = d.dataset.savedOpen === "1";
+        });
       }
 
       function showSection(section) {
@@ -155,6 +227,7 @@
         const guidesContainer = document.getElementById("guides-container");
         const guideContentContainer = document.getElementById("guide-content-container");
 
+        saveGuidesOpenState();
         apiContainer.classList.remove("visible");
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.remove("visible");
@@ -162,18 +235,19 @@
         if (section === "api") {
           apiContainer.classList.add("visible");
           setActiveNav("nav-api");
-          history.pushState({}, '', '?');
+          if (!window.location.hash.startsWith('#tag/')) {
+            history.pushState({}, '', '?');
+          }
         } else if (section === "guides") {
           guidesContainer.classList.add("visible");
+          restoreGuidesOpenState();
           setActiveNav("nav-guides");
-          renderGuidesList();
           history.pushState({}, '', '?section=guides');
         }
       }
 
       /**
        * GitHub-style heading slugs so [text](#understanding-ids) matches ## Understanding IDs.
-       * Marked does not emit id on headings by default.
        */
       function addHeadingIdsToGuideContent(root) {
         if (!root) return;
@@ -195,27 +269,104 @@
         });
       }
 
+      function allGuides() {
+        return GUIDES_DATA.flatMap((item) => {
+          if (item.type !== "group") return [item];
+          return [
+            ...(item.items || []),
+            ...(item.products || []).flatMap((product) => product.items),
+          ];
+        });
+      }
+
       /**
-       * Markdown links like [x](other-guide.md) resolve against the site root and open
-       * raw files. Rewrite them to call showGuide for in-app navigation.
+       * Rewrite relative .md links to call showGuide for in-app navigation.
        */
+      function rewriteApiReferenceLinks(container) {
+        if (!container) return;
+        // Rewrite "#tag/..." hrefs to "?#tag/..." so clicking causes a full page
+        // navigation to the root with that hash. DOMContentLoaded detects the #tag/
+        // hash and shows the API section — the same behaviour as the old
+        // ../index.html#tag/... links that the guides originally used.
+        container.querySelectorAll("a[href]").forEach((a) => {
+          const href = a.getAttribute("href");
+          if (!href || !href.startsWith("#tag/")) return;
+          a.setAttribute("href", "?" + href);
+        });
+      }
+
       function rewriteRelativeMarkdownLinks(container) {
         if (!container) return;
         container.querySelectorAll("a[href]").forEach((a) => {
           const href = a.getAttribute("href");
           if (!href || /^https?:\/\//i.test(href) || href.startsWith("mailto:")) return;
-          if (href.includes("..")) return;
+          if (href.includes("..")) {
+            const url = new URL(href, "http://x/guides/");
+            const section = url.searchParams.get("section");
+            if (section) {
+              a.setAttribute("href", "#");
+              a.addEventListener("click", function (e) {
+                e.preventDefault();
+                showSection(section);
+              });
+            }
+            return;
+          }
           const hashIndex = href.indexOf("#");
           const pathPart = hashIndex >= 0 ? href.slice(0, hashIndex) : href;
           if (!pathPart.toLowerCase().endsWith(".md")) return;
           const file = pathPart.replace(/^\.\//, "").split("/").pop();
-          const guide = GUIDES_DATA.find((g) => g.file === file);
+          const guide = allGuides().find((g) => g.file === file);
           if (!guide) return;
           a.setAttribute("href", "#");
           a.addEventListener("click", function (e) {
             e.preventDefault();
             showGuide(file, guide.id);
           });
+        });
+      }
+
+      function makeCurlBlocksCollapsible(root) {
+        if (!root) return;
+        root.querySelectorAll("pre").forEach((pre) => {
+          const code = pre.querySelector("code");
+          if (!code || !code.textContent.trim().startsWith("curl")) return;
+          const prev = pre.previousElementSibling;
+          const details = document.createElement("details");
+          details.className = "curl-block";
+          const summary = document.createElement("summary");
+          summary.className = "curl-block-summary";
+          if (prev && /^H[1-6]$/.test(prev.tagName)) {
+            Array.from(prev.childNodes).forEach((n) => summary.appendChild(n.cloneNode(true)));
+            summary.className = prev.className + " curl-block-summary";
+            prev.replaceWith(details);
+          } else {
+            summary.textContent = "curl example";
+            pre.parentNode.insertBefore(details, pre);
+          }
+          details.appendChild(summary);
+          details.appendChild(pre);
+          // Also pull in any response label + response block that follow
+          let next = details.nextElementSibling;
+          while (next) {
+            const isResponseLabel = next.tagName === "P" && /^response/i.test(next.textContent.trim());
+            const isResponseBlock = next.tagName === "PRE";
+            if (isResponseLabel || isResponseBlock) {
+              const toMove = next;
+              next = next.nextElementSibling;
+              details.appendChild(toMove);
+            } else {
+              break;
+            }
+          }
+          // Pull in a trailing paragraph only if the element after it is a major section
+          // heading (H1/H2) or nothing — meaning it's a closing note on the example.
+          if (next && next.tagName === "P") {
+            const afterNext = next.nextElementSibling;
+            if (!afterNext || /^H[12]$/.test(afterNext.tagName)) {
+              details.appendChild(next);
+            }
+          }
         });
       }
 
@@ -244,7 +395,7 @@
           const pathPart = href.split("#")[0];
           if (!pathPart.toLowerCase().endsWith(".md")) return;
           const file = pathPart.replace(/^\.\//, "").split("/").pop();
-          const guide = GUIDES_DATA.find((g) => g.file === file);
+          const guide = allGuides().find((g) => g.file === file);
           if (!guide) return;
           e.preventDefault();
           e.stopPropagation();
@@ -253,16 +404,96 @@
         true
       );
 
+      function renderGuideCard(guide) {
+        const a = document.createElement("a");
+        a.className = "guide-card";
+        a.href = "#";
+        a.dataset.guideFile = guide.file;
+        a.dataset.guideId = guide.id;
+        const h3 = document.createElement("h3");
+        if (guide.icon) {
+          const img = document.createElement("img");
+          img.src = guide.icon;
+          img.width = 20;
+          img.height = 20;
+          img.alt = "";
+          img.className = "guide-icon";
+          h3.appendChild(img);
+          h3.appendChild(document.createTextNode(" " + guide.title));
+        } else {
+          h3.textContent = guide.title;
+        }
+        const p = document.createElement("p");
+        p.textContent = guide.description;
+        a.appendChild(h3);
+        a.appendChild(p);
+        return a;
+      }
+
       function renderGuidesList() {
         const container = document.getElementById("guides-list");
-        container.innerHTML = GUIDES_DATA.map(
-          (guide) => `
-          <a class="guide-card" href="#" onclick="showGuide('${guide.file}', '${guide.id}'); return false;">
-            <h3><img src="${guide.icon}" width="20" height="20" alt="" class="guide-icon" /> ${guide.title}</h3>
-            <p>${guide.description}</p>
-          </a>`
-        ).join("");
+        container.textContent = "";
+
+        GUIDES_DATA.forEach((item) => {
+          if (item.type === "group") {
+            const details = document.createElement("details");
+            details.className = "guide-group";
+
+            const summary = document.createElement("summary");
+            summary.className = "guide-group-title";
+            if (item.icon) {
+              const img = document.createElement("img");
+              img.src = item.icon;
+              img.width = 20;
+              img.height = 20;
+              img.alt = "";
+              img.className = "guide-icon";
+              summary.appendChild(img);
+            }
+            summary.appendChild(document.createTextNode(item.title));
+            details.appendChild(summary);
+
+            const groupList = document.createElement("div");
+            groupList.className = "guide-group-list";
+
+            (item.items || []).forEach((g) => groupList.appendChild(renderGuideCard(g)));
+
+            (item.products || []).forEach((product) => {
+              const prodDetails = document.createElement("details");
+              prodDetails.className = "guide-product";
+              const prodSummary = document.createElement("summary");
+              prodSummary.className = "guide-product-title";
+              prodSummary.textContent = product.title;
+              prodDetails.appendChild(prodSummary);
+              const prodList = document.createElement("div");
+              prodList.className = "guide-product-list";
+              if (product.items.length) {
+                product.items.forEach((g) => prodList.appendChild(renderGuideCard(g)));
+              } else {
+                const empty = document.createElement("p");
+                empty.className = "guide-product-empty";
+                empty.textContent = "No guides available yet.";
+                prodList.appendChild(empty);
+              }
+              prodDetails.appendChild(prodList);
+              groupList.appendChild(prodDetails);
+            });
+
+            details.appendChild(groupList);
+            container.appendChild(details);
+          } else {
+            container.appendChild(renderGuideCard(item));
+          }
+        });
+
       }
+
+      document.getElementById("guides-list").addEventListener("click", function(e) {
+        const link = e.target.closest("a[data-guide-file]");
+        if (!link) return;
+        e.preventDefault();
+        showGuide(link.dataset.guideFile, link.dataset.guideId);
+      });
 
       function showGuide(file, guideId) {
         const apiContainer = document.getElementById("api-container");
@@ -270,45 +501,43 @@
         const guideContentContainer = document.getElementById("guide-content-container");
         const guideContent = document.getElementById("guide-content");
 
+        saveGuidesOpenState();
         apiContainer.classList.remove("visible");
         guidesContainer.classList.remove("visible");
         guideContentContainer.classList.add("visible");
         setActiveNav("nav-guide-" + guideId);
         history.pushState({}, '', '?guide=' + guideId);
 
-        // Show loading
-        guideContent.innerHTML = '<p style="color: #8b8b9e;">Loading...</p>';
+        guideContent.innerHTML = DOMPurify.sanitize('<p style="color: #8b8b9e;">Loading...</p>');
 
-        // Fetch and render markdown
         fetch('guides/' + file)
           .then((res) => {
             if (!res.ok) throw new Error('Not found');
             return res.text();
           })
           .then((md) => {
-            // Configure marked to rewrite image paths (relative to guides folder)
             const renderer = new marked.Renderer();
             const originalImage = renderer.image.bind(renderer);
             renderer.image = function(token) {
-              // Prepend 'guides/' to relative image paths
               if (token.href && !token.href.startsWith('http') && !token.href.startsWith('/')) {
                 token.href = 'guides/' + token.href;
               }
               return originalImage(token);
             };
-            guideContent.innerHTML = marked.parse(md, { renderer });
+            guideContent.innerHTML = DOMPurify.sanitize(marked.parse(md, { renderer }));
             addHeadingIdsToGuideContent(guideContent);
             rewriteRelativeMarkdownLinks(guideContent);
-            // Apply syntax highlighting
+            rewriteApiReferenceLinks(guideContent);
+            makeCurlBlocksCollapsible(guideContent);
             document.querySelectorAll("#guide-content pre code").forEach((block) => {
               hljs.highlightElement(block);
             });
           })
           .catch(() => {
-            guideContent.innerHTML = `
+            guideContent.innerHTML = DOMPurify.sanitize(`
               <h2 style="color: #f87171;">Guide not found</h2>
               <p style="color: #8b8b9e;">The requested guide could not be loaded.</p>
-            `;
+            `);
           });
       }
     </script>

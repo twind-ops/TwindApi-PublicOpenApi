@@ -57,7 +57,7 @@ A successful response indicates that your API key is valid and properly configur
 
 ## Next Steps
 
-- Explore the [API Reference](../index.html) for all available endpoints
+- Explore the [API Reference](../index.html?section=api) for all available endpoints
 - Check out other guides for common integration patterns
 
 ---
