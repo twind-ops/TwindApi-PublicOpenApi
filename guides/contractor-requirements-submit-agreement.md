@@ -9,7 +9,7 @@ Some requirements ask your company to accept a set of terms or policies rather t
 
 ## Submit the acceptance
 
-[`POST /v1/companies/{companyId}/evidences/agreement`](#tag/evidence/POST/v1/companies/{companyId}/evidences/agreement)
+[`POST /v1/companies/{companyId}/evidences/agreement`](#tag/submissions/POST/v1/companies/{companyId}/evidences/agreement)
 
 ### Example: Accept an agreement requirement
 

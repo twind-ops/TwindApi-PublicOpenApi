@@ -350,7 +350,7 @@ The Payment Authorization API tells you *which* requirement instance is blocking
 its full configuration or evidence. To get that, dereference the `requirementInstanceId`
 against the **Requirements API**:
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/requirements/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
 
 - `instanceId` = the `requirementInstanceId` from the issue.
 - `companyId` = the issue's **`contractor.id`** (the company that owns the requirement) —

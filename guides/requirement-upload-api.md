@@ -56,7 +56,7 @@ upload routes).
 ## Step 1: Request a presigned upload URL
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`GET /v1/companies/{companyId}/requirements/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/requirements/GET/v1/companies/{companyId}/requirements/temporary-upload-url)
+[`GET /v1/companies/{companyId}/requirements/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/configuration/GET/v1/companies/{companyId}/requirements/temporary-upload-url)
 
 `{mime}` must be one of the accepted MIME types listed in
 [Supported content types](#supported-content-types).
@@ -131,7 +131,7 @@ After a successful upload, the object must exist at the **`key`** in
 ### Create requirement
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`POST /v1/companies/{companyId}/requirements`](#tag/requirements/POST/v1/companies/{companyId}/requirements) (`Content-Type: application/json`)
+[`POST /v1/companies/{companyId}/requirements`](#tag/configuration/POST/v1/companies/{companyId}/requirements) (`Content-Type: application/json`)
 
 ### Body — `templateFile`
 
@@ -185,7 +185,7 @@ Unlike **`POST .../evidences/upload`**, which returns **`201 Created`**, **`POST
 Replace or add a template on an existing requirement:
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`PUT /v1/companies/{companyId}/requirements/{requirementId}`](#tag/requirements/PUT/v1/companies/{companyId}/requirements/{requirementId}) (`Content-Type: application/json`)
+[`PUT /v1/companies/{companyId}/requirements/{requirementId}`](#tag/configuration/PUT/v1/companies/{companyId}/requirements/{requirementId}) (`Content-Type: application/json`)
 
 Include **`templateFile`** with the new object key, plus every field required by
 `UpdateRequirementDto` for your API version (typically the same logical shape as

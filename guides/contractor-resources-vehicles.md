@@ -86,7 +86,7 @@ curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000
 
 Response: `204 No Content`.
 
-When a vehicle leaves the fleet, soft-delete the record using [`DELETE /v1/companies/{companyId}/vehicles/{id}`](#tag/resources/DELETE/v1/companies/{companyId}/vehicles/{id}). The vehicle is removed from future assignments but its historical data is preserved.
+When a vehicle leaves the fleet, soft-delete the record using [`DELETE /v1/companies/{companyId}/vehicles/{id}`](#tag/vehicles/DELETE/v1/companies/{companyId}/vehicles/{id}). The vehicle is removed from future assignments but its historical data is preserved.
 
 ### Example: Delete a vehicle
 
