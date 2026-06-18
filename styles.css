@@ -667,3 +667,9 @@ details[open] > .guide-product-title::before {
 .curl-block[open] > .curl-block-summary {
   margin-bottom: 12px;
 }
+
+/* Scalar API sidebar section headers (Shared, Access control, Requirements, etc.) */
+#api-container [data-sidebar-id*="/tag-group/"] div.cursor-auto {
+  font-size: 16px !important;
+  color: #d4d4dc !important;
+}
