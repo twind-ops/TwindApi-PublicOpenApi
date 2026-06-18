@@ -13,7 +13,7 @@ When a requirement instance asks you to provide a document, you upload the file 
 
 Request a presigned POST URL for your file. `contentType` and `fileName` are required; `contentType` must be one of the accepted MIME types (see [Supported content types](#supported-content-types)).
 
-[`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url`](#tag/evidence/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
+[`GET /v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url`](#tag/submissions/GET/v1/companies/{companyId}/evidences/{requirementInstanceId}/temporary-upload-url)
 
 ### Example: Get the upload URL
 
@@ -68,7 +68,7 @@ curl -X POST "$URL_FROM_STEP_1" \
 
 Once every file is in storage, register the submission against the requirement instance in one call.
 
-[`POST /v1/cm/companies/{companyId}/evidences/upload`](#tag/evidence/POST/v1/cm/companies/{companyId}/evidences/upload)
+[`POST /v1/cm/companies/{companyId}/evidences/upload`](#tag/submissions/POST/v1/cm/companies/{companyId}/evidences/upload)
 
 > **Note:** This route lives under `/v1/cm/...` while the presigned-URL route lives under `/v1/...` — the two prefixes are intentional; use each URL as documented.
 

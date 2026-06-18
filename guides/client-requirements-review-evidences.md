@@ -59,7 +59,7 @@ Keep the **evidence id** (`evidences[].id`) for the next steps.
 
 Fetch the evidence details: the uploaded `files` (URLs), the contractor's declared `dateOfIssue`, and any `comment`.
 
-[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/evidence/GET/v1/companies/{companyId}/evidences/{evidenceId})
+[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/submissions/GET/v1/companies/{companyId}/evidences/{evidenceId})
 
 ### Example: Get evidence details
 
@@ -85,7 +85,7 @@ Response (`200 OK`, trimmed):
 
 Both decisions require the **`issueDate`** — the date the document was actually issued, which drives the expiration calculation. When rejecting, include a `reason` and, if it helps the contractor, the specific `rejectedAcceptanceCriteria`.
 
-[`PUT /v1/companies/{companyId}/evidences/{evidenceId}/approve`](#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/approve) · [`PUT .../reject`](#tag/evidence/PUT/v1/companies/{companyId}/evidences/{evidenceId}/reject)
+[`PUT /v1/companies/{companyId}/evidences/{evidenceId}/approve`](#tag/submissions/PUT/v1/companies/{companyId}/evidences/{evidenceId}/approve) · [`PUT .../reject`](#tag/submissions/PUT/v1/companies/{companyId}/evidences/{evidenceId}/reject)
 
 ### Example: Approve
 

@@ -52,7 +52,7 @@ array.
 ## Step 1: Request a presigned upload URL
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`GET /v1/companies/{companyId}/visitor/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/access-control/GET/v1/companies/{companyId}/visitor/temporary-upload-url)
+[`GET /v1/companies/{companyId}/visitor/temporary-upload-url?contentType={mime}&fileName={name}`](#tag/visitors/GET/v1/companies/{companyId}/visitor/temporary-upload-url)
 
 `{mime}` must be one of the accepted MIME types listed in
 [Supported content types](#supported-content-types).
@@ -121,7 +121,7 @@ Repeat for each documentation file you need. Collect each object **`key`** (from
 ### Create visitor
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`POST /v1/companies/{companyId}/visitor`](#tag/access-control/POST/v1/companies/{companyId}/visitor) (`Content-Type: application/json`)
+[`POST /v1/companies/{companyId}/visitor`](#tag/visitors/POST/v1/companies/{companyId}/visitor) (`Content-Type: application/json`)
 
 ### Body (main fields)
 
@@ -174,7 +174,7 @@ The **`id`** is the **visitor** record id.
 Replace documentation or other fields:
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`PUT /v1/companies/{companyId}/visitor/{visitorId}`](#tag/access-control/PUT/v1/companies/{companyId}/visitor/{visitorId}) (`Content-Type: application/json`)
+[`PUT /v1/companies/{companyId}/visitor/{visitorId}`](#tag/visitors/PUT/v1/companies/{companyId}/visitor/{visitorId}) (`Content-Type: application/json`)
 
 Use the same JSON shape as create (`CreateVisitorDto`). Set **`files`** to the
 list of keys for the documentation that should be stored after the update.
@@ -196,14 +196,14 @@ version.
 - **Visit register — entry** — When you **register a visit entry** (visitor on
   site), call
   <!-- markdownlint-disable-next-line MD051 -->
-  [**POST** `/v1/companies/{companyId}/visit-register`](#tag/access-control/POST/v1/companies/{companyId}/visit-register)
+  [**POST** `/v1/companies/{companyId}/visit-register`](#tag/visit-register/POST/v1/companies/{companyId}/visit-register)
   with **`visitorId`** set to the visitor **`id`** returned from **Step 3** in
   this guide (create or update visitor). That links the visit to the profile
   whose documentation you uploaded.
 - **Visit register — exit** — When the visitor leaves, **register the visit exit**
   with
   <!-- markdownlint-disable-next-line MD051 -->
-  [**PATCH** `/v1/companies/{companyId}/visit-register/{visitRegisterId}`](#tag/access-control/PATCH/v1/companies/{companyId}/visit-register/{visitRegisterId}),
+  [**PATCH** `/v1/companies/{companyId}/visit-register/{visitRegisterId}`](#tag/visit-register/PATCH/v1/companies/{companyId}/visit-register/{visitRegisterId}),
   using the **visit register record id** from the entry response or from listing
   visits. Exit registration does not require `visitorId`; the `visitRegisterId`
   path parameter alone identifies which open visit to close.

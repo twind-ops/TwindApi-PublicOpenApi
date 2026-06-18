@@ -98,7 +98,7 @@ curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000
 
 Response: `204 No Content`.
 
-When an employee leaves the company, soft-delete the record using [`DELETE /v1/companies/{companyId}/employees/{id}`](#tag/resources/DELETE/v1/companies/{companyId}/employees/{id}). The employee is removed from future assignments but their historical data is preserved.
+When an employee leaves the company, soft-delete the record using [`DELETE /v1/companies/{companyId}/employees/{id}`](#tag/employees/DELETE/v1/companies/{companyId}/employees/{id}). The employee is removed from future assignments but their historical data is preserved.
 
 ### Example: Delete an employee
 
