@@ -136,6 +136,13 @@ const GUIDES_DATA = [
             description: "Create equipment records with their standard type and client classifications, and keep them up to date.",
             icon: "assets/icon-resource.svg",
           },
+          {
+            id: "contractor-contracts-assign-resources",
+            file: "contractor-contracts-assign-resources.md",
+            title: "Assign Resources to a Contract Site",
+            description: "Assign your employees, vehicles and equipment to a contract site, with the right risks for each one.",
+            icon: "assets/icon-resource.svg",
+          },
         ],
       },
       {
@@ -181,13 +188,6 @@ const GUIDES_DATA = [
             file: "contractor-contracts-view.md",
             title: "View Your Contracts and Clients",
             description: "List your client companies and active contracts, and drill into the sites and activities of each one.",
-            icon: "assets/icon-contract.svg",
-          },
-          {
-            id: "contractor-contracts-assign-resources",
-            file: "contractor-contracts-assign-resources.md",
-            title: "Assign Resources to a Contract Site",
-            description: "Assign your employees, vehicles and equipment to a contract site, with the right risks for each one.",
             icon: "assets/icon-contract.svg",
           },
           {
