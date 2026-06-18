@@ -28,7 +28,7 @@ const GUIDES_DATA = [
   {
     type: "group",
     title: "Client Guides",
-    icon: "assets/icon-requirements.svg",
+    icon: "assets/icon-client.svg",
     products: [
       {
         id: "client-requirements",
@@ -109,7 +109,7 @@ const GUIDES_DATA = [
   {
     type: "group",
     title: "Contractor Guides",
-    icon: "assets/icon-resource.svg",
+    icon: "assets/icon-contractor.svg",
     products: [
       {
         id: "contractor-resources",
