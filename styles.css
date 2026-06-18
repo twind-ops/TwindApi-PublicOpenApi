@@ -160,14 +160,16 @@ body {
   display: none;
 }
 
-.nav-collapsible > summary.nav-group-label::before {
-  content: "▸";
-  font-size: 9px;
+.nav-collapsible > summary.nav-group-label::after {
+  content: "›";
+  font-size: 16px;
   line-height: 1;
+  margin-left: auto;
   transition: transform 0.15s ease;
+  opacity: 0.5;
 }
 
-.nav-collapsible[open] > summary.nav-group-label::before {
+.nav-collapsible[open] > summary.nav-group-label::after {
   transform: rotate(90deg);
 }
 
@@ -464,7 +466,7 @@ details[open] > .guide-product-title::before {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 0 24px 24px;
+  padding: 24px;
 }
 
 .guide-product {
@@ -499,7 +501,7 @@ details[open] > .guide-product-title::before {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 0 18px 18px 18px;
+  padding: 18px;
 }
 
 .guide-product-empty {
@@ -664,4 +666,16 @@ details[open] > .guide-product-title::before {
 
 .curl-block[open] > .curl-block-summary {
   margin-bottom: 12px;
+}
+
+/* Scalar API sidebar section headers (Shared, Access control, Requirements, etc.) */
+#api-container [data-sidebar-id*="/tag-group/"] div.cursor-auto {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #a78bfa !important;
+  border-left: 2px solid #a78bfa !important;
+  padding-left: 8px !important;
+  margin-left: 4px !important;
 }
