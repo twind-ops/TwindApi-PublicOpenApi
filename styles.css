@@ -670,5 +670,12 @@ details[open] > .guide-product-title::before {
 
 /* Scalar API sidebar section headers (Shared, Access control, Requirements, etc.) */
 #api-container [data-sidebar-id*="/tag-group/"] div.cursor-auto {
-  font-size: 15px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #a78bfa !important;
+  border-left: 2px solid #a78bfa !important;
+  padding-left: 8px !important;
+  margin-left: 4px !important;
 }
