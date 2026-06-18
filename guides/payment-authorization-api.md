@@ -82,7 +82,7 @@ it with `PUT .../config` — see [Configuration](#configuration).
 
 ## Step 1: List contractors by payment status
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-company`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-company)
+[`GET /v1/companies/{clientId}/payment-authorization/by-company`](#tag/contractor-status/GET/v1/companies/{clientId}/payment-authorization/by-company)
 
 Returns one row per contractor with at least one active contract with the client, with
 their **aggregated** payment authorization status. Paginated.
@@ -149,7 +149,7 @@ Save the `contractor.id` of any `NOT_AUTHORIZED` row to inspect what's blocking 
 
 ## Step 2: Inspect a contractor's blocking requirements
 
-[`GET /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/contractors/{contractorId})
+[`GET /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}`](#tag/contractor-status/GET/v1/companies/{clientId}/payment-authorization/contractors/{contractorId})
 
 Returns the contractor, its aggregated payment status, its contracts with the client, and —
 when `NOT_AUTHORIZED` — the `blockingRequirements[]` currently preventing payment, each
@@ -229,7 +229,7 @@ by-contract pair.
 
 ### List contracts by payment status
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-contract`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-contract)
+[`GET /v1/companies/{clientId}/payment-authorization/by-contract`](#tag/contract-status/GET/v1/companies/{clientId}/payment-authorization/by-contract)
 
 Returns one row per contract. Accepts the same filters as `by-company` — except
 `maxContractsPerContractor`, which is `by-company`-only — plus:
@@ -284,7 +284,7 @@ curl -X GET \
 
 ### Inspect a single contract
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-contract/{contractId})
+[`GET /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}`](#tag/contract-status/GET/v1/companies/{clientId}/payment-authorization/by-contract/{contractId})
 
 Returns the contract's payment status, an `issueCount`, and the `issues[]` blocking it.
 Each item in `issues[]` has the **same shape** as `blockingRequirements[]` in Step 2 — only the field name differs between the two endpoints.
@@ -418,7 +418,7 @@ The Payment Authorization API tells you *which* requirement instance is blocking
 its full configuration or evidence. To get that, dereference the `requirementInstanceId`
 against the **Requirements API**:
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/requirements/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId})
 
 - `instanceId` = the `requirementInstanceId` from the issue.
 - `companyId` = the issue's **`contractor.id`** (the company that owns the requirement) —
@@ -447,7 +447,7 @@ additionally requires write permission.
 
 ### Read the current calculation mode
 
-[`GET /v1/companies/{clientId}/payment-authorization/config`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/config)
+[`GET /v1/companies/{clientId}/payment-authorization/config`](#tag/calculation-mode/GET/v1/companies/{clientId}/payment-authorization/config)
 
 Returns the client's current [calculation mode](#calculation-modes). Defaults to
 `INDIVIDUAL` when no mode has been explicitly saved.
@@ -467,7 +467,7 @@ curl -X GET \
 
 ### Update the calculation mode
 
-[`PUT /v1/companies/{clientId}/payment-authorization/config`](#tag/payment-authorization/PUT/v1/companies/{clientId}/payment-authorization/config)
+[`PUT /v1/companies/{clientId}/payment-authorization/config`](#tag/calculation-mode/PUT/v1/companies/{clientId}/payment-authorization/config)
 
 Sets the calculation mode. The change applies immediately to every status calculation and
 is recorded in the configuration history. Requires the `PAYMENT_AUTHORIZATION_WRITE`
@@ -485,7 +485,7 @@ curl -X PUT \
 
 ### Review the configuration history
 
-[`GET /v1/companies/{clientId}/payment-authorization/history`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/history)
+[`GET /v1/companies/{clientId}/payment-authorization/history`](#tag/calculation-mode/GET/v1/companies/{clientId}/payment-authorization/history)
 
 Returns product activation, deactivation and calculation-mode changes, most recent first.
 
