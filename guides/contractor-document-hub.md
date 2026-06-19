@@ -211,7 +211,20 @@ Response (`200 OK`):
 
 ## Step 4: Filter by subject type
 
-To filter the document list by subject type, apply `subjectTypes` to the subjects lookup and `subjectTypes` to the document types lookup. Both calls are typically made in parallel when the user selects a filter.
+Pass `subjectTypes` to the document list endpoint to receive only documents belonging to that subject type. The two reference-data lookups are also re-queried in parallel to refresh the filter dropdowns.
+
+### Filtered document list
+
+[`GET /v1/companies/{companyId}/documents`](#tag/Document-hub/GET/v1/companies/{companyId}/documents)
+
+```bash
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents?subjectTypes=EMPLOYEE&page=0&size=10" \
+  -H "X-Api-Key: your-api-key-here"
+```
+
+Response (`200 OK`): same paginated shape as Step 3, containing only documents whose `subjectType` is `EMPLOYEE`.
+
+### Refresh filter dropdowns (parallel)
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?subjectTypes=EMPLOYEE&size=50" \
