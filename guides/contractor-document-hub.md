@@ -211,7 +211,7 @@ Response (`200 OK`):
 
 ## Step 4: Filter by subject type
 
-To filter the document list by subject type, apply `subjectTypes` to the subjects lookup and `documentTargetTypes` to the document types lookup. Both calls are typically made in parallel when the user selects a filter.
+To filter the document list by subject type, apply `subjectTypes` to the subjects lookup and `subjectTypes` to the document types lookup. Both calls are typically made in parallel when the user selects a filter.
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?subjectTypes=EMPLOYEE&size=50" \
@@ -219,7 +219,7 @@ curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
 ```
 
 ```bash
-curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/document-types?subjectTypes=EMPLOYEE&size=50" \
+curl -X GET "https://app.twind.io/api/v1/document-types?subjectTypes=EMPLOYEE&size=50" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
@@ -267,6 +267,7 @@ curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
     "name": "Insurance Certificate (renewed)",
     "subjectType": "CONTRACTOR",
     "subjectId": "00000000-0000-0000-0000-000000000010",
+    "documentTypeId": "00000000-0000-0000-0000-000000000020",
     "issueDate": "2026-06-01",
     "expirationDate": "2027-06-01",
     "files": [
@@ -331,6 +332,7 @@ curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-0000
     "name": "Insurance Certificate",
     "subjectType": "CONTRACTOR",
     "subjectId": "00000000-0000-0000-0000-000000000010",
+    "documentTypeId": "00000000-0000-0000-0000-000000000020",
     "issueDate": "2026-01-01",
     "expirationDate": "2027-01-01",
     "files": [
