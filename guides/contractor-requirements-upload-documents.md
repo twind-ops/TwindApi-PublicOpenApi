@@ -145,7 +145,7 @@ Pass one of these MIME types as `contentType` in Step 1, and echo the same strin
 ## Next Steps
 
 - [Track Your Pending Requirements](contractor-requirements-track-instances.md) — find requirement instance ids and check their status.
-- [Track and Reuse Submitted Documents](contractor-requirements-track-evidences.md) — follow the review outcome of what you submitted.
+- [Track Submission Status and Review Outcome](contractor-requirements-track-submission-status.md) — follow the review outcome of what you submitted.
 - [Review and Approve Submissions](client-requirements-review-evidences.md) — the client-side flow that decides on your submission.
 - Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
