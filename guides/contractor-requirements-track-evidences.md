@@ -118,8 +118,8 @@ Response: `200 OK` (no body). The selected instances now carry the same document
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | Insufficient permissions, or `companyId` is not your contractor company. | Ensure your user has the necessary permissions for this action. |
-| 400 | Instance not in a submittable state (`PENDING_UPLOAD`, `REJECTED`, or `EXPIRED`). | Check the instance status before submitting. |
-| 400 | An id in Step 3 was not returned by the matches endpoint. | Send only ids from the Step 2 response. |
+| 400 | **Step 1:** Instance not in a submittable state (`PENDING_UPLOAD`, `REJECTED`, or `EXPIRED`). | Check the instance status before submitting. |
+| 400 | **Step 3:** An id was not returned by the matches endpoint. | Send only ids from the Step 2 response. |
 | 404 | Unknown `instanceId` or `evidenceId`. | Re-fetch ids from your instance list. |
 
 ## Next Steps

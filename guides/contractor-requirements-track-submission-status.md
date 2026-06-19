@@ -8,7 +8,7 @@ Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
 - **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
-- **A submission id** — returned when you submit a document (see [Upload Documents for a Requirement](contractor-requirements-upload-documents.md)) or an agreement (see [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md)), or taken from the `evidences[].id` field of your [instance list](contractor-requirements-track-instances.md).
+- **A submission id** — returned when you submit a document (see [Upload Documents for a Requirement](contractor-requirements-upload-documents.md)), an agreement (see [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md)), or a single-submission propagation (see [Single Submission: Reuse Evidence Across Requirements](contractor-requirements-track-evidences.md)); or taken from the `evidences[].id` field of your [instance list](contractor-requirements-track-instances.md).
 
 ## Step 1: Check the review outcome
 
