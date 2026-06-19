@@ -1,68 +1,102 @@
-# Track and Reuse Submitted Evidences
+# Single Submission: Reuse Evidence Across Requirements
 
-After submitting an evidence you want to know its review outcome — and when it is rejected, exactly why, so the fix is fast. For **single-submission** requirements, one approved document can also be applied to several matching instances, so you never upload the same file twice. This guide is written for **contractor** companies.
+When a requirement is configured for **single submission**, one approved document can satisfy multiple matching instances across contracts or clients — so you never upload the same file twice. This guide walks through the full flow: submit the document on the original instance, retrieve which other instances qualify, and propagate it to the ones you choose. This guide is written for **contractor** companies.
 
 ## Prerequisites
 
 Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
-- **An evidence record id** — returned when you [submit evidence](contractor-requirements-submit-agreement.md), or taken from the `evidences[].id` of your [instance list](contractor-requirements-track-instances.md).
+- **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
+- **An instance id** — the original instance you are submitting the document for. Retrieve pending instances from [Track Your Pending Requirements](contractor-requirements-track-instances.md). The instance must be in `PENDING_UPLOAD`, `REJECTED`, or `EXPIRED` state.
 
-## Step 1: Check the review outcome
+## Step 1: Submit the document to the instance
 
-The evidence detail shows the current `status`, and — when rejected — the reviewer's `reason` and the specific `rejectedAcceptanceCriteria` that failed.
+Upload the document directly to the instance. This creates the submission in `PENDING_REVIEW` state on the original instance and triggers the single-submission matching process.
 
-[`GET /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/submissions/GET/v1/companies/{companyId}/evidences/{evidenceId})
+[`POST /v1/companies/{companyId}/requirement-instances/{instanceId}/evidences`](#tag/requirement-instances/POST/v1/companies/{companyId}/requirement-instances/{instanceId}/evidences)
 
-### Example: Get the evidence status
+Send the request as `multipart/form-data`:
+
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `file` | file | Yes | The document file to upload. |
+| `dateOfIssue` | string (date) | Yes | Issue date of the document (`YYYY-MM-DD`). |
+| `expirationDate` | string (date) | No | Expiration date of the document (`YYYY-MM-DD`). Omitting it may reduce or eliminate matches in Step 2, since the matching criteria filters by expiration date against destination contract start dates. |
+
+### Example: Submit a document to an instance
 
 ```bash
-curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000050/evidences" \
+  -H "X-Api-Key: your-api-key-here" \
+  -F "file=@/path/to/insurance-certificate.pdf" \
+  -F "dateOfIssue=2026-01-01" \
+  -F "expirationDate=2027-01-01"
+```
+
+Response (`201 Created`):
+
+```json
+{
+  "id": "00000000-0000-0000-0000-000000000071"
+}
+```
+
+The returned `id` is the **evidence id** — you will need it in Step 3. The submission is now in `PENDING_REVIEW` on the original instance.
+
+## Step 2: Get the matching instances
+
+Retrieve all other instances that qualify for single-submission reuse from the document submitted in Step 1. The system matches instances that share:
+
+- The same **subject type** (`EMPLOYEE`, `VEHICLE`, `EQUIPMENT`, or `CONTRACTOR`)
+- The same **resource** (via applicability records)
+- The same **document type**
+- No valid submission already (no instance in `APPROVED`, `PENDING_REVIEW`, or `UNDER_GRACE_PERIOD` state)
+- A document expiration date later than the destination contract's start date
+
+The response groups matches by client so the user can review and select which instances to propagate to.
+
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/matches`](#tag/requirement-instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/matches)
+
+### Example: Get matches for an instance
+
+```bash
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000050/matches" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
 Response (`200 OK`, trimmed):
 
 ```json
-{
-  "id": "00000000-0000-0000-0000-000000000071",
-  "status": "REJECTED",
-  "reason": "The certificate does not name the employee.",
-  "rejectedAcceptanceCriteria": ["Employee name matches the assigned resource"],
-  "files": ["https://storage.twind.io/evidences/2026/06/certificate-john-smith.pdf"],
-  "dateOfIssue": "2026-06-01",
-  "createdAt": "2026-06-10T11:20:00Z",
-  "revisedAt": "2026-06-10T16:45:00Z"
-}
+[
+  {
+    "clientId": "00000000-0000-0000-0000-000000000001",
+    "clientName": "Industrial Corp",
+    "matches": [
+      {
+        "requirementInstanceId": "00000000-0000-0000-0000-000000000161",
+        "contractName": "Plant maintenance 2026",
+        "siteName": "North Plant"
+      },
+      {
+        "requirementInstanceId": "00000000-0000-0000-0000-000000000162",
+        "contractName": "Plant maintenance 2026",
+        "siteName": "South Plant"
+      }
+    ]
+  }
+]
 ```
 
-A rejected evidence is fixed by submitting a **new** evidence for the same instance (see [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md)) — rejection feedback tells you what to change.
+Use this list to let the user select which instances to propagate to. Pass only ids from this list in Step 3 — any id outside this set will fail validation.
 
-## Step 2: Update evidence flags
+## Step 3: Propagate the document to selected instances
 
-The evidence update currently covers the `expressValidation` flag (when your client allows express-validated submissions).
-
-[`PATCH /v1/companies/{companyId}/evidences/{evidenceId}`](#tag/submissions/PATCH/v1/companies/{companyId}/evidences/{evidenceId})
-
-### Example: Mark an evidence for express validation
-
-```bash
-curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
-  -H "X-Api-Key: your-api-key-here" \
-  -H "Content-Type: application/json" \
-  -d '{ "expressValidation": true }'
-```
-
-Response: `204 No Content`.
-
-## Step 3: Reuse a single-submission evidence
-
-When a requirement allows **single submission**, one evidence (e.g. a company-level insurance policy) can satisfy several requirement instances across contracts or clients. Apply the source evidence to the matching instances in one call — only instances allowed by the single-submission rules and your visibility are accepted.
+Apply the submission from Step 1 to the instances the user selected from the matches in Step 2. The API validates that every id you send is a subset of the matches returned in Step 2 — if any id was not in the match list, the call fails.
 
 [`POST /v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances`](#tag/submissions/POST/v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances)
 
-### Example: Apply one evidence to two more instances
+### Example: Propagate a document to selected instances
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071/matching-requirement-instances" \
@@ -76,7 +110,7 @@ curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-0000
   }'
 ```
 
-Response: `200 OK` (no body). The target instances now carry the same evidence.
+Response: `200 OK` (no body). The selected instances now carry the same document.
 
 ## Common errors
 
@@ -84,13 +118,14 @@ Response: `200 OK` (no body). The target instances now carry the same evidence.
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | Insufficient permissions, or `companyId` is not your contractor company. | Ensure your user has the necessary permissions for this action. |
-| 400 | A target instance does not match the single-submission rules (different requirement, or outside your visibility). | Send only instances of the same single-submission requirement. |
-| 404 | Unknown `evidenceId` or `requirementInstanceIds` entry. | Re-fetch ids from your instance list. |
+| 400 | Instance not in a submittable state (`PENDING_UPLOAD`, `REJECTED`, or `EXPIRED`). | Check the instance status before submitting. |
+| 400 | An id in Step 3 was not returned by the matches endpoint. | Send only ids from the Step 2 response. |
+| 404 | Unknown `instanceId` or `evidenceId`. | Re-fetch ids from your instance list. |
 
 ## Next Steps
 
-- [Submit an Agreement for a Requirement](contractor-requirements-submit-agreement.md) — submit the corrected document after a rejection.
-- [Track Your Pending Requirements](contractor-requirements-track-instances.md) — see the instance-level picture.
+- [Track Your Pending Requirements](contractor-requirements-track-instances.md) — see all pending instances across your contracts.
+- [Track Submission Status and Review Outcome](contractor-requirements-track-submission-status.md) — check whether the submission was approved or rejected after propagation.
 - [Upload Documents for a Requirement](contractor-requirements-upload-documents.md) — presigned upload mechanics when resubmitting a corrected document.
 - Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
