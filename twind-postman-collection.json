@@ -791,6 +791,11 @@
             "description" : ""
           } ],
           "query" : [ {
+            "key" : "contractNames",
+            "value" : "",
+            "description" : "Filter by exact contract names (multi-value). Replaces the deprecated `contractName` parameter.",
+            "disabled" : true
+          }, {
             "key" : "q",
             "value" : "",
             "description" : "",
@@ -829,11 +834,6 @@
             "key" : "contractName",
             "value" : "",
             "description" : "Deprecated — use 'contractNames' instead.",
-            "disabled" : true
-          }, {
-            "key" : "contractNames",
-            "value" : "",
-            "description" : "",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -3937,6 +3937,11 @@
             "description" : ""
           } ],
           "query" : [ {
+            "key" : "contractNames",
+            "value" : "",
+            "description" : "Filter by exact contract names (multi-value). Replaces the deprecated `contractName` parameter.",
+            "disabled" : true
+          }, {
             "key" : "q",
             "value" : "",
             "description" : "",
@@ -3950,11 +3955,6 @@
             "key" : "contractName",
             "value" : "",
             "description" : "Deprecated — use 'contractNames' instead.",
-            "disabled" : true
-          }, {
-            "key" : "contractNames",
-            "value" : "",
-            "description" : "",
             "disabled" : true
           }, {
             "key" : "contractorIds",

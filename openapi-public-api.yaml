@@ -989,6 +989,15 @@ paths:
         \ (contract end date). **Sort format:** `?sort=field,direction` (e.g. `?sort=name,asc`)."
       operationId: contractsWhereMyCompanyIsContractor
       parameters:
+      - name: contractNames
+        in: query
+        description: Filter by exact contract names (multi-value). Replaces the deprecated
+          `contractName` parameter.
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
       - name: companyId
         in: path
         required: true
@@ -1047,13 +1056,6 @@ paths:
         deprecated: true
         schema:
           type: string
-      - name: contractNames
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
       - name: siteIds
         in: query
         required: false
@@ -7262,6 +7264,15 @@ paths:
         \ (e.g. `?sort=name,asc`)."
       operationId: contractsWhereMyCompanyIsClient
       parameters:
+      - name: contractNames
+        in: query
+        description: Filter by exact contract names (multi-value). Replaces the deprecated
+          `contractName` parameter.
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
       - name: companyId
         in: path
         required: true
@@ -7286,13 +7297,6 @@ paths:
         deprecated: true
         schema:
           type: string
-      - name: contractNames
-        in: query
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
       - name: contractorIds
         in: query
         required: false
@@ -8578,6 +8582,8 @@ components:
           - CLIENT_NAME
           - SITE
           - VALIDITY_DATE
+          - BIRTH_DATE
+          - HIRE_DATE
           - SUBCONTRACTING
         yMm:
           type: number
@@ -9456,6 +9462,9 @@ components:
         birthDate:
           type: string
           format: date
+        hireDate:
+          type: string
+          format: date
         classifications:
           type: array
           description: "Client-specific classifications for the employee. Each entry\
@@ -9819,6 +9828,11 @@ components:
         photo:
           type: string
         birthDate:
+          type: string
+          format: date
+          description: Omit to leave unchanged; send null to clear; send a date to
+            set.
+        hireDate:
           type: string
           format: date
           description: Omit to leave unchanged; send null to clear; send a date to
@@ -10324,6 +10338,10 @@ components:
           - PRODUCT
         name:
           type: string
+        identity:
+          type: string
+        classification:
+          $ref: "#/components/schemas/IdAndNameV2"
         risks:
           type: array
           items:
@@ -13364,6 +13382,9 @@ components:
         photo:
           type: string
         birthDate:
+          type: string
+          format: date
+        hireDate:
           type: string
           format: date
         classifications:
