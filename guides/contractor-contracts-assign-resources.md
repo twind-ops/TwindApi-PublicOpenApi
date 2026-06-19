@@ -8,6 +8,7 @@ Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
 - **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
+- **A contract id** — list the contracts where your company is the contractor with [`GET /v1/companies/{companyId}/contracts/with-clients`](#tag/contract-listings/GET/v1/companies/{companyId}/contracts/with-clients) (see [View Your Contracts and Clients](contractor-contracts-view.md)).
 - **Resources registered** — your employees, vehicles or equipment must already exist in Twind.
 
 ## Step 1: Find the contract's sites
@@ -74,7 +75,32 @@ Response (`200 OK`, trimmed):
 }
 ```
 
-For **employees** you also choose the risks of the assignment — they determine which compliance requirements are triggered. Risks are defined by the client; list them with `GET /v1/companies/{companyId}/risks`. Vehicles and equipment take no risks (`riskIds: []`).
+For **employees** you also choose the risks of the assignment — they determine which compliance requirements are triggered. Risks are scoped to the contract (they come from the client behind it), so list them per contract — pass your contractor `companyId` and the `contractId`:
+
+[`GET /v1/companies/{companyId}/contracts/{contractId}/risks`](#tag/assignments/GET/v1/companies/{companyId}/contracts/{contractId}/risks)
+
+### Example: List the contract's risks
+
+```bash
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/risks?page=0&size=1000" \
+  -H "X-Api-Key: your-api-key-here"
+```
+
+Response (`200 OK`, trimmed):
+
+```json
+{
+  "content": [
+    {
+      "id": "00000000-0000-0000-0000-000000000080",
+      "name": "Working at height"
+    }
+  ],
+  "page": { "size": 1000, "number": 0, "totalElements": 1, "totalPages": 1 }
+}
+```
+
+Collect the `id` of each risk you need and pass them in `riskIds` when you assign the employee (Step 3). Vehicles and equipment take no risks (`riskIds: []`).
 
 ## Step 3: Set the site's resources
 
