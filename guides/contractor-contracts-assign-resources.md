@@ -79,7 +79,7 @@ For **employees** you also choose the risks of the assignment. **Risks** are haz
 
 [`GET /v1/companies/{companyId}/contracts/{contractId}/risks`](#tag/assignments/GET/v1/companies/{companyId}/contracts/{contractId}/risks)
 
-> **Pagination:** Risks are a short, client-managed list — typically fewer than 50 entries. Using `size=1000` fetches them in one page in virtually all cases. If `page.totalPages > 1` (check the `page` envelope), paginate with `page=1`, `page=2`, … until you have all items.
+> **Pagination:** Risks are a short, client-managed list — typically fewer than 50 entries. Using `size=1000` fetches them in one page in virtually all cases. If `page.totalPages > 1` (check the `page` envelope), paginate with `page=1&size=1000`, `page=2&size=1000`, … until you have all items.
 
 ### Example: List the contract's risks
 
@@ -156,7 +156,7 @@ Response: `204 No Content`.
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | Insufficient permissions, or `companyId` is not your contractor company. | Ensure your user has the necessary permissions for this action. |
 | 404 | Unknown `contractId` or `siteId`, the site is not part of that contract, or a `resourceId` does not exist. | Re-fetch ids from Steps 1–2. |
-| 400 | Invalid body — e.g. a resource that is not assignable, or malformed `riskIds`. | Check `isAssignable` (Step 2) and that risk ids are valid UUIDs. |
+| 400 | Invalid body — e.g. a resource that is not assignable, malformed `riskIds`, or a risk id not returned by the contract's risks endpoint. | Check `isAssignable` (Step 2); re-fetch risk ids from `GET .../contracts/{contractId}/risks` (Step 2) and confirm they belong to this contract. |
 
 ## Next Steps
 
