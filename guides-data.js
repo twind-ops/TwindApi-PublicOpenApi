@@ -184,6 +184,13 @@ const GUIDES_DATA = [
             description: "Submit a document to the original instance, retrieve matching instances, and propagate it in one flow.",
             icon: "assets/icon-requirements.svg",
           },
+          {
+            id: "contractor-document-hub-manage",
+            file: "contractor-document-hub.md",
+            title: "Manage Your Company Documents",
+            description: "Upload, list, filter, edit, and delete documents in your company's Document Hub.",
+            icon: "assets/icon-file-upload.svg",
+          },
         ],
       },
       {
