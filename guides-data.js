@@ -218,6 +218,13 @@ const GUIDES_DATA = [
             description: "Upload, list, filter, edit, and delete documents in your company's Document Hub.",
             icon: "assets/icon-file-upload.svg",
           },
+          {
+            id: "contractor-requirements-track-evidences",
+            file: "contractor-requirements-track-evidences.md",
+            title: "Single Submission: Reuse Evidence Across Requirements",
+            description: "Submit a document to the original instance, retrieve matching instances, and propagate it in one flow.",
+            icon: "assets/icon-requirements.svg",
+          },
         ],
       },
       {
