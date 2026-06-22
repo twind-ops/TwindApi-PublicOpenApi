@@ -166,7 +166,7 @@ curl -X GET \
 ## Step 3: Get a single access register record
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`GET /v1/companies/{companyId}/access-register/{accessRecordId}`](#tag/access-register/GET/v1/companies/{companyId}/access-register/{accessRecordId})
+[`GET /v1/companies/{companyId}/access-register/{id}`](#tag/access-register/GET/v1/companies/{companyId}/access-register/{accessRecordId})
 
 ### Example: cURL — get by ID
 
@@ -182,7 +182,7 @@ curl -X GET \
 ## Step 4: Record a site exit
 
 <!-- markdownlint-disable-next-line MD051 -->
-[`PATCH /v1/companies/{companyId}/access-register/{accessRegisterId}`](#tag/access-register/PATCH/v1/companies/{companyId}/access-register/{accessRegisterId})
+[`PATCH /v1/companies/{companyId}/access-register/{id}`](#tag/access-register/PATCH/v1/companies/{companyId}/access-register/{accessRegisterId})
 
 Sets the exit time and optional notes on an open access register record.
 

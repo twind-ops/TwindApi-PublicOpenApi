@@ -232,6 +232,7 @@ curl -X GET \
 
 - **401** — Missing or invalid API key.
 - **403** — Your integration does not have client access to this company.
+- **404** — Resource not found; the composite `{resourceId}-{siteId}` identifier does not match any access control record (single-resource endpoint only).
 - **500** — Internal server error; retry with exponential back-off.
 
 ## Related flows
