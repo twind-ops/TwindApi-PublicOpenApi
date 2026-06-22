@@ -82,10 +82,18 @@ it with `PUT .../config` — see [Configuration](#configuration).
 
 ## Step 1: List contractors by payment status
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-company`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-company)
+[`GET /v1/companies/{clientId}/payment-authorization/by-company`](#tag/contractor-status/GET/v1/companies/{clientId}/payment-authorization/by-company)
 
 Returns one row per contractor with at least one active contract with the client, with
 their **aggregated** payment authorization status. Paginated.
+
+> **Which calculation mode are you in?** The aggregation depends on the client's mode. If
+> you don't already know it, call [`GET .../config`](#configuration) first. In
+> `SUBCONTRACTING_CHAIN` mode a contractor can be `NOT_AUTHORIZED` because of a
+> *subcontractor's* failing requirement rather than its own — so seeing whole chains marked
+> `NOT_AUTHORIZED` is expected. See [Calculation modes](#calculation-modes), then drill into
+> the [contractor detail](#step-2-inspect-a-contractors-blocking-requirements) or
+> [contract detail](#step-3-work-at-the-contract-level) to find the responsible company.
 
 ### Common query parameters
 
@@ -141,7 +149,7 @@ Save the `contractor.id` of any `NOT_AUTHORIZED` row to inspect what's blocking 
 
 ## Step 2: Inspect a contractor's blocking requirements
 
-[`GET /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/contractors/{contractorId})
+[`GET /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}`](#tag/contractor-status/GET/v1/companies/{clientId}/payment-authorization/contractors/{contractorId})
 
 Returns the contractor, its aggregated payment status, its contracts with the client, and —
 when `NOT_AUTHORIZED` — the `blockingRequirements[]` currently preventing payment, each
@@ -221,7 +229,7 @@ by-contract pair.
 
 ### List contracts by payment status
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-contract`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-contract)
+[`GET /v1/companies/{clientId}/payment-authorization/by-contract`](#tag/contract-status/GET/v1/companies/{clientId}/payment-authorization/by-contract)
 
 Returns one row per contract. Accepts the same filters as `by-company` — except
 `maxContractsPerContractor`, which is `by-company`-only — plus:
@@ -276,7 +284,7 @@ curl -X GET \
 
 ### Inspect a single contract
 
-[`GET /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/by-contract/{contractId})
+[`GET /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}`](#tag/contract-status/GET/v1/companies/{clientId}/payment-authorization/by-contract/{contractId})
 
 Returns the contract's payment status, an `issueCount`, and the `issues[]` blocking it.
 Each item in `issues[]` has the **same shape** as `blockingRequirements[]` in Step 2 — only the field name differs between the two endpoints.
@@ -342,6 +350,66 @@ curl -X GET \
 }
 ```
 
+### Example: Subcontracting Chain mode
+
+Here the queried main contract (`level: 0`) is `NOT_AUTHORIZED` even though the main
+contractor itself is compliant — a **subcontractor** (`level: 1`) further down the tree has
+an expired requirement. In chain mode that failure cascades: the subcontract is
+`NOT_AUTHORIZED`, and that bubbles up to mark **every** contract in the tree — including the
+main contract — `NOT_AUTHORIZED`.
+
+Two fields in the `issues[]` entry are easy to confuse:
+
+- **`contractor`** is the *responsible* company — here the subcontractor, **not** the
+  contract's main contractor. This is the `contractor.id` trap from Step 2: always
+  dereference a blocking requirement against this `contractor.id`.
+- **`subject`** is the *failing* entity and is polymorphic (`CONTRACTOR`, `EMPLOYEE`,
+  `VEHICLE`, …). When the requirement is on the company itself, `subject` and `contractor`
+  point at the same entity — as they do here.
+
+`contracts[]` lists every contract in the chain with its own status.
+
+```json
+{
+  "contractor": { "id": "11111111-0000-0000-0000-000000000001", "name": "Electrical Works Ltd" },
+  "contract": {
+    "id": "aaaaaaaa-0000-0000-0000-000000000001",
+    "name": "Building Maintenance 2026",
+    "level": 0,
+    "sites": [{ "id": "ssssssss-0000-0000-0000-000000000001", "name": "Site A", "level": "SITE", "breadcrumb": [] }],
+    "activities": [{ "id": "actact01-0000-0000-0000-000000000001", "name": "Wiring" }]
+  },
+  "paymentStatus": "NOT_AUTHORIZED",
+  "issueCount": 1,
+  "issues": [
+    {
+      "requirementInstanceId": "dddddddd-0000-0000-0000-000000000002",
+      "requirement": { "id": "eeeeeeee-0000-0000-0000-000000000002", "name": "Social Security Certificate" },
+      "status": "EXPIRED",
+      "subject": { "type": "CONTRACTOR", "id": "22222222-0000-0000-0000-000000000002", "name": "Welding Subcontractor SL", "identifier": "B87654321" },
+      "contractor": { "id": "22222222-0000-0000-0000-000000000002", "name": "Welding Subcontractor SL", "taxId": "B87654321" }
+    }
+  ],
+  "calculationMode": "SUBCONTRACTING_CHAIN",
+  "contracts": [
+    {
+      "id": "aaaaaaaa-0000-0000-0000-000000000001",
+      "name": "Building Maintenance 2026",
+      "level": 0,
+      "contractor": { "id": "11111111-0000-0000-0000-000000000001", "name": "Electrical Works Ltd", "taxId": "B12345678" },
+      "paymentStatus": "NOT_AUTHORIZED"
+    },
+    {
+      "id": "aaaaaaaa-0000-0000-0000-000000000002",
+      "name": "Welding subcontract",
+      "level": 1,
+      "contractor": { "id": "22222222-0000-0000-0000-000000000002", "name": "Welding Subcontractor SL", "taxId": "B87654321" },
+      "paymentStatus": "NOT_AUTHORIZED"
+    }
+  ]
+}
+```
+
 ---
 
 ## Step 4: Resolve a blocking requirement
@@ -379,7 +447,7 @@ additionally requires write permission.
 
 ### Read the current calculation mode
 
-[`GET /v1/companies/{clientId}/payment-authorization/config`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/config)
+[`GET /v1/companies/{clientId}/payment-authorization/config`](#tag/calculation-mode/GET/v1/companies/{clientId}/payment-authorization/config)
 
 Returns the client's current [calculation mode](#calculation-modes). Defaults to
 `INDIVIDUAL` when no mode has been explicitly saved.
@@ -399,7 +467,7 @@ curl -X GET \
 
 ### Update the calculation mode
 
-[`PUT /v1/companies/{clientId}/payment-authorization/config`](#tag/payment-authorization/PUT/v1/companies/{clientId}/payment-authorization/config)
+[`PUT /v1/companies/{clientId}/payment-authorization/config`](#tag/calculation-mode/PUT/v1/companies/{clientId}/payment-authorization/config)
 
 Sets the calculation mode. The change applies immediately to every status calculation and
 is recorded in the configuration history. Requires the `PAYMENT_AUTHORIZATION_WRITE`
@@ -417,7 +485,7 @@ curl -X PUT \
 
 ### Review the configuration history
 
-[`GET /v1/companies/{clientId}/payment-authorization/history`](#tag/payment-authorization/GET/v1/companies/{clientId}/payment-authorization/history)
+[`GET /v1/companies/{clientId}/payment-authorization/history`](#tag/calculation-mode/GET/v1/companies/{clientId}/payment-authorization/history)
 
 Returns product activation, deactivation and calculation-mode changes, most recent first.
 
@@ -452,11 +520,27 @@ deactivated).
 
 ## Errors
 
-| Status | Meaning |
-|--------|---------|
-| `401` | Missing or invalid API key. |
-| `403` | Insufficient permissions, feature disabled, or Payment Authorization product not enabled for the company. |
-| `404` | (Contractor detail) the contractor has no active contract with this client. |
+Errors are returned in the standard [RFC 7807](https://www.rfc-editor.org/rfc/rfc7807)
+problem format, with a `detail` message you can surface to help diagnose the cause.
+
+| Status | When | Meaning |
+|--------|------|---------|
+| `400` | Invalid request | A malformed parameter, or an unknown `calculationMode` value on `PUT /config`. |
+| `401` | Not authenticated | The `X-Api-Key` header is missing or invalid. |
+| `403` | Not allowed | One of three distinct cases — read the `detail` message: your key lacks the required permission; the **Payment Authorization product is not subscribed** for the company; or the feature is disabled. |
+| `404` | Nothing here for this client | The contractor or contract isn't linked to this client (e.g. requesting contractor detail for a contractor you don't engage). On `PUT /config`, a caller that bypasses product-gating (e.g. Global Admin) gets `404` instead of `403` when the product isn't enabled. |
+| `5xx` | Unexpected server error | Same problem format; retry or contact support if it persists. |
+
+A response body follows the RFC 7807 shape (the `detail` text varies by cause):
+
+```json
+{
+  "type": "about:blank",
+  "title": "Forbidden",
+  "status": 403,
+  "detail": "Payment Authorization product is not enabled for company 11111111-0000-0000-0000-000000000001"
+}
+```
 
 ---
 
