@@ -92,7 +92,7 @@ their **aggregated** payment authorization status. Paginated.
 > `SUBCONTRACTING_CHAIN` mode a contractor can be `NOT_AUTHORIZED` because of a
 > *subcontractor's* failing requirement rather than its own — so seeing whole chains marked
 > `NOT_AUTHORIZED` is expected. See [Calculation modes](#calculation-modes), then drill into
-> the [contractor detail](#step-2-inspect-a-contractors-blocking-requirements) or
+> the [contractor detail](#step-2-inspect-a-contractor-s-blocking-requirements) or
 > [contract detail](#step-3-work-at-the-contract-level) to find the responsible company.
 
 ### Common query parameters
@@ -143,7 +143,7 @@ curl -X GET \
 ```
 
 Save the `contractor.id` of any `NOT_AUTHORIZED` row to inspect what's blocking it
-([Step 2](#step-2-inspect-a-contractors-blocking-requirements)).
+([Step 2](#step-2-inspect-a-contractor-s-blocking-requirements)).
 
 ---
 
