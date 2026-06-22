@@ -16,6 +16,8 @@ Before uploading a document you need the ids of the subject (the resource the do
 
 [`GET /v1/companies/{companyId}/documents/subjects?size=50`](#tag/Document-hub/GET/v1/companies/{companyId}/documents/subjects)
 
+### Example: Get available subjects
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?size=50" \
   -H "X-Api-Key: your-api-key-here"
@@ -44,6 +46,8 @@ Response (`200 OK`):
 
 [`GET /v1/document-types?size=50`](#tag/Document-hub/GET/v1/document-types)
 
+### Example: Get document types
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/document-types?size=50" \
   -H "X-Api-Key: your-api-key-here"
@@ -63,6 +67,8 @@ Response (`200 OK`):
 ### Get document name catalog
 
 [`GET /v1/companies/{companyId}/documents/document-names?size=50`](#tag/Document-hub/GET/v1/companies/{companyId}/documents/document-names)
+
+### Example: Get document name catalog
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/document-names?size=50" \
@@ -88,6 +94,8 @@ The API never receives the file binary directly. You request a presigned URL, up
 [`GET /v1/companies/{companyId}/documents/temporary-upload-url`](#tag/Document-hub/GET/v1/companies/{companyId}/documents/temporary-upload-url)
 
 `contentType` must be one of the accepted MIME types (see [Supported content types](#supported-content-types)).
+
+### Example: Get presigned upload URL
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/temporary-upload-url?contentType=application%2Fpdf&fileName=insurance-certificate.pdf" \
@@ -116,6 +124,8 @@ Response (`200 OK`):
 ### Step 2b: Upload the file to storage
 
 POST the file to `url` as `multipart/form-data`, sending **every** entry of `fields` as a form field (names and values unchanged) plus the file itself.
+
+### Example: Upload the file to storage
 
 ```bash
 curl -X POST "$URL_FROM_STEP_2A" \
@@ -148,6 +158,8 @@ Once every file is in storage, register the document in one call. The body accep
 | `issueDate` | Yes | Date the document was issued (`YYYY-MM-DD`). |
 | `expirationDate` | No | Document expiration date (`YYYY-MM-DD`), when applicable. |
 | `files` | Yes | Array of `fields.key` values from Step 2a — one entry per uploaded file. |
+
+### Example: Register a document
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents" \
@@ -186,6 +198,8 @@ The returned array of `ids` contains one entry per registered document.
 
 Supports pagination via `page` (zero-based) and `size` query parameters.
 
+### Example: List documents
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents?page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
@@ -217,6 +231,8 @@ Pass `subjectTypes` to the document list endpoint to receive only documents belo
 
 [`GET /v1/companies/{companyId}/documents`](#tag/Document-hub/GET/v1/companies/{companyId}/documents)
 
+### Example: List documents filtered by subject type
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents?subjectTypes=EMPLOYEE&page=0&size=10" \
   -H "X-Api-Key: your-api-key-here"
@@ -226,10 +242,14 @@ Response (`200 OK`): same paginated shape as Step 3, containing only documents w
 
 ### Refresh filter dropdowns (parallel)
 
+### Example: Get subjects filtered by type
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?subjectTypes=EMPLOYEE&size=50" \
   -H "X-Api-Key: your-api-key-here"
 ```
+
+### Example: Get document types filtered by subject type
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/document-types?subjectTypes=EMPLOYEE&size=50" \
@@ -241,6 +261,8 @@ Supported `subjectTypes` values: `CONTRACTOR`, `EMPLOYEE`, `EQUIPMENT`.
 ## Step 5: Get document detail
 
 [`GET /v1/companies/{companyId}/documents/{id}`](#tag/Document-hub/GET/v1/companies/{companyId}/documents/{id})
+
+### Example: Get document detail
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
@@ -272,6 +294,8 @@ To update a document's metadata or replace its files, repeat Steps 2a–2b for a
 
 The body uses the same shape as a single document in Step 2c (no array wrapper). Returns `204 No Content`.
 
+### Example: Edit a document
+
 ```bash
 curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
   -H "X-Api-Key: your-api-key-here" \
@@ -295,6 +319,8 @@ curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
 
 Returns `204 No Content`.
 
+### Example: Delete a document
+
 ```bash
 curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
   -H "X-Api-Key: your-api-key-here"
@@ -309,6 +335,8 @@ Documents can be saved as drafts before being finalized. Use drafts when you wan
 [`POST /v1/companies/{companyId}/documents/draft`](#tag/Document-hub/POST/v1/companies/{companyId}/documents/draft)
 
 The request body is identical to Step 2c. Returns `201 Created` with the same `{ "ids": [...] }` shape.
+
+### Example: Create a draft
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/draft" \
@@ -336,6 +364,8 @@ curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-0000
 [`POST /v1/companies/{companyId}/documents/{id}/finalize`](#tag/Document-hub/POST/v1/companies/{companyId}/documents/{id}/finalize)
 
 Send the same body shape as an edit (no array wrapper). Returns `204 No Content`. The endpoint returns `400` if the document is already finalized.
+
+### Example: Finalize a draft
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030/finalize" \
