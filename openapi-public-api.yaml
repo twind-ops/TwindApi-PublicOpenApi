@@ -443,7 +443,7 @@ paths:
       - Lookups
       summary: List countries
       description: Paginated countries catalog. Filter by partial **name** match.
-      operationId: findAll_10
+      operationId: findAll_9
       parameters:
       - name: name
         in: query
@@ -495,7 +495,7 @@ paths:
       summary: List languages
       description: Paginated languages catalog. Filter by partial **name** or **code**
         match.
-      operationId: findAll_9
+      operationId: findAll_8
       parameters:
       - name: name
         in: query
@@ -553,7 +553,7 @@ paths:
       description: "Returns a paginated list of activities defined for the company\
         \ (client configuration). **Sort format:** `sort=name,asc` (default: name\
         \ ascending)."
-      operationId: findAll_6
+      operationId: findAll_5
       parameters:
       - name: q
         in: query
@@ -1136,7 +1136,7 @@ paths:
         \ `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:**\
         \ `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort\
         \ format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
-      operationId: findAll_5
+      operationId: findAll_4
       parameters:
       - name: q
         in: query
@@ -1518,7 +1518,7 @@ paths:
       summary: List standard vehicle types
       description: Returns the platform-level catalog of standard vehicle types. The
         standard vehicle type is a mandatory field when creating a vehicle.
-      operationId: findAll_7
+      operationId: findAll_6
       parameters:
       - name: q
         in: query
@@ -1906,7 +1906,7 @@ paths:
       summary: List standard equipment types
       description: Returns the platform-level catalog of standard equipment types.
         The standard equipment type is a mandatory field when creating equipment.
-      operationId: findAll_8
+      operationId: findAll_7
       parameters:
       - name: q
         in: query
@@ -1954,7 +1954,7 @@ paths:
       summary: List equipment
       description: "Returns a paginated list of equipment for the company. Supports\
         \ optional text search (q), subcontractor scope, and contractor filters."
-      operationId: findAll_4
+      operationId: findAll_3
       parameters:
       - name: q
         in: query
@@ -2278,22 +2278,29 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ContractorClient"
-  /v1/companies/{companyId}/risks:
+  /v1/companies/{companyId}/contracts/{contractId}/risks:
     get:
       tags:
       - Assignments
-      summary: List risks for a company
-      description: "Returns paginated risks configured by the company. Risks define\
-        \ potential dangers or safety responsibilities associated with employees in\
-        \ contract engagements, and determine which compliance requirements are triggered\
-        \ when assigned."
-      operationId: findAll_2
+      summary: List risks for a contract
+      description: Returns paginated risks associated with a contract. These are the
+        risks configured by the client company that apply to the contract.
+      operationId: contractRisks
       parameters:
-      - name: q
-        in: query
-        required: false
+      - name: companyId
+        in: path
+        description: Company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies`.
+        required: true
         schema:
           type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID. UUID of the contract whose risks are listed.
+        required: true
+        schema:
+          type: string
+          format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -2317,37 +2324,27 @@ paths:
         required: false
         schema:
           type: array
-          default:
-          - "name,ASC"
           items:
             type: string
-      - name: companyId
-        in: path
-        description: Company ID. UUID of the company whose risks are listed. Obtain
-          it from `GET /v1/users/me/companies`.
-        required: true
-        schema:
-          type: string
-          format: uuid
       responses:
         "200":
-          description: Paged risks
+          description: Paged contract risks
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelRiskDto"
+                $ref: "#/components/schemas/PageResponseGetContractRisksQueryResult"
         "401":
           description: "Unauthorized: authentication required"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelRiskDto"
+                $ref: "#/components/schemas/PageResponseGetContractRisksQueryResult"
         "403":
           description: "Access denied: insufficient permissions"
           content:
             '*/*':
               schema:
-                $ref: "#/components/schemas/PagedModelRiskDto"
+                $ref: "#/components/schemas/PageResponseGetContractRisksQueryResult"
   /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}:
     get:
       tags:
@@ -4820,7 +4817,7 @@ paths:
         \ Rule-based list parameters use OR within the same parameter and AND across\
         \ different parameters. **Sort format:** use query parameter `sort=field,direction`\
         \ (e.g. `?sort=name,asc`)."
-      operationId: findAll_3
+      operationId: findAll_2
       parameters:
       - name: companyId
         in: path
@@ -9169,18 +9166,6 @@ components:
           - AREA
       required:
       - name
-    CreateRiskDto:
-      type: object
-      properties:
-        name:
-          type: string
-          minLength: 1
-        description:
-          type: string
-        photo:
-          type: string
-      required:
-      - name
     CreateRequirementDto:
       type: object
       properties:
@@ -11741,34 +11726,6 @@ components:
       - clientId
       - clientName
       - sites
-    PagedModelRiskDto:
-      type: object
-      properties:
-        content:
-          type: array
-          items:
-            $ref: "#/components/schemas/RiskDto"
-        page:
-          $ref: "#/components/schemas/PageMetadata"
-    RiskDto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        companyId:
-          type: string
-          format: uuid
-        name:
-          type: string
-        description:
-          type: string
-        photo:
-          type: string
-      required:
-      - companyId
-      - id
-      - name
     Custody:
       type: object
       properties:
@@ -13416,6 +13373,31 @@ components:
             $ref: "#/components/schemas/EmployeeResponseDto"
         page:
           $ref: "#/components/schemas/PageMetadata"
+    GetContractRisksQueryResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseGetContractRisksQueryResult:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetContractRisksQueryResult"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     ContractData:
       type: object
       properties:

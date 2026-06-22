@@ -1345,25 +1345,24 @@
     "name" : "Assignments",
     "description" : "Site details, resource assignments to contract sites, and risk assignments.",
     "item" : [ {
-      "name" : "List risks for a company",
+      "name" : "List risks for a contract",
       "request" : {
         "method" : "GET",
         "header" : [ ],
         "url" : {
-          "raw" : "{{baseUrl}}/v1/companies/:companyId/risks",
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/contracts/:contractId/risks",
           "host" : [ "{{baseUrl}}" ],
-          "path" : [ "v1", "companies", ":companyId", "risks" ],
+          "path" : [ "v1", "companies", ":companyId", "contracts", ":contractId", "risks" ],
           "variable" : [ {
             "key" : "companyId",
             "value" : "{{companyId}}",
-            "description" : "Company ID. UUID of the company whose risks are listed. Obtain it from `GET /v1/users/me/companies`."
+            "description" : "Company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies`."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID. UUID of the contract whose risks are listed."
           } ],
           "query" : [ {
-            "key" : "q",
-            "value" : "",
-            "description" : "",
-            "disabled" : true
-          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -1380,7 +1379,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated risks configured by the company. Risks define potential dangers or safety responsibilities associated with employees in contract engagements, and determine which compliance requirements are triggered when assigned."
+        "description" : "Returns paginated risks associated with a contract. These are the risks configured by the client company that apply to the contract."
       }
     }, {
       "name" : "Get site details",
