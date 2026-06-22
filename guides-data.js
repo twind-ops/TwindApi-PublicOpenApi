@@ -177,13 +177,6 @@ const GUIDES_DATA = [
             description: "Check whether a submission was approved or rejected, read the reviewer's feedback, and request express review.",
             icon: "assets/icon-requirements.svg",
           },
-          {
-            id: "contractor-requirements-track-evidences",
-            file: "contractor-requirements-track-evidences.md",
-            title: "Single Submission: Reuse Evidence Across Requirements",
-            description: "Submit a document to the original instance, retrieve matching instances, and propagate it in one flow.",
-            icon: "assets/icon-requirements.svg",
-          },
         ],
       },
       {
