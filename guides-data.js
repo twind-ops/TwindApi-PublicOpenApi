@@ -92,9 +92,30 @@ const GUIDES_DATA = [
         ],
       },
       {
-        id: "client-visits",
-        title: "Visits",
+        id: "client-access-control",
+        title: "Access Control",
         items: [
+          {
+            id: "client-access-control-status",
+            file: "client-access-control-status.md",
+            title: "Query Access Control Status",
+            description: "Check whether contractor resources are allowed or blocked at your sites, with per-activity breakdowns.",
+            icon: "assets/icon-visitor.svg",
+          },
+          {
+            id: "client-access-control-temporary-authorizations",
+            file: "client-access-control-temporary-authorizations.md",
+            title: "Manage Temporary Authorizations",
+            description: "Grant or deny contractor resources access for a defined date window, and manage the full authorization lifecycle.",
+            icon: "assets/icon-visitor.svg",
+          },
+          {
+            id: "client-access-control-register",
+            file: "client-access-control-register.md",
+            title: "Access Register",
+            description: "Record site entries and exits for contractor resources, and query the full movement history.",
+            icon: "assets/icon-visitor.svg",
+          },
           {
             id: "visits-documentation-upload-api",
             file: "visits-documentation-upload-api.md",
