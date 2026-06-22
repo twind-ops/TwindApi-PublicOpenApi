@@ -13,9 +13,40 @@ Before you start, ensure you have the following:
 
 ## Step 1: Upload the document to the instance
 
-Upload the document using the standard presigned URL flow described in [Upload Documents for a Requirement](contractor-requirements-upload-documents.md). Complete all three steps of that guide for your instance.
+The upload is a two-part process: upload the file to object storage, then register the submission against the requirement instance. The full mechanics are covered in [Upload Documents for a Requirement](contractor-requirements-upload-documents.md) — follow Steps 1 and 2 of that guide to obtain the file storage key, then come back here for the registration call below.
 
-The registration call (`POST /v1/cm/companies/{companyId}/evidences/upload`) returns:
+### Register the submission
+
+[`POST /v1/companies/{companyId}/evidences/upload`](#tag/submissions/POST/v1/companies/{companyId}/evidences/upload)
+
+The URL is company-scoped, but the submission is always tied to a specific requirement instance via `requirementInstanceId` in the body.
+
+| Field | Required | Description |
+| --- | --- | --- |
+| `requirementInstanceId` | Yes | The instance id from the Prerequisites. |
+| `issueDate` | Yes | Issue date of the document (`YYYY-MM-DD`). |
+| `expirationDate` | No | Expiration date (`YYYY-MM-DD`). Include it — matches in Step 2 are filtered against each destination contract's start date, so omitting it may reduce or eliminate results. |
+| `filePaths` | Yes | Storage keys from the presigned upload (see [Upload Documents for a Requirement](contractor-requirements-upload-documents.md)). |
+| `expressValidation` | Yes | Send `false` unless the client has document management enabled. |
+
+### Example
+
+```bash
+curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
+  -H "X-Api-Key: your-api-key-here" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requirementInstanceId": "00000000-0000-0000-0000-000000000050",
+    "issueDate": "2026-01-01",
+    "expirationDate": "2027-01-01",
+    "filePaths": [
+      "evidences/00000000-0000-0000-0000-000000000002/00000000-0000-0000-0000-000000000050/2026-06-22/insurance-certificate.pdf"
+    ],
+    "expressValidation": false
+  }'
+```
+
+Response (`200 OK`):
 
 ```json
 {
@@ -25,8 +56,6 @@ The registration call (`POST /v1/cm/companies/{companyId}/evidences/upload`) ret
 ```
 
 Take the first entry from `successfulEvidenceIds` — this is the **evidence id** you will need in Step 3. The instance is now in `PENDING_REVIEW`.
-
-> **Tip:** Include `expirationDate` when registering the document. Matches in Step 2 are filtered by expiration date against each destination contract's start date — omitting it may reduce or eliminate results.
 
 ## Step 2: Get the matching instances
 
