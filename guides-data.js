@@ -211,6 +211,13 @@ const GUIDES_DATA = [
             description: "Check whether a submission was approved or rejected, read the reviewer's feedback, and request express review.",
             icon: "assets/icon-requirements.svg",
           },
+          {
+            id: "contractor-document-hub-manage",
+            file: "contractor-document-hub.md",
+            title: "Manage Your Company Documents",
+            description: "Upload, list, filter, edit, and delete documents in your company's Document Hub.",
+            icon: "assets/icon-file-upload.svg",
+          },
         ],
       },
       {
