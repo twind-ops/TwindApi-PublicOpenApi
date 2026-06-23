@@ -17,7 +17,7 @@ The upload is a two-part process: upload the file to object storage, then regist
 
 ### Register the submission
 
-[`POST /v1/companies/{companyId}/evidences/upload`](#tag/submissions/POST/v1/companies/{companyId}/evidences/upload)
+[`POST /v1/cm/companies/{companyId}/evidences/upload`](#tag/submissions/POST/v1/cm/companies/{companyId}/evidences/upload)
 
 The URL is company-scoped, but the submission is always tied to a specific requirement instance via `requirementInstanceId` in the body.
 
@@ -32,7 +32,7 @@ The URL is company-scoped, but the submission is always tied to a specific requi
 ### Example
 
 ```bash
-curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
+curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
   -H "X-Api-Key: your-api-key-here" \
   -H "Content-Type: application/json" \
   -d '{
@@ -69,7 +69,7 @@ Retrieve all other instances that qualify for single-submission reuse. The syste
 
 The response groups matches by client so you can review and select which instances to propagate to.
 
-[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/matches`](#tag/requirement-instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/matches)
+[`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/matches`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/matches)
 
 ### Example: Get matches for an instance
 
