@@ -55,7 +55,7 @@ Response (`200 OK`):
 }
 ```
 
-Take the first entry from `successfulEvidenceIds` — this is the **evidence id** you will need in Step 3. The instance is now in `PENDING_REVIEW`.
+Take the first entry from `successfulEvidenceIds` — this is the **evidence id** you will need in Step 3. The instance is now in `PENDING_REVIEW`. If `successfulEvidenceIds` is empty, check `failedEvidenceIds` for upload errors and resolve them before continuing.
 
 ## Step 2: Get the matching instances
 
