@@ -29,7 +29,7 @@ The URL is company-scoped, but the submission is always tied to a specific requi
 | `filePaths` | Yes | Storage keys from the presigned upload (see [Upload Documents for a Requirement](contractor-requirements-upload-documents.md)). |
 | `expressValidation` | Yes | Send `false` unless the client has document management enabled. |
 
-### Example
+### Example: Register the submission
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
@@ -67,9 +67,11 @@ Retrieve all other instances that qualify for single-submission reuse. The syste
 - No valid submission already (no instance in `APPROVED`, `PENDING_REVIEW`, or `UNDER_GRACE_PERIOD` state)
 - A document expiration date later than the destination contract's start date
 
-The response groups matches by client so you can review and select which instances to propagate to.
+The response groups matches by client so you can review and select which instances to propagate to. The response also includes a `documentHubMatches` field with additional matches sourced from your Document Hub.
 
 [`GET /v1/companies/{companyId}/requirement-instances/{instanceId}/matches`](#tag/instances/GET/v1/companies/{companyId}/requirement-instances/{instanceId}/matches)
+
+Use the same `{instanceId}` from your Prerequisites (the same id you passed as `requirementInstanceId` in Step 1).
 
 ### Example: Get matches for an instance
 
@@ -109,6 +111,10 @@ Apply the submission from Step 1 to the instances you selected from the matches 
 
 [`POST /v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances`](#tag/submissions/POST/v1/companies/{companyId}/evidences/{evidenceId}/matching-requirement-instances)
 
+| Field | Required | Description |
+| --- | --- | --- |
+| `requirementInstanceIds` | Yes | Array of instance ids to propagate to (from Step 2). At least one id required. |
+
 ### Example: Propagate a document to selected instances
 
 ```bash
@@ -139,6 +145,7 @@ Response: `200 OK` (no body). The selected instances now carry the same document
 - [Track Your Pending Requirements](contractor-requirements-track-instances.md) — see all pending instances across your contracts.
 - [Track Submission Status and Review Outcome](contractor-requirements-track-submission-status.md) — check whether the submission was approved or rejected after propagation.
 - [Upload Documents for a Requirement](contractor-requirements-upload-documents.md) — full presigned upload mechanics.
+- [Review and Approve Submissions](client-requirements-review-evidences.md) — the client-side flow that decides on your submission.
 - Explore the [API Reference](../index.html?section=api) for all available endpoints.
 
 ---
