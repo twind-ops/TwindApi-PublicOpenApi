@@ -7,7 +7,7 @@ When a requirement instance asks you to provide a document, you upload the file 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
 - **The requirement instance id** — from [Track Your Pending Requirements](contractor-requirements-track-instances.md). Check the instance detail to confirm `evidenceType` is `UPLOAD`.
 
-> **Note — two different ids.** Steps 1–2 use the **requirement instance id** to get a presigned URL and upload the file. The **submission record id** is different: it only exists after Step 3 and is returned in `successfulEvidenceIds`. Use that id when fetching or referencing the submission later.
+> **Note — two different ids.** Steps 1–2 use the **requirement instance id** to get a presigned URL and upload the file. The **submission record id** is different: it only exists after Step 3 and is returned as `id` in the response. Use that id when fetching or referencing the submission later.
 
 ## Step 1: Get a presigned upload URL
 
@@ -80,7 +80,7 @@ Once every file is in storage, register the submission against the requirement i
 | `expirationDate` | No | Explicit document expiration, when applicable. |
 | `comments` | No | Note for the reviewer; **required** when `requirementDoesNotApply` is `true`. |
 | `requirementDoesNotApply` | No | Marks the requirement as not applicable instead of providing a document. |
-| `expressValidation` | Yes | Requests express validation; needs document management enabled for the client. Send `false` unless that applies — the API rejects bodies without the field. |
+| `expressValidation` | No | Requests express validation when the client has document management enabled. Defaults to `false` if omitted. |
 | `createdAt` | No | Defaults to server time. |
 
 ### Example: Register a document with two files
@@ -101,16 +101,15 @@ curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-0
   }'
 ```
 
-Response (`200 OK`):
+Response (`201 Created`):
 
 ```json
 {
-  "successfulEvidenceIds": ["00000000-0000-0000-0000-000000000071"],
-  "failedEvidenceIds": []
+  "id": "00000000-0000-0000-0000-000000000071"
 }
 ```
 
-The server verifies that every `filePaths` entry exists in storage; the instance then moves to `PENDING_REVIEW`. To submit on behalf of a subcontractor in your chain, add `?asSubcontractorId={subcontractorCompanyId}` to **both** the Step 1 and Step 3 URLs.
+The returned `id` is the submission record id. The server verifies that every `filePaths` entry exists in storage; the instance then moves to `PENDING_REVIEW`. To submit on behalf of a subcontractor in your chain, add `?asSubcontractorId={subcontractorCompanyId}` to **both** the Step 1 and Step 3 URLs.
 
 ## Common errors
 
@@ -118,7 +117,7 @@ The server verifies that every `filePaths` entry exists in storage; the instance
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | Insufficient permissions, or `asSubcontractorId` points outside your subcontractor chain. | Ensure your user has the necessary permissions; check the subcontractor id. |
-| 400 | A `filePaths` entry not found in storage, an unsupported `contentType` in Step 1, a missing `expressValidation`, `requirementDoesNotApply` without `comments`, or `expressValidation: true` without document management. | Re-check the keys from Step 1 and include `"expressValidation": false`. |
+| 400 | A `filePaths` entry not found in storage, an unsupported `contentType` in Step 1, `requirementDoesNotApply: true` without `comments`, or `expressValidation: true` without document management enabled. | Re-check the keys from Step 1; include `comments` when marking not applicable. |
 | 404 | Unknown `requirementInstanceId`. | Re-fetch it from [Track Your Pending Requirements](contractor-requirements-track-instances.md). |
 | 403 (storage) | The multipart POST does not match the presigned policy. | Send all `fields` unchanged and add the named `Content-Type` form field. |
 

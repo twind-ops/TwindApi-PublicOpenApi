@@ -27,7 +27,7 @@ The URL is company-scoped, but the submission is always tied to a specific requi
 | `issueDate` | Yes | Issue date of the document (`YYYY-MM-DD`). |
 | `expirationDate` | No | Expiration date (`YYYY-MM-DD`). Include it — matches in Step 2 are filtered against each destination contract's start date, so omitting it may reduce or eliminate results. |
 | `filePaths` | Yes | Storage keys from the presigned upload (see [Upload Documents for a Requirement](contractor-requirements-upload-documents.md)). |
-| `expressValidation` | Yes | Send `false` unless the client has document management enabled. |
+| `expressValidation` | No | Requests express validation when the client has document management enabled. Defaults to `false` if omitted. |
 
 ### Example: Register the submission
 
@@ -46,16 +46,15 @@ curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-0
   }'
 ```
 
-Response (`200 OK`):
+Response (`201 Created`):
 
 ```json
 {
-  "successfulEvidenceIds": ["00000000-0000-0000-0000-000000000071"],
-  "failedEvidenceIds": []
+  "id": "00000000-0000-0000-0000-000000000071"
 }
 ```
 
-Take the first entry from `successfulEvidenceIds` — this is the **evidence id** you will need in Step 3. The instance is now in `PENDING_REVIEW`. If `successfulEvidenceIds` is empty, check `failedEvidenceIds` for upload errors and resolve them before continuing.
+The returned `id` is the **evidence id** — save it, you will need it in Step 3. The instance is now in `PENDING_REVIEW`.
 
 ## Step 2: Get the matching instances
 
@@ -83,27 +82,63 @@ curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
 Response (`200 OK`, trimmed):
 
 ```json
-[
-  {
-    "clientId": "00000000-0000-0000-0000-000000000001",
-    "clientName": "Industrial Corp",
-    "matches": [
-      {
-        "requirementInstanceId": "00000000-0000-0000-0000-000000000161",
-        "contractName": "Plant maintenance 2026",
-        "siteName": "North Plant"
+{
+  "subject": {
+    "id": "00000000-0000-0000-0000-000000000099",
+    "name": "John Doe",
+    "type": "EMPLOYEE",
+    "identifierType": "ID",
+    "identifier": "12345678"
+  },
+  "matches": [
+    {
+      "requirementName": "Insurance Certificate",
+      "requirementInstance": {
+        "id": "00000000-0000-0000-0000-000000000161",
+        "status": "PENDING_UPLOAD",
+        "dateOfIssue": null,
+        "expirationDate": null
       },
-      {
-        "requirementInstanceId": "00000000-0000-0000-0000-000000000162",
-        "contractName": "Plant maintenance 2026",
-        "siteName": "South Plant"
-      }
-    ]
-  }
-]
+      "client": {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "name": "Industrial Corp",
+        "taxId": "12-3456789"
+      },
+      "contracts": [
+        {
+          "id": "00000000-0000-0000-0000-000000000200",
+          "name": "Plant maintenance 2026",
+          "sites": [{ "id": "00000000-0000-0000-0000-000000000300", "name": "North Plant" }]
+        }
+      ]
+    },
+    {
+      "requirementName": "Insurance Certificate",
+      "requirementInstance": {
+        "id": "00000000-0000-0000-0000-000000000162",
+        "status": "PENDING_UPLOAD",
+        "dateOfIssue": null,
+        "expirationDate": null
+      },
+      "client": {
+        "id": "00000000-0000-0000-0000-000000000001",
+        "name": "Industrial Corp",
+        "taxId": "12-3456789"
+      },
+      "contracts": [
+        {
+          "id": "00000000-0000-0000-0000-000000000200",
+          "name": "Plant maintenance 2026",
+          "sites": [{ "id": "00000000-0000-0000-0000-000000000301", "name": "South Plant" }]
+        }
+      ]
+    }
+  ],
+  "documentHubMatches": []
+}
 ```
 
-Pass only ids from this response in Step 3 — any id outside this set will fail validation.
+The instance ids for Step 3 are `matches[i].requirementInstance.id`. Pass only ids from this response — any id outside this set will fail validation.
 
 ## Step 3: Propagate the document to selected instances
 
