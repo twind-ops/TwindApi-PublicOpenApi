@@ -212,6 +212,13 @@ const GUIDES_DATA = [
             icon: "assets/icon-requirements.svg",
           },
           {
+            id: "contractor-requirements-track-evidences",
+            file: "contractor-requirements-track-evidences.md",
+            title: "Single Submission: Reuse Evidence Across Requirements",
+            description: "Upload a document once and propagate it to all matching requirement instances across contracts — no duplicate uploads.",
+            icon: "assets/icon-requirements.svg",
+          },
+          {
             id: "contractor-document-hub-manage",
             file: "contractor-document-hub.md",
             title: "Manage Your Company Documents",
