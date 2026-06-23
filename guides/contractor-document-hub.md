@@ -213,17 +213,21 @@ Response (`200 OK`):
 
 To filter the document list by subject type, apply `subjectTypes` to the subjects lookup and `documentTargetTypes` to the document types lookup. Both calls are typically made in parallel when the user selects a filter.
 
+> **Note:** This step uses the company-scoped `/v1/companies/{companyId}/document-types` endpoint rather than the global `/v1/document-types` from Step 1. The company-scoped endpoint supports the `documentTargetTypes` filter parameter; the global endpoint does not.
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?subjectTypes=EMPLOYEE&size=50" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
 ```bash
-curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/document-types?subjectTypes=EMPLOYEE&size=50" \
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/document-types?documentTargetTypes=EMPLOYEE&size=50" \
   -H "X-Api-Key: your-api-key-here"
 ```
 
-Supported `subjectTypes` values: `CONTRACTOR`, `EMPLOYEE`, `EQUIPMENT`.
+Supported `subjectTypes` values (subjects endpoint): `CONTRACTOR`, `EMPLOYEE`, `EQUIPMENT`.
+
+Supported `documentTargetTypes` values (document types endpoint): `CONTRACTOR`, `EMPLOYEE`, `EQUIPMENT`, `VEHICLE`, `PRODUCT`.
 
 ## Step 5: Get document detail
 
@@ -267,6 +271,7 @@ curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
     "name": "Insurance Certificate (renewed)",
     "subjectType": "CONTRACTOR",
     "subjectId": "00000000-0000-0000-0000-000000000010",
+    "documentTypeId": "00000000-0000-0000-0000-000000000020",
     "issueDate": "2026-06-01",
     "expirationDate": "2027-06-01",
     "files": [
@@ -331,6 +336,7 @@ curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-0000
     "name": "Insurance Certificate",
     "subjectType": "CONTRACTOR",
     "subjectId": "00000000-0000-0000-0000-000000000010",
+    "documentTypeId": "00000000-0000-0000-0000-000000000020",
     "issueDate": "2026-01-01",
     "expirationDate": "2027-01-01",
     "files": [
