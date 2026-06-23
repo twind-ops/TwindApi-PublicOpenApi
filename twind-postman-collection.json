@@ -4247,5 +4247,765 @@
         "description" : "Returns all subcontracts at the given (contract, site) pair. Each entry groups activities by child contract."
       }
     } ]
+  }, {
+    "name" : "Document hub",
+    "description" : "Document Hub: create, read, update, and delete company documents; draft lifecycle (create drafts and finalize them); and autocomplete helpers for subject and document-name filters.",
+    "item" : [ {
+      "name" : "List documents for a company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "documentTypeIds",
+            "value" : "",
+            "description" : "Filter by document type IDs",
+            "disabled" : true
+          }, {
+            "key" : "subjectIds",
+            "value" : "",
+            "description" : "Filter by subject IDs",
+            "disabled" : true
+          }, {
+            "key" : "subjectTypes",
+            "value" : "",
+            "description" : "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR)",
+            "disabled" : true
+          }, {
+            "key" : "productTypeIds",
+            "value" : "",
+            "description" : "Filter by product type IDs",
+            "disabled" : true
+          }, {
+            "key" : "documentNames",
+            "value" : "",
+            "description" : "Filter by document names",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of finalized documents created by the company, with optional filters and sort fields. **Allowed sort fields:** `subjectType`; `documentName`; `documentType`; `subjectName`; `issueDate`; `expirationDate`; `createdAt` (default descending). **Sort format:** `?sort=field,direction` (e.g. `?sort=documentName,asc`)."
+      }
+    }, {
+      "name" : "Create one or more finalized documents",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ]
+        },
+        "description" : "Creates documents that are immediately finalized. Strict validation applies: each document must have a name, subjectType, issueDate, and (when subjectType is not CONTRACTOR) a subjectId. Use POST /draft to create documents that should remain in draft state. The endpoint is atomic: on success it returns 201 with `{ids: [...]}`; if any document in the batch fails validation, it returns 400 with `code=DOCUMENT_HUB_CREATE_DOCUMENT_FAILED` and an `errors[]` array (each entry carries `index`, `name`, `code`, `message`, and per-error metadata). Nothing is persisted when the response is 400.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List draft documents for a company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/draft",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", "draft" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "documentTypeIds",
+            "value" : "",
+            "description" : "Filter by document type IDs",
+            "disabled" : true
+          }, {
+            "key" : "subjectIds",
+            "value" : "",
+            "description" : "Filter by subject IDs",
+            "disabled" : true
+          }, {
+            "key" : "subjectTypes",
+            "value" : "",
+            "description" : "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR)",
+            "disabled" : true
+          }, {
+            "key" : "productTypeIds",
+            "value" : "",
+            "description" : "Filter by product type IDs",
+            "disabled" : true
+          }, {
+            "key" : "documentNames",
+            "value" : "",
+            "description" : "Filter by document names",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of draft documents (not yet finalized) for the company, with the same filters and sort fields as the main listing endpoint."
+      }
+    }, {
+      "name" : "Create one or more draft documents",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/draft",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", "draft" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ]
+        },
+        "description" : "Creates documents in draft state (finalized_at = null). Permissive validation: missing fields like name, subjectType, subjectId, or issueDate are allowed. Subject/document-type consistency rules still apply. Use POST /{id}/finalize to transition a draft to finalized. The endpoint is atomic: on success it returns 201 with `{ids: [...]}`; if any document in the batch fails validation, it returns 400 with `code=DOCUMENT_HUB_CREATE_DOCUMENT_FAILED` and an `errors[]` array (each entry carries `index`, `name`, `code`, `message`, and per-error metadata). Nothing is persisted when the response is 400.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get a document by ID",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Document ID"
+          } ]
+        },
+        "description" : "Returns a single document with temporary download URLs for its files."
+      }
+    }, {
+      "name" : "Edit a document in place",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Document ID"
+          } ]
+        },
+        "description" : "Updates an existing document's fields without changing its draft/finalized state. Drafts remain drafts (permissive validation); finalized documents stay finalized (strict validation: name, subjectType, subjectId/CONTRACTOR, and issueDate must be present). Clients editing a document must re-send the full payload (not just the modified fields). Use POST /{id}/finalize to transition a draft to finalized.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete a document",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/:id",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", ":id" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Document ID"
+          } ]
+        },
+        "description" : "Soft-deletes a document by ID."
+      }
+    }, {
+      "name" : "Apply field values and finalize a draft document",
+      "request" : {
+        "method" : "POST",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/:id/finalize",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", ":id", "finalize" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          }, {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Document ID"
+          } ]
+        },
+        "description" : "Atomically applies the provided field values to a draft document and transitions it to finalized (sets finalized_at = now). Strict validation applies. Returns 400 with code DOCUMENT_HUB_ALREADY_FINALIZED if the target is already finalized.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "List subjects for the document hub autocomplete",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/subjects",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", "subjects" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search query to filter subjects by name",
+            "disabled" : true
+          }, {
+            "key" : "subjectTypes",
+            "value" : "",
+            "description" : "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR)",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns all possible subjects (employees, vehicles, equipment, products, and the company itself as CONTRACTOR) belonging to the company, regardless of whether they are referenced by a document. Intended to populate a subject filter picker."
+      }
+    }, {
+      "name" : "List distinct document names for the document hub autocomplete",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/document-names",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", "document-names" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search query to filter document names",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns the distinct document names of non-deleted documents belonging to the company. Intended to populate a document-name filter picker."
+      }
+    }, {
+      "name" : "Presigned upload URL for a Document Hub file",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/documents/temporary-upload-url",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "documents", "temporary-upload-url" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "contentType",
+            "value" : "",
+            "description" : "MIME type of the file to upload",
+            "disabled" : false
+          }, {
+            "key" : "fileName",
+            "value" : "",
+            "description" : "Name of the file to upload",
+            "disabled" : false
+          } ]
+        },
+        "description" : "Returns a presigned POST payload for uploading a single file to object storage for this company's Document Hub."
+      }
+    }, {
+      "name" : "List global document types",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/document-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "document-types" ],
+          "query" : [ {
+            "key" : "name",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "code",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "countryId",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns a paginated list of document types available across the platform. Optionally filter by name, code, or country. **Default sort:** `name` ascending."
+      }
+    }, {
+      "name" : "List document types for a company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/document-types",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "document-types" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Company ID"
+          } ],
+          "query" : [ {
+            "key" : "documentTargetTypes",
+            "value" : "",
+            "description" : "Filter by target types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR, PRODUCT)",
+            "disabled" : true
+          }, {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional search query for accent-insensitive partial match on name",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns the document type catalog for the company's country (same source as requirements admin). Each entry includes target (EMPLOYEE, EQUIPMENT, VEHICLE, CONTRACTOR, PRODUCT). Optional documentTargetTypes pre-filters server-side (multi-select). Optional q performs an accent-insensitive partial match on name."
+      }
+    } ]
+  }, {
+    "name" : "Contractor status",
+    "description" : "List contractors with their aggregated payment authorization status, and drill into a contractor to see the requirements blocking payment.\n\nSupports both calculation modes (Individual and Subcontracting Chain) following the same business rules as the Payment Authorization module.\n\n- **Payment status by contractor**: List contractors with aggregated payment authorization status (paginated, filterable by contractor/company, payment status, contract, site and activity)\n- **Contractor detail**: Aggregated status for a single contractor plus the blocking requirement instances\n- **Resolving blocking requirements**: Each blocking requirement carries a `requirementInstanceId`. Dereference it via `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (requires the Requirements API product).",
+    "item" : [ {
+      "name" : "Get payment authorization status by company",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-company",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-company" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "paymentStatus",
+            "value" : "",
+            "description" : "Filter by aggregated payment status",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter contractors to those with at least one matching contract. Obtain contract IDs from the `by-contract` list response (field `contract.id`).",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (matches contract scope including child sites). Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by activity IDs (contract has an engagement on one of these activities). Obtain them from `GET /v1/companies/{companyId}/activities` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "Contract date range start (contract.dateFrom >= dateFrom)",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "Contract date range end (contract.dateTo <= dateTo)",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "maxContractsPerContractor",
+            "value" : "",
+            "description" : "Maximum number of contracts to return per contractor. When omitted, all contracts are returned (useful for exports).",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns one row per contractor with at least one active contract with the client, with their aggregated payment authorization status. Works in both calculation modes; the mode in effect is returned in each row's `calculationMode` field. **Allowed sort fields:** `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      }
+    }, {
+      "name" : "Get payment authorization detail for a contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/contractors/:contractorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "contractors", ":contractorId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company ID. UUID of the contractor company. Obtain it from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`)."
+          } ]
+        },
+        "description" : "Returns the contractor, the aggregated payment status, the count of active contracts with the calling client, and the payment-required requirement instances currently blocking payment (with the specific failing subject: contractor company, employee, vehicle, equipment or product). When `paymentStatus` is not authorized, `blockingRequirements[]` lists the failing requirement instances. To obtain the full requirement configuration and evidence detail for each, take its `requirementInstanceId` and call the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the API key must also have the Requirements API product subscribed)."
+      }
+    } ]
+  }, {
+    "name" : "Contract status",
+    "description" : "List contracts with the contractor's payment authorization status per contract, and drill into a contract to see the blocking requirement issues.\n\n- **Payment status by contract**: List contracts with the contractor's payment authorization status per contract (paginated, filterable by contractor/company, contract, site, activity and payment status)\n- **Contract detail**: Payment authorization status and blocking requirement issues for a contractor on a specific contract\n- **Resolving blocking requirements**: Each issue carries a `requirementInstanceId`. Dereference it via `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (requires the Requirements API product).",
+    "item" : [ {
+      "name" : "Get payment authorization status by contract",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-contract",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-contract" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          }, {
+            "key" : "paymentStatus",
+            "value" : "",
+            "description" : "Filter by per-contract payment status",
+            "disabled" : true
+          }, {
+            "key" : "contractorIds",
+            "value" : "",
+            "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "contractIds",
+            "value" : "",
+            "description" : "Filter by specific contract IDs. Obtain them from the `by-contract` list response (field `contract.id`).",
+            "disabled" : true
+          }, {
+            "key" : "siteIds",
+            "value" : "",
+            "description" : "Filter by site IDs (matches contract scope including child sites). Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "activityIds",
+            "value" : "",
+            "description" : "Filter by activity IDs (contract has an engagement on one of these activities). Obtain them from `GET /v1/companies/{companyId}/activities` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "dateFrom",
+            "value" : "",
+            "description" : "Contract date range start (contract.dateFrom >= dateFrom)",
+            "disabled" : true
+          }, {
+            "key" : "dateTo",
+            "value" : "",
+            "description" : "Contract date range end (contract.dateTo <= dateTo)",
+            "disabled" : true
+          }, {
+            "key" : "managerIds",
+            "value" : "",
+            "description" : "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "subcontractingLevel",
+            "value" : "",
+            "description" : "Filter by subcontracting level (0 = Main contract, ≥1 = Subcontract level N)",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "When true, includes contracts whose end date has passed alongside active contracts.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns one row per contract between the client and any contractor, with the contract's payment authorization status. The status is computed per the client's calculation mode: in **Individual** mode it reflects that contract's own contractor; in **Subcontracting Chain** mode the whole subcontracting tree is one unit, so a single failing contractor at any level marks every contract in the tree as Not authorized (expired contracts never block). The active mode is returned per row in `calculationMode`. **`showExpired`:** when `false` (default), only non-expired contracts are returned. When `true`, expired contracts are included alongside active ones. **Allowed sort fields:** `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      }
+    }, {
+      "name" : "Get payment authorization detail for a contract",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/by-contract/:contractId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "by-contract", ":contractId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID. UUID of the contract. Obtain it from the `by-contract` list response (field `contract.id`)."
+          } ]
+        },
+        "description" : "Returns the payment authorization status, the contracts that make up the chain, and any blocking requirement issues for the given contract. In **Individual** mode the detail is scoped to this single contract; in **Subcontracting Chain** mode the whole subcontracting tree is evaluated as one unit, so `contracts[]` lists every active contract in the tree (each with its own contractor) and `issues[]` spans every contributing contractor; in this mode an expired viewed contract is always Authorized and shows no issues. When the status is not authorized, `issues[]` lists the failing requirement instances. To obtain the full requirement configuration and evidence detail for each, take its `requirementInstanceId` and call the Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the API key must also have the Requirements API product subscribed)."
+      }
+    } ]
+  }, {
+    "name" : "Calculation mode",
+    "description" : "Read and manage the client's calculation mode (Individual or Subcontracting Chain), and review its change history.\n\n- **Configuration**: Read the current calculation mode, and update it (updating requires write permission)\n- **History**: List the configuration change history — product activations, deactivations and calculation mode changes",
+    "item" : [ {
+      "name" : "Get the Payment Authorization calculation mode configuration",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/config",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "config" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ]
+        },
+        "description" : "Returns the client's current Payment Authorization calculation mode. Defaults to `INDIVIDUAL` when no explicit mode has been saved."
+      }
+    }, {
+      "name" : "Update the Payment Authorization calculation mode",
+      "request" : {
+        "method" : "PUT",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/config",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "config" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ]
+        },
+        "description" : "Sets the client's Payment Authorization calculation mode. The change is recorded in the configuration history.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Get the Payment Authorization configuration change history",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/payment-authorization/history",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "payment-authorization", "history" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company ID. UUID of the client company. Obtain it from `GET /v1/users/me/companies` (field `companyId`)."
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns mode/activation events for the client's Payment Authorization product (most recent first): product activated, product deactivated, and calculation mode changes. Each entry includes the timestamp and the actor (name + email)."
+      }
+    } ]
   } ]
 }

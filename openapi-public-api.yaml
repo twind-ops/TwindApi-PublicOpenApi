@@ -89,6 +89,32 @@ tags:
 - name: Subcontracts
   description: "Subcontracting relationships: direct creation, requests (list, create,\
     \ approve, reject), contractor view, and subcontracts at a contract site."
+- name: Document hub
+  description: "Document Hub: create, read, update, and delete company documents;\
+    \ draft lifecycle (create drafts and finalize them); and autocomplete helpers\
+    \ for subject and document-name filters."
+- name: Contractor status
+  description: |-
+    List contractors with their aggregated payment authorization status, and drill into a contractor to see the requirements blocking payment.
+
+    Supports both calculation modes (Individual and Subcontracting Chain) following the same business rules as the Payment Authorization module.
+
+    - **Payment status by contractor**: List contractors with aggregated payment authorization status (paginated, filterable by contractor/company, payment status, contract, site and activity)
+    - **Contractor detail**: Aggregated status for a single contractor plus the blocking requirement instances
+    - **Resolving blocking requirements**: Each blocking requirement carries a `requirementInstanceId`. Dereference it via `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (requires the Requirements API product).
+- name: Contract status
+  description: |-
+    List contracts with the contractor's payment authorization status per contract, and drill into a contract to see the blocking requirement issues.
+
+    - **Payment status by contract**: List contracts with the contractor's payment authorization status per contract (paginated, filterable by contractor/company, contract, site, activity and payment status)
+    - **Contract detail**: Payment authorization status and blocking requirement issues for a contractor on a specific contract
+    - **Resolving blocking requirements**: Each issue carries a `requirementInstanceId`. Dereference it via `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (requires the Requirements API product).
+- name: Calculation mode
+  description: |-
+    Read and manage the client's calculation mode (Individual or Subcontracting Chain), and review its change history.
+
+    - **Configuration**: Read the current calculation mode, and update it (updating requires write permission)
+    - **History**: List the configuration change history — product activations, deactivations and calculation mode changes
 paths:
   /v1/users/me:
     get:
@@ -443,7 +469,7 @@ paths:
       - Lookups
       summary: List countries
       description: Paginated countries catalog. Filter by partial **name** match.
-      operationId: findAll_9
+      operationId: findAll_10
       parameters:
       - name: name
         in: query
@@ -7676,6 +7702,1448 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/SubcontractV2"
+  /v1/companies/{companyId}/documents:
+    get:
+      tags:
+      - Document hub
+      summary: List documents for a company
+      description: "Returns a paginated list of finalized documents created by the\
+        \ company, with optional filters and sort fields. **Allowed sort fields:**\
+        \ `subjectType`; `documentName`; `documentType`; `subjectName`; `issueDate`;\
+        \ `expirationDate`; `createdAt` (default descending). **Sort format:** `?sort=field,direction`\
+        \ (e.g. `?sort=documentName,asc`)."
+      operationId: listDocuments
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: documentTypeIds
+        in: query
+        description: Filter by document type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: subjectIds
+        in: query
+        description: Filter by subject IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: subjectTypes
+        in: query
+        description: "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT,\
+          \ CONTRACTOR)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+      - name: productTypeIds
+        in: query
+        description: Filter by product type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: documentNames
+        in: query
+        description: Filter by document names
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "createdAt,DESC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved documents list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+    post:
+      tags:
+      - Document hub
+      summary: Create one or more finalized documents
+      description: "Creates documents that are immediately finalized. Strict validation\
+        \ applies: each document must have a name, subjectType, issueDate, and (when\
+        \ subjectType is not CONTRACTOR) a subjectId. Use POST /draft to create documents\
+        \ that should remain in draft state. The endpoint is atomic: on success it\
+        \ returns 201 with `{ids: [...]}`; if any document in the batch fails validation,\
+        \ it returns 400 with `code=DOCUMENT_HUB_CREATE_DOCUMENT_FAILED` and an `errors[]`\
+        \ array (each entry carries `index`, `name`, `code`, `message`, and per-error\
+        \ metadata). Nothing is persisted when the response is 400."
+      operationId: createDocuments
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchCreateDocumentDto"
+        required: true
+      responses:
+        "201":
+          description: Documents created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "400":
+          description: "Validation failed: one or more documents are invalid"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+  /v1/companies/{companyId}/documents/draft:
+    get:
+      tags:
+      - Document hub
+      summary: List draft documents for a company
+      description: "Returns a paginated list of draft documents (not yet finalized)\
+        \ for the company, with the same filters and sort fields as the main listing\
+        \ endpoint."
+      operationId: listDraftDocuments
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: documentTypeIds
+        in: query
+        description: Filter by document type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: subjectIds
+        in: query
+        description: Filter by subject IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: subjectTypes
+        in: query
+        description: "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT,\
+          \ CONTRACTOR)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+      - name: productTypeIds
+        in: query
+        description: Filter by product type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: documentNames
+        in: query
+        description: Filter by document names
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "createdAt,DESC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved draft documents list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentResponseDto"
+    post:
+      tags:
+      - Document hub
+      summary: Create one or more draft documents
+      description: "Creates documents in draft state (finalized_at = null). Permissive\
+        \ validation: missing fields like name, subjectType, subjectId, or issueDate\
+        \ are allowed. Subject/document-type consistency rules still apply. Use POST\
+        \ /{id}/finalize to transition a draft to finalized. The endpoint is atomic:\
+        \ on success it returns 201 with `{ids: [...]}`; if any document in the batch\
+        \ fails validation, it returns 400 with `code=DOCUMENT_HUB_CREATE_DOCUMENT_FAILED`\
+        \ and an `errors[]` array (each entry carries `index`, `name`, `code`, `message`,\
+        \ and per-error metadata). Nothing is persisted when the response is 400."
+      operationId: createDraftDocuments
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchCreateDocumentDto"
+        required: true
+      responses:
+        "201":
+          description: Draft documents created successfully
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "400":
+          description: "Validation failed: one or more documents are invalid"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/CreateDocumentResult"
+  /v1/companies/{companyId}/documents/{id}:
+    get:
+      tags:
+      - Document hub
+      summary: Get a document by ID
+      description: Returns a single document with temporary download URLs for its
+        files.
+      operationId: getDocument
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Document ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved document
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DocumentDetailResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DocumentDetailResponseDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DocumentDetailResponseDto"
+        "404":
+          description: Document not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/DocumentDetailResponseDto"
+    put:
+      tags:
+      - Document hub
+      summary: Edit a document in place
+      description: "Updates an existing document's fields without changing its draft/finalized\
+        \ state. Drafts remain drafts (permissive validation); finalized documents\
+        \ stay finalized (strict validation: name, subjectType, subjectId/CONTRACTOR,\
+        \ and issueDate must be present). Clients editing a document must re-send\
+        \ the full payload (not just the modified fields). Use POST /{id}/finalize\
+        \ to transition a draft to finalized."
+      operationId: editDocument
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Document ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentDto"
+        required: true
+      responses:
+        "204":
+          description: Document updated successfully
+          content: {}
+        "400":
+          description: Validation failed
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content: {}
+        "403":
+          description: "Access denied: insufficient permissions"
+          content: {}
+        "404":
+          description: Document not found
+          content: {}
+    delete:
+      tags:
+      - Document hub
+      summary: Delete a document
+      description: Soft-deletes a document by ID.
+      operationId: deleteDocument
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Document ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "204":
+          description: Document deleted successfully
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content: {}
+        "403":
+          description: "Access denied: insufficient permissions"
+          content: {}
+        "404":
+          description: Document not found
+          content: {}
+  /v1/companies/{companyId}/documents/{id}/finalize:
+    post:
+      tags:
+      - Document hub
+      summary: Apply field values and finalize a draft document
+      description: Atomically applies the provided field values to a draft document
+        and transitions it to finalized (sets finalized_at = now). Strict validation
+        applies. Returns 400 with code DOCUMENT_HUB_ALREADY_FINALIZED if the target
+        is already finalized.
+      operationId: finalizeDocument
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: id
+        in: path
+        description: Document ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateDocumentDto"
+        required: true
+      responses:
+        "204":
+          description: Document finalized successfully
+          content: {}
+        "400":
+          description: Validation failed or document already finalized
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content: {}
+        "403":
+          description: "Access denied: insufficient permissions"
+          content: {}
+        "404":
+          description: Document not found
+          content: {}
+  /v1/companies/{companyId}/documents/subjects:
+    get:
+      tags:
+      - Document hub
+      summary: List subjects for the document hub autocomplete
+      description: "Returns all possible subjects (employees, vehicles, equipment,\
+        \ products, and the company itself as CONTRACTOR) belonging to the company,\
+        \ regardless of whether they are referenced by a document. Intended to populate\
+        \ a subject filter picker."
+      operationId: listDocumentHubSubjects
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Optional search query to filter subjects by name
+        required: false
+        schema:
+          type: string
+      - name: subjectTypes
+        in: query
+        description: "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT,\
+          \ CONTRACTOR)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved subjects list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentHubSubjectDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentHubSubjectDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseDocumentHubSubjectDto"
+  /v1/companies/{companyId}/documents/document-names:
+    get:
+      tags:
+      - Document hub
+      summary: List distinct document names for the document hub autocomplete
+      description: Returns the distinct document names of non-deleted documents belonging
+        to the company. Intended to populate a document-name filter picker.
+      operationId: listDocumentHubDocumentNames
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: Optional search query to filter document names
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved document names list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseString"
+  /v1/companies/{companyId}/documents/temporary-upload-url:
+    get:
+      tags:
+      - Document hub
+      summary: Presigned upload URL for a Document Hub file
+      description: Returns a presigned POST payload for uploading a single file to
+        object storage for this company's Document Hub.
+      operationId: getTemporaryUploadUrl
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contentType
+        in: query
+        description: MIME type of the file to upload
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: fileName
+        in: query
+        description: Name of the file to upload
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        "200":
+          description: Successfully retrieved presigned upload URL
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PresignedUploadUrl"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PresignedUploadUrl"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PresignedUploadUrl"
+  /v1/document-types:
+    get:
+      tags:
+      - Document hub
+      summary: List global document types
+      description: "Returns a paginated list of document types available across the\
+        \ platform. Optionally filter by name, code, or country. **Default sort:**\
+        \ `name` ascending."
+      operationId: findAll_9
+      parameters:
+      - name: name
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: code
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: countryId
+        in: query
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved document types list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelDocumentTypeResponseDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelDocumentTypeResponseDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelDocumentTypeResponseDto"
+  /v1/companies/{id}/document-types:
+    get:
+      tags:
+      - Document hub
+      summary: List document types for a company
+      description: "Returns the document type catalog for the company's country (same\
+        \ source as requirements admin). Each entry includes target (EMPLOYEE, EQUIPMENT,\
+        \ VEHICLE, CONTRACTOR, PRODUCT). Optional documentTargetTypes pre-filters\
+        \ server-side (multi-select). Optional q performs an accent-insensitive partial\
+        \ match on name."
+      operationId: getDocumentTypes
+      parameters:
+      - name: id
+        in: path
+        description: Company ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: documentTargetTypes
+        in: query
+        description: "Filter by target types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR,\
+          \ PRODUCT)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+      - name: q
+        in: query
+        description: Optional search query for accent-insensitive partial match on
+          name
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved document types list
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDocumentTypesResponse"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDocumentTypesResponse"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseGetDocumentTypesResponse"
+  /v1/companies/{clientId}/payment-authorization/by-company:
+    get:
+      tags:
+      - Contractor status
+      summary: Get payment authorization status by company
+      description: "Returns one row per contractor with at least one active contract\
+        \ with the client, with their aggregated payment authorization status. Works\
+        \ in both calculation modes; the mode in effect is returned in each row's\
+        \ `calculationMode` field. **Allowed sort fields:** `contractor_name` (default).\
+        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+      operationId: getByCompany
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "contractor_name,ASC"
+          items:
+            type: string
+      - name: paymentStatus
+        in: query
+        description: Filter by aggregated payment status
+        required: false
+        schema:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      - name: contractorIds
+        in: query
+        description: "Filter by contractor company IDs. Obtain them from the `by-company`\
+          \ list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contractIds
+        in: query
+        description: Filter contractors to those with at least one matching contract.
+          Obtain contract IDs from the `by-contract` list response (field `contract.id`).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (matches contract scope including child sites).\
+          \ Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        description: "Filter by activity IDs (contract has an engagement on one of\
+          \ these activities). Obtain them from `GET /v1/companies/{companyId}/activities`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: dateFrom
+        in: query
+        description: Contract date range start (contract.dateFrom >= dateFrom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        description: Contract date range end (contract.dateTo <= dateTo)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: managerIds
+        in: query
+        description: "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: maxContractsPerContractor
+        in: query
+        description: "Maximum number of contracts to return per contractor. When omitted,\
+          \ all contracts are returned (useful for exports)."
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization rows
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByCompanyRowDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/payment-authorization/contractors/{contractorId}:
+    get:
+      tags:
+      - Contractor status
+      summary: Get payment authorization detail for a contractor
+      description: "Returns the contractor, the aggregated payment status, the count\
+        \ of active contracts with the calling client, and the payment-required requirement\
+        \ instances currently blocking payment (with the specific failing subject:\
+        \ contractor company, employee, vehicle, equipment or product). When `paymentStatus`\
+        \ is not authorized, `blockingRequirements[]` lists the failing requirement\
+        \ instances. To obtain the full requirement configuration and evidence detail\
+        \ for each, take its `requirementInstanceId` and call the Requirements API:\
+        \ `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (the\
+        \ API key must also have the Requirements API product subscribed)."
+      operationId: getContractorDetail
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: "Contractor company ID. UUID of the contractor company. Obtain\
+          \ it from the `by-company` list response (field `contractor.id`) or from\
+          \ `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`)."
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved blocking requirements
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ContractorPaymentAuthorizationDetailDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contractor has no active contract with this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/payment-authorization/by-contract:
+    get:
+      tags:
+      - Contract status
+      summary: Get payment authorization status by contract
+      description: "Returns one row per contract between the client and any contractor,\
+        \ with the contract's payment authorization status. The status is computed\
+        \ per the client's calculation mode: in **Individual** mode it reflects that\
+        \ contract's own contractor; in **Subcontracting Chain** mode the whole subcontracting\
+        \ tree is one unit, so a single failing contractor at any level marks every\
+        \ contract in the tree as Not authorized (expired contracts never block).\
+        \ The active mode is returned per row in `calculationMode`. **`showExpired`:**\
+        \ when `false` (default), only non-expired contracts are returned. When `true`,\
+        \ expired contracts are included alongside active ones. **Allowed sort fields:**\
+        \ `contractor_name` (default). **Sort format:** `?sort=field,direction` (e.g.\
+        \ `?sort=contractor_name,asc`)."
+      operationId: getByContract
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "contractor_name,ASC"
+          items:
+            type: string
+      - name: paymentStatus
+        in: query
+        description: Filter by per-contract payment status
+        required: false
+        schema:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      - name: contractorIds
+        in: query
+        description: "Filter by contractor company IDs. Obtain them from the `by-company`\
+          \ list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: contractIds
+        in: query
+        description: Filter by specific contract IDs. Obtain them from the `by-contract`
+          list response (field `contract.id`).
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: siteIds
+        in: query
+        description: "Filter by site IDs (matches contract scope including child sites).\
+          \ Obtain them from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: activityIds
+        in: query
+        description: "Filter by activity IDs (contract has an engagement on one of\
+          \ these activities). Obtain them from `GET /v1/companies/{companyId}/activities`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: dateFrom
+        in: query
+        description: Contract date range start (contract.dateFrom >= dateFrom)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: dateTo
+        in: query
+        description: Contract date range end (contract.dateTo <= dateTo)
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: managerIds
+        in: query
+        description: "Filter by contract manager user IDs. Obtain them from `GET /v1/companies/{companyId}/users`\
+          \ (field `id`)."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: subcontractingLevel
+        in: query
+        description: "Filter by subcontracting level (0 = Main contract, ≥1 = Subcontract\
+          \ level N)"
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - name: showExpired
+        in: query
+        description: "When true, includes contracts whose end date has passed alongside\
+          \ active contracts."
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization rows by contract
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationByContractRowDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/payment-authorization/by-contract/{contractId}:
+    get:
+      tags:
+      - Contract status
+      summary: Get payment authorization detail for a contract
+      description: "Returns the payment authorization status, the contracts that make\
+        \ up the chain, and any blocking requirement issues for the given contract.\
+        \ In **Individual** mode the detail is scoped to this single contract; in\
+        \ **Subcontracting Chain** mode the whole subcontracting tree is evaluated\
+        \ as one unit, so `contracts[]` lists every active contract in the tree (each\
+        \ with its own contractor) and `issues[]` spans every contributing contractor;\
+        \ in this mode an expired viewed contract is always Authorized and shows no\
+        \ issues. When the status is not authorized, `issues[]` lists the failing\
+        \ requirement instances. To obtain the full requirement configuration and\
+        \ evidence detail for each, take its `requirementInstanceId` and call the\
+        \ Requirements API: `GET /v1/companies/{companyId}/requirement-instances/{instanceId}`\
+        \ (the API key must also have the Requirements API product subscribed)."
+      operationId: getByContractDetail
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID. UUID of the contract. Obtain it from the `by-contract`
+          list response (field `contract.id`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved payment authorization detail
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationContractDetailDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: No contract found for this client
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/payment-authorization/config:
+    get:
+      tags:
+      - Calculation mode
+      summary: Get the Payment Authorization calculation mode configuration
+      description: Returns the client's current Payment Authorization calculation
+        mode. Defaults to `INDIVIDUAL` when no explicit mode has been saved.
+      operationId: getConfig
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved config
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PaymentAuthorizationConfigDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+    put:
+      tags:
+      - Calculation mode
+      summary: Update the Payment Authorization calculation mode
+      description: Sets the client's Payment Authorization calculation mode. The change
+        is recorded in the configuration history.
+      operationId: updateConfig
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentAuthorizationConfigDto"
+        required: true
+      responses:
+        "204":
+          description: Calculation mode updated
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions or feature disabled"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: "Payment Authorization product not enabled for company (returned\
+            \ instead of 403 for callers who bypass product-gating, e.g. Global Admin)"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/payment-authorization/history:
+    get:
+      tags:
+      - Calculation mode
+      summary: Get the Payment Authorization configuration change history
+      description: "Returns mode/activation events for the client's Payment Authorization\
+        \ product (most recent first): product activated, product deactivated, and\
+        \ calculation mode changes. Each entry includes the timestamp and the actor\
+        \ (name + email)."
+      operationId: getHistory
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company ID. UUID of the client company. Obtain it from
+          `GET /v1/users/me/companies` (field `companyId`).
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved history
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponsePaymentAuthorizationHistoryEventDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions, feature disabled,\
+            \ or Payment Authorization product not enabled for company"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/cm/companies/{companyId}/evidences/upload:
     post:
       tags:
@@ -8224,6 +9692,55 @@ components:
           example: 2026-03-25
       required:
       - issueDate
+    UpdateDocumentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        subjectType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        subjectId:
+          type: string
+          format: uuid
+        documentTypeId:
+          type: string
+          format: uuid
+        files:
+          type: array
+          items:
+            type: string
+          minItems: 1
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+      required:
+      - files
+      - name
+    PaymentAuthorizationConfigDto:
+      type: object
+      properties:
+        calculationMode:
+          type: string
+          description: "Calculation mode driving every payment authorization status\
+            \ for the client. INDIVIDUAL (default): each contractor is evaluated independently\
+            \ from its own payment-required requirements. SUBCONTRACTING_CHAIN: a\
+            \ contract is AUTHORIZED only when every company in its contracting chain\
+            \ is compliant — one NOT_AUTHORIZED company blocks the whole chain, up\
+            \ and down the tree."
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+      required:
+      - calculationMode
     CreateSubcontractDtoV2:
       type: object
       properties:
@@ -9468,6 +10985,79 @@ components:
       - identity
       - identityType
       - lastName
+    BatchCreateDocumentDto:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateDocumentDto"
+          minItems: 1
+      required:
+      - documents
+    CreateDocumentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        subjectType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        subjectId:
+          type: string
+          format: uuid
+        documentTypeId:
+          type: string
+          format: uuid
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        files:
+          type: array
+          items:
+            type: string
+          minItems: 1
+      required:
+      - files
+      - name
+    CreateDocumentResult:
+      type: object
+      properties:
+        ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - ids
+    BulkSubmissionRequestDto:
+      type: object
+      properties:
+        documentIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 100
+          minItems: 1
+      required:
+      - documentIds
+    StartBulkSubmissionResponseDto:
+      type: object
+      properties:
+        jobId:
+          type: string
+          format: uuid
+      required:
+      - jobId
     CreateActivityDto:
       type: object
       properties:
@@ -11091,6 +12681,41 @@ components:
       - id
       - name
       - taxId
+    GetDocumentTypesResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+        target:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+      required:
+      - code
+      - id
+      - name
+      - target
+    PageResponseGetDocumentTypesResponse:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/GetDocumentTypesResponse"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     CompanyBasicDataDto:
       type: object
       properties:
@@ -13373,6 +14998,234 @@ components:
             $ref: "#/components/schemas/EmployeeResponseDto"
         page:
           $ref: "#/components/schemas/PageMetadata"
+    AiDataResponseDto:
+      type: object
+      properties:
+        documentType:
+          $ref: "#/components/schemas/DocumentTypeDto"
+        confidence:
+          type: number
+          format: double
+        isUnknown:
+          type: boolean
+        topPredictions:
+          type: array
+          items:
+            $ref: "#/components/schemas/TopPredictionDto"
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        subjectType:
+          type: string
+        resourceName:
+          type: string
+        resourceId:
+          type: string
+        referencedResourceCount:
+          type: integer
+          format: int32
+        extractionMethod:
+          type: string
+      required:
+      - confidence
+      - isUnknown
+    DocumentResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subject:
+          $ref: "#/components/schemas/DocumentSubjectResponseDto"
+        documentType:
+          $ref: "#/components/schemas/DocumentTypeDto"
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        files:
+          type: array
+          items:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+        needsAIReview:
+          type: boolean
+        aiData:
+          $ref: "#/components/schemas/AiDataResponseDto"
+        aiReviewedAt:
+          type: string
+          format: date-time
+        aiExtractionStatus:
+          type: string
+      required:
+      - aiExtractionStatus
+      - createdAt
+      - files
+      - id
+      - name
+      - needsAIReview
+    DocumentSubjectResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        name:
+          type: string
+        subtype:
+          type: string
+      required:
+      - id
+      - name
+      - type
+    DocumentTypeDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseDocumentResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentResponseDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    TopPredictionDto:
+      type: object
+      properties:
+        typeCode:
+          type: string
+        confidence:
+          type: number
+          format: double
+      required:
+      - confidence
+      - typeCode
+    DocumentDetailResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        subject:
+          $ref: "#/components/schemas/DocumentSubjectResponseDto"
+        documentType:
+          $ref: "#/components/schemas/DocumentTypeDto"
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileDto"
+        createdAt:
+          type: string
+          format: date-time
+        needsAIReview:
+          type: boolean
+        aiData:
+          $ref: "#/components/schemas/AiDataResponseDto"
+        aiReviewedAt:
+          type: string
+          format: date-time
+        finalizedAt:
+          type: string
+          format: date-time
+      required:
+      - createdAt
+      - files
+      - id
+      - name
+      - needsAIReview
+    FileDto:
+      type: object
+      properties:
+        key:
+          type: string
+        downloadUrl:
+          type: string
+      required:
+      - downloadUrl
+      - key
+    PresignedUploadUrl:
+      type: object
+      properties:
+        url:
+          type: string
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - fields
+      - url
+    DocumentHubSubjectDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        subtype:
+          type: string
+      required:
+      - id
+      - name
+      - type
+    PageResponseDocumentHubSubjectDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentHubSubjectDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     GetContractRisksQueryResult:
       type: object
       properties:
@@ -14435,6 +16288,498 @@ components:
       required:
       - id
       - name
+    Actor:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "User id of the actor, when available."
+        name:
+          type: string
+          description: "Display name of the actor, when available."
+        email:
+          type: string
+          description: "Email of the actor, when available."
+    PageResponsePaymentAuthorizationHistoryEventDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationHistoryEventDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    PaymentAuthorizationHistoryEventDto:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event happened.
+        eventName:
+          type: string
+          description: "Type of configuration event: `system_product.created` (Payment\
+            \ Authorization product activated for the client), `system_product.updated`\
+            \ (configuration changed, e.g. calculation mode) or `system_product.deleted`\
+            \ (product deactivated)."
+        calculationMode:
+          type: string
+          description: Calculation mode set by this event. Null when the event did
+            not carry a calculation mode (e.g. a product activation or deactivation
+            without explicit configuration).
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+        actor:
+          $ref: "#/components/schemas/Actor"
+          description: The user who performed the change.
+      required:
+      - actor
+      - eventName
+      - timestamp
+    ContractorPaymentAuthorizationContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`, or as the\
+            \ `contractIds` filter."
+        name:
+          type: string
+        level:
+          type: integer
+          format: int32
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      required:
+      - id
+      - level
+      - name
+      - paymentStatus
+    ContractorPaymentAuthorizationDetailDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/ContractorRef"
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        calculationMode:
+          type: string
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractorPaymentAuthorizationContractRef"
+        blockingRequirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationIssueDto"
+      required:
+      - blockingRequirements
+      - calculationMode
+      - contractor
+      - contracts
+      - paymentStatus
+    ContractorRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Contractor company id.
+        name:
+          type: string
+          description: Contractor company name.
+        taxId:
+          type: string
+          description: Contractor company tax id when available.
+      required:
+      - id
+      - name
+    PaymentAuthorizationIssueDto:
+      type: object
+      properties:
+        requirementInstanceId:
+          type: string
+          format: uuid
+          description: "Id of the requirement instance blocking payment. Use it with\
+            \ `GET /v1/companies/{companyId}/requirement-instances/{instanceId}` (Requirements\
+            \ API) to obtain the full requirement configuration and evidence detail.\
+            \ The `companyId` path variable is the contractor company that owns the\
+            \ requirement instance: read it from this issue's `contractor.id` (in\
+            \ Subcontracting Chain mode it may differ from the enclosing detail's\
+            \ contractor); it also equals `subject.id` when the subject is the contractor\
+            \ company itself."
+        requirement:
+          $ref: "#/components/schemas/RequirementRef"
+          description: The requirement (id and name) that is blocking payment.
+        status:
+          type: string
+          description: "Evidence status of the requirement instance. Only blocking\
+            \ statuses appear here: PENDING_UPLOAD, PENDING_REVIEW, REJECTED, EXPIRED\
+            \ or PENDING_VALIDITY. Satisfied statuses (APPROVED, UNDER_GRACE_PERIOD)\
+            \ never appear, since such an instance no longer blocks payment."
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
+        subject:
+          $ref: "#/components/schemas/SubjectRef"
+          description: "The specific subject failing the requirement: contractor company,\
+            \ employee, vehicle, equipment or product."
+        contractor:
+          $ref: "#/components/schemas/ContractorRef"
+          description: The contractor company that owns this failing requirement.
+            In Individual mode it always equals the enclosing detail's contractor;
+            in Subcontracting Chain mode it may be another contractor in the chain
+            contributing to the block.
+      required:
+      - contractor
+      - requirement
+      - requirementInstanceId
+      - status
+      - subject
+    RequirementRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Requirement id (the requirement definition). To dereference\
+            \ the blocking instance use `requirementInstanceId` against the Requirements\
+            \ API, not this id."
+        name:
+          type: string
+          description: Requirement name.
+      required:
+      - id
+      - name
+    SubjectRef:
+      type: object
+      properties:
+        type:
+          type: string
+          description: "Subject type: CONTRACTOR (the contractor company itself),\
+            \ EMPLOYEE, VEHICLE, EQUIPMENT or PRODUCT."
+          enum:
+          - EMPLOYEE
+          - EQUIPMENT
+          - CONTRACTOR
+          - VEHICLE
+          - PRODUCT
+        id:
+          type: string
+          format: uuid
+          description: "Subject id. Its source depends on `type`: when CONTRACTOR\
+            \ it equals the contractor company id (`contractor.id` of the enclosing\
+            \ detail response); when EMPLOYEE, VEHICLE, EQUIPMENT or PRODUCT it is\
+            \ the resource id from the matching resource list endpoint (`GET /v1/companies/{companyId}/employees|vehicles|equipment|products`,\
+            \ field `id`), which requires the corresponding resource product to be\
+            \ subscribed in addition to Payment Authorization."
+        name:
+          type: string
+          description: Subject display name.
+        identifier:
+          type: string
+          description: "Human-readable identifier of the subject when available, e.g.\
+            \ an employee's national id or a vehicle's plate number."
+      required:
+      - id
+      - name
+      - type
+    PageResponsePaymentAuthorizationByContractRowDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractRowDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    PaymentAuthorizationByContractActivityRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Activity id. Pass it as an `activityIds` filter value. Obtain\
+            \ the full catalogue from `GET /v1/companies/{companyId}/activities` (field\
+            \ `id`)."
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PaymentAuthorizationByContractContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`, or as the\
+            \ `contractIds` filter."
+        name:
+          type: string
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        level:
+          type: integer
+          format: int32
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractSiteRef"
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractActivityRef"
+      required:
+      - activities
+      - id
+      - level
+      - name
+      - sites
+    PaymentAuthorizationByContractContractorRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contractor company id. Pass it as the `contractorId` path\
+            \ variable of `GET .../payment-authorization/contractors/{contractorId}`,\
+            \ or as the `contractorIds` filter. It is also the `companyId` for the\
+            \ Requirements API dereference of blocking requirement instances."
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+    PaymentAuthorizationByContractRowDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractorRef"
+          description: The contractor company holding the contract.
+        contract:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractRef"
+          description: The contract this row's payment status is calculated for.
+        paymentStatus:
+          type: string
+          description: "Payment authorization status of this contractor-contract pair.\
+            \ AUTHORIZED when every payment-required requirement is satisfied (in\
+            \ Subcontracting Chain mode, across the whole contracting chain of the\
+            \ contract); NOT_AUTHORIZED otherwise. Use `GET .../payment-authorization/by-contract/{contractId}`\
+            \ to obtain the blocking requirement issues behind a NOT_AUTHORIZED status."
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        calculationMode:
+          type: string
+          description: "Calculation mode used for this row's status: INDIVIDUAL or\
+            \ SUBCONTRACTING_CHAIN. Read the client's configured mode from `GET .../payment-authorization/config`."
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+      required:
+      - calculationMode
+      - contract
+      - contractor
+      - paymentStatus
+    PaymentAuthorizationByContractSiteRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Site id. Pass it as a `siteIds` filter value. Obtain the full\
+            \ catalogue from `GET /v1/companies/{companyId}/sites` (field `id`)."
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        breadcrumb:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
+      required:
+      - breadcrumb
+      - id
+      - level
+      - name
+    PaymentAuthorizationByContractChainContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`."
+        name:
+          type: string
+        level:
+          type: integer
+          format: int32
+          description: "Subcontracting level: 0 = Main contract, >=1 = Subcontract\
+            \ level N."
+        contractor:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractorRef"
+          description: "The contractor on this contract. In Subcontracting Chain mode\
+            \ the chain spans multiple contractors, so each contributing contract\
+            \ carries its own."
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+      required:
+      - contractor
+      - id
+      - level
+      - name
+      - paymentStatus
+    PaymentAuthorizationContractDetailDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractorRef"
+          description: The contractor company holding the contract.
+        contract:
+          $ref: "#/components/schemas/PaymentAuthorizationByContractContractRef"
+          description: The contract this detail's payment status is calculated for.
+        paymentStatus:
+          type: string
+          description: "Payment authorization status of this contractor-contract pair.\
+            \ AUTHORIZED when every payment-required requirement is satisfied (in\
+            \ Subcontracting Chain mode, across the whole contracting chain of the\
+            \ contract); NOT_AUTHORIZED otherwise."
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        issueCount:
+          type: integer
+          format: int32
+          description: Total number of blocking requirement issues. Always 0 when
+            `paymentStatus` is AUTHORIZED.
+        issues:
+          type: array
+          description: The requirement issues blocking payment on this contract. Empty
+            when `paymentStatus` is AUTHORIZED. In Subcontracting Chain mode the list
+            may include issues owned by other contractors in the chain (see each issue's
+            `contractor`). Dereference each issue's `requirementInstanceId` via the
+            Requirements API to obtain the full requirement and evidence detail.
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationIssueDto"
+        calculationMode:
+          type: string
+          description: "Calculation mode used for this detail's status: INDIVIDUAL\
+            \ or SUBCONTRACTING_CHAIN. Read the client's configured mode from `GET\
+            \ .../payment-authorization/config`."
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+        contracts:
+          type: array
+          description: "The contracts contributing to this status. In INDIVIDUAL mode\
+            \ this is the queried contract only; in SUBCONTRACTING_CHAIN mode it includes\
+            \ every contract in the subcontracting chain, each with its own contractor\
+            \ and payment status."
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractChainContractRef"
+      required:
+      - calculationMode
+      - contract
+      - contractor
+      - contracts
+      - issueCount
+      - issues
+      - paymentStatus
+    ContractRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: "Contract id. Pass it as the `contractId` path variable of\
+            \ `GET .../payment-authorization/by-contract/{contractId}`, or as the\
+            \ `contractIds` filter."
+        name:
+          type: string
+      required:
+      - id
+      - name
+    PageResponsePaymentAuthorizationByCompanyRowDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByCompanyRowDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
+    PaymentAuthorizationByCompanyRowDto:
+      type: object
+      properties:
+        contractor:
+          $ref: "#/components/schemas/ContractorRef"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractRef"
+        totalContractsCount:
+          type: integer
+          format: int32
+        paymentStatus:
+          type: string
+          enum:
+          - AUTHORIZED
+          - NOT_AUTHORIZED
+        calculationMode:
+          type: string
+          enum:
+          - INDIVIDUAL
+          - SUBCONTRACTING_CHAIN
+      required:
+      - calculationMode
+      - contractor
+      - contracts
+      - paymentStatus
+      - totalContractsCount
     PagedModelSystemStandardVehicleType:
       type: object
       properties:
@@ -14504,6 +16849,44 @@ components:
       - code
       - id
       - name
+    CountryEmbeddedDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+      required:
+      - id
+      - name
+    DocumentTypeResponseDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+        country:
+          $ref: "#/components/schemas/CountryEmbeddedDto"
+      required:
+      - code
+      - id
+      - name
+    PagedModelDocumentTypeResponseDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentTypeResponseDto"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
     PagedModelSystemCountry:
       type: object
       properties:
@@ -14569,9 +16952,15 @@ x-tagGroups:
   - Configuration
   - Instances
   - Submissions
+  - Document hub
 - name: Companies and contracts
   tags:
   - Company
   - Sites
   - Contracts
   - Subcontracts
+- name: Payment authorization
+  tags:
+  - Contractor status
+  - Contract status
+  - Calculation mode
