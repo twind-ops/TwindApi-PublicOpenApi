@@ -95,22 +95,7 @@ their **aggregated** payment authorization status. Paginated.
 > the [contractor detail](#step-2-inspect-a-contractor-s-blocking-requirements) or
 > [contract detail](#step-3-work-at-the-contract-level) to find the responsible company.
 
-### Common query parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| `page`, `size` | Pagination. Zero-based `page`, `size` defaults to 10. |
-| `sort` | `field,direction` — allowed field: `contractor_name` (default). E.g. `?sort=contractor_name,asc`. |
-| `paymentStatus` | `AUTHORIZED` or `NOT_AUTHORIZED`. |
-| `contractorIds` | Filter by contractor company UUIDs. |
-| `contractIds` | Only contractors with at least one matching contract. |
-| `siteIds` | Filter by site UUIDs (matches contract scope, including child sites). |
-| `activityIds` | Filter by activity UUIDs. |
-| `managerIds` | Filter by contract manager user IDs. |
-| `dateFrom`, `dateTo` | Contract date range (`contract.dateFrom >= dateFrom`, `contract.dateTo <= dateTo`). ISO 8601 date format (`YYYY-MM-DD`). |
-| `maxContractsPerContractor` | Cap the `contracts[]` preview per row. Omit to return all (useful for exports). |
-
-### Example: List contractors by payment status
+### Example: cURL — GET contractors by payment status
 
 ```bash
 curl -X GET \
@@ -156,7 +141,7 @@ when `NOT_AUTHORIZED` — the `blockingRequirements[]` currently preventing paym
 with the specific failing **subject** (contractor company, employee, vehicle, equipment or
 product).
 
-### Example: Get a contractor's payment status
+### Example: cURL — GET a contractor's payment status
 
 ```bash
 curl -X GET \
@@ -231,15 +216,11 @@ by-contract pair.
 
 [`GET /v1/companies/{clientId}/payment-authorization/by-contract`](#tag/contract-status/GET/v1/companies/{clientId}/payment-authorization/by-contract)
 
-Returns one row per contract. Accepts the same filters as `by-company` — except
-`maxContractsPerContractor`, which is `by-company`-only — plus:
+Returns one row per contract. Accepts the same filters as `by-company` (except
+`maxContractsPerContractor`), plus the contract-level `subcontractingLevel` and
+`showExpired` — see the endpoint reference for the full parameter list.
 
-| Parameter | Description |
-|-----------|-------------|
-| `subcontractingLevel` | Filter to a single contract level (exact match, not a range): `0` = main contract, `1` = first subcontract level, `2` = second, and so on. |
-| `showExpired` | `false` (default) returns only non-expired contracts; `true` includes expired ones. |
-
-### Example: List contracts by payment status
+### Example: cURL — GET contracts by payment status
 
 ```bash
 curl -X GET \
@@ -293,7 +274,7 @@ together: in `INDIVIDUAL` mode that is just the contract you queried; in
 `SUBCONTRACTING_CHAIN` mode it lists every active contract in the subcontracting tree, each
 with its own `contractor` and `paymentStatus`.
 
-### Example: Inspect a single contract's payment status
+### Example: cURL — GET a single contract's payment status
 
 ```bash
 curl -X GET \
@@ -424,7 +405,7 @@ against the **Requirements API**:
 - `companyId` = the issue's **`contractor.id`** (the company that owns the requirement) —
   *not* necessarily the contractor you originally queried.
 
-### Example: Fetch the blocking requirement instance
+### Example: cURL — GET the blocking requirement instance
 
 ```bash
 curl -X GET \
@@ -452,6 +433,8 @@ additionally requires write permission.
 Returns the client's current [calculation mode](#calculation-modes). Defaults to
 `INDIVIDUAL` when no mode has been explicitly saved.
 
+### Example: cURL — GET the calculation mode
+
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/config" \
@@ -473,6 +456,8 @@ Sets the calculation mode. The change applies immediately to every status calcul
 is recorded in the configuration history. Requires the `PAYMENT_AUTHORIZATION_WRITE`
 permission.
 
+### Example: cURL — PUT the calculation mode
+
 ```bash
 curl -X PUT \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/config" \
@@ -488,6 +473,8 @@ curl -X PUT \
 [`GET /v1/companies/{clientId}/payment-authorization/history`](#tag/calculation-mode/GET/v1/companies/{clientId}/payment-authorization/history)
 
 Returns product activation, deactivation and calculation-mode changes, most recent first.
+
+### Example: cURL — GET the configuration history
 
 ```bash
 curl -X GET \
