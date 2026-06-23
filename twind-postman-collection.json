@@ -3006,6 +3006,27 @@
         "description" : "Returns paginated resources (employees, vehicles, equipment) eligible for child requirement instances. Can be filtered by a search query on resource name."
       }
     }, {
+      "name" : "Get matching requirement instances for single submission",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:companyId/requirement-instances/:instanceId/matches",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":companyId", "requirement-instances", ":instanceId", "matches" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Company ID acting as contractor"
+          }, {
+            "key" : "instanceId",
+            "value" : "{{instanceId}}",
+            "description" : "Source requirement instance ID"
+          } ]
+        },
+        "description" : "Returns requirement instances that match the same resource and document type, allowing evidence to be reused across multiple instances (single submission). Results are filtered based on the user's client company and site visibility."
+      }
+    }, {
       "name" : "Get requirement instances as contractor",
       "request" : {
         "method" : "GET",
@@ -4290,6 +4311,11 @@
             "description" : "Filter by document names",
             "disabled" : true
           }, {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search across document name, subject name, and document type",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -4372,6 +4398,11 @@
             "key" : "documentNames",
             "value" : "",
             "description" : "Filter by document names",
+            "disabled" : true
+          }, {
+            "key" : "q",
+            "value" : "",
+            "description" : "Search across document name, subject name, and document type",
             "disabled" : true
           }, {
             "key" : "page",

@@ -5509,6 +5509,57 @@ paths:
             '*/*':
               schema:
                 $ref: "#/components/schemas/PageResponseGetEligibleResourcesForChildRequirementsResponse"
+  /v1/companies/{companyId}/requirement-instances/{instanceId}/matches:
+    get:
+      tags:
+      - Instances
+      summary: Get matching requirement instances for single submission
+      description: "Returns requirement instances that match the same resource and\
+        \ document type, allowing evidence to be reused across multiple instances\
+        \ (single submission). Results are filtered based on the user's client company\
+        \ and site visibility."
+      operationId: getMatchingRequirementInstances
+      parameters:
+      - name: companyId
+        in: path
+        description: Company ID acting as contractor
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: instanceId
+        in: path
+        description: Source requirement instance ID
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Successfully retrieved matching instances
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/SingleSubmissionDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: "Requirement instance not found for this company, or no matching\
+            \ instances for single submission under the user's visibility."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{companyId}/requirement-instances/as-contractor:
     get:
       tags:
@@ -7771,6 +7822,14 @@ paths:
           type: array
           items:
             type: string
+      - name: q
+        in: query
+        description: "Search across document name, subject name, and document type"
+        required: false
+        schema:
+          type: string
+          maxLength: 255
+          minLength: 0
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7936,6 +7995,14 @@ paths:
           type: array
           items:
             type: string
+      - name: q
+        in: query
+        description: "Search across document name, subject name, and document type"
+        required: false
+        schema:
+          type: string
+          maxLength: 255
+          minLength: 0
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -8235,6 +8302,8 @@ paths:
         required: false
         schema:
           type: string
+          maxLength: 255
+          minLength: 0
       - name: subjectTypes
         in: query
         description: "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT,\
@@ -8316,6 +8385,8 @@ paths:
         required: false
         schema:
           type: string
+          maxLength: 255
+          minLength: 0
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -14274,6 +14345,163 @@ components:
       - id
       - name
       - type
+    Client:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/Site"
+      required:
+      - id
+      - name
+      - sites
+    DocumentHubMatch:
+      type: object
+      properties:
+        documentId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        issueDate:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        downloadUrls:
+          type: array
+          items:
+            type: string
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchFile"
+      required:
+      - documentId
+      - downloadUrls
+      - files
+      - name
+    MatchEntry:
+      type: object
+      properties:
+        requirementName:
+          type: string
+        requirementInstance:
+          $ref: "#/components/schemas/RequirementInstance"
+        client:
+          $ref: "#/components/schemas/Client"
+        contracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Contract"
+        downloadUrls:
+          type: array
+          items:
+            type: string
+        files:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchFile"
+      required:
+      - client
+      - contracts
+      - downloadUrls
+      - files
+      - requirementInstance
+      - requirementName
+    MatchFile:
+      type: object
+      properties:
+        name:
+          type: string
+      required:
+      - name
+    RequirementInstance:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
+        dateOfIssue:
+          type: string
+          format: date
+        expirationDate:
+          type: string
+          format: date
+        evidenceId:
+          type: string
+          format: uuid
+      required:
+      - id
+      - status
+    SingleSubmissionDto:
+      type: object
+      properties:
+        subject:
+          $ref: "#/components/schemas/Subject"
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/MatchEntry"
+        documentHubMatches:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentHubMatch"
+      required:
+      - documentHubMatches
+      - matches
+      - subject
+    Subject:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        identifierType:
+          type: string
+        identifier:
+          type: string
+        subtype:
+          type: string
+      required:
+      - id
+      - name
+      - type
     InstanceAudit:
       type: object
       properties:
@@ -16145,23 +16373,6 @@ components:
       required:
       - content
       - page
-    Contract:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        dateFrom:
-          type: string
-          format: date
-        dateTo:
-          type: string
-          format: date
-      required:
-      - id
-      - name
     GetAccessControlActiveEntry:
       type: object
       properties:
