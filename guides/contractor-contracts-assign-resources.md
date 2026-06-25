@@ -155,7 +155,7 @@ Response: `204 No Content`.
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | Insufficient permissions, or `companyId` is not your contractor company. | Ensure your user has the necessary permissions for this action. |
-| 404 | Unknown `contractId` or `siteId`, the site is not part of that contract, or a `resourceId` does not exist. | Re-fetch ids from Steps 1–2. |
+| 404 | Unknown `contractId` or `siteId`, the site is not part of that contract, a `resourceId` does not exist, or the contract is outside your API key user's team-visibility scope. | Re-fetch ids from Steps 1–2. A team-scoped key only sees contracts within its assigned sites and clients. |
 | 400 | Invalid body — e.g. a resource that is not assignable, malformed `riskIds`, or a risk id not returned by the contract's risks endpoint. | Check `isAssignable` (Step 2); re-fetch risk ids from `GET .../contracts/{contractId}/risks` (Step 2) and confirm they belong to this contract. |
 
 ## Next Steps

@@ -165,7 +165,7 @@ Each resource entry includes an `assignments` array listing every (contract, sit
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | `companyId` is not a company your user belongs to. | Use your contractor company id from `GET /v1/users/me/companies`. |
-| 404 | Unknown `contractId`, or the contract does not involve your company. | Re-fetch contract ids from Step 2. |
+| 404 | Unknown `contractId`, the contract does not involve your company, or it is outside your API key user's team-visibility scope. | Re-fetch contract ids from Step 2. A team-scoped key only sees contracts within its assigned sites and clients. |
 
 ## Next Steps
 
