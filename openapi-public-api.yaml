@@ -6686,11 +6686,6 @@ paths:
           items:
             type: string
             format: uuid
-      - name: skipTeamFilter
-        in: query
-        required: false
-        schema:
-          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -6813,11 +6808,6 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: skipTeamFilter
-        in: query
-        required: false
-        schema:
-          type: boolean
       responses:
         "200":
           description: Successfully retrieved site
@@ -6865,11 +6855,6 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: skipTeamFilter
-        in: query
-        required: false
-        schema:
-          type: boolean
       requestBody:
         content:
           application/json:
@@ -10005,6 +9990,8 @@ components:
           type: boolean
         title:
           type: string
+        subcontractingLabel:
+          type: string
         fields:
           type: array
           items:
@@ -10161,7 +10148,7 @@ components:
           type: string
           enum:
           - TITLE
-          - WORKER_NAME
+          - EMPLOYEE_NAME
           - IDENTITY
           - CONTRACTOR
           - CLIENT_NAME
@@ -10169,6 +10156,7 @@ components:
           - VALIDITY_DATE
           - BIRTH_DATE
           - HIRE_DATE
+          - CONTRACT_DATE
           - SUBCONTRACTING
         yMm:
           type: number
