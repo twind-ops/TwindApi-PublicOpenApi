@@ -136,7 +136,7 @@ If a resource is missing a risk it should carry, ask the contractor to update th
 | --- | --- | --- |
 | 401 | Missing or invalid `X-Api-Key`. | Check the key; see the [API Authentication Guide](get-api-token.md). |
 | 403 | `companyId` is not a company your user belongs to. | Use a user of the client company that owns the contract. |
-| 404 | Unknown `contractId` or `siteId`, or the site is not part of that contract. | Re-fetch ids from Steps 1–2. |
+| 404 | Unknown `contractId` or `siteId`, the site is not part of that contract, or the contract is outside your API key user's team-visibility scope. | Re-fetch ids from Steps 1–2. A team-scoped key only sees contracts within its assigned sites and clients. |
 
 ## Next Steps
 
