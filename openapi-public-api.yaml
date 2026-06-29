@@ -5123,6 +5123,15 @@ paths:
             format: uuid
             description: Filter by product type IDs referenced in rules. Multiple
               values combine with OR.
+      - name: brand
+        in: query
+        description: "When set, filters requirements by client partner brand (e.g.\
+          \ 'avanta')."
+        required: false
+        schema:
+          type: string
+          description: "When set, filters requirements by client partner brand (e.g.\
+            \ 'avanta')."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -5863,6 +5872,15 @@ paths:
             format: uuid
             description: "When set with subcontractor permissions, filters to instances\
               \ for these contractor ids."
+      - name: brand
+        in: query
+        description: "When set, filters requirements by the client company partner\
+          \ brand (e.g. 'avanta')."
+        required: false
+        schema:
+          type: string
+          description: "When set, filters requirements by the client company partner\
+            \ brand (e.g. 'avanta')."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7430,6 +7448,12 @@ paths:
           items:
             type: string
             format: uuid
+      - name: hideLinkedToProject
+        in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -9673,6 +9697,10 @@ components:
         paymentRequired:
           type: boolean
           description: Whether the requirement must be fulfilled for payment authorization.
+        clientApprovalResourceAssignments:
+          type: boolean
+          description: Whether this requirement must be reviewed on the resource assignment
+            review page when auto approvals are disabled.
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
@@ -9928,6 +9956,9 @@ components:
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    ApprovalResourceAssignmentsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     AutomaticReviewConfig:
       type: object
       properties:
@@ -10116,18 +10147,33 @@ components:
           type: number
           format: double
           writeOnly: true
-        iconSizeMm:
-          type: number
-          format: double
+        renderAs:
+          type: string
+          enum:
+          - ICON
+          - TEXT
+        maxIcons:
+          type: integer
+          format: int32
         columns:
           type: integer
           format: int32
         gapMm:
           type: number
           format: double
-        maxIcons:
-          type: integer
-          format: int32
+        iconSizeMm:
+          type: number
+          format: double
+        fontPt:
+          type: number
+          format: double
+        style:
+          type: string
+          enum:
+          - REGULAR
+          - BOLD
+          - ITALIC
+          - UNDERLINE
         xmm:
           type: number
           format: double
@@ -10137,8 +10183,9 @@ components:
       required:
       - columns
       - gapMm
-      - iconSizeMm
       - maxIcons
+      - renderAs
+      - style
       - xmm
       - ymm
     CardTextField:
@@ -10541,6 +10588,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
@@ -10841,6 +10889,8 @@ components:
           items:
             type: string
         paymentRequired:
+          type: boolean
+        clientApprovalResourceAssignments:
           type: boolean
         trainingCourseId:
           type: string
@@ -12109,6 +12159,8 @@ components:
           type: string
         taxId:
           type: string
+        brand:
+          type: string
       required:
       - id
       - name
@@ -12282,6 +12334,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
@@ -12576,12 +12629,18 @@ components:
             $ref: "#/components/schemas/QuotaDto"
         hasBeenSeeded:
           type: boolean
+        external:
+          type: boolean
+        owningCompanyId:
+          type: string
+          format: uuid
         active:
           type: boolean
       required:
       - accessControlType
       - active
       - createdAt
+      - external
       - id
       - name
       - products
@@ -12664,6 +12723,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
@@ -12735,6 +12795,8 @@ components:
         phonePrefix:
           type: string
         phone:
+          type: string
+        brand:
           type: string
       required:
       - id
@@ -13475,6 +13537,8 @@ components:
           type: string
         taxId:
           type: string
+        brand:
+          type: string
         gracePeriod:
           type: integer
           format: int32
@@ -13688,6 +13752,8 @@ components:
             type: boolean
           paymentRequired:
             type: boolean
+          clientApprovalResourceAssignments:
+            type: boolean
           trainingCourseId:
             type: string
             format: uuid
@@ -13826,6 +13892,8 @@ components:
           validableByEmail:
             type: boolean
           paymentRequired:
+            type: boolean
+          clientApprovalResourceAssignments:
             type: boolean
           trainingCourseId:
             type: string
@@ -14778,6 +14846,9 @@ components:
         taxId:
           type: string
           description: Client company tax id.
+        brand:
+          type: string
+          description: Client company partner brand (e.g. 'avanta') when set.
       required:
       - id
       - name

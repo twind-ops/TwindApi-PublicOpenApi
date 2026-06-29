@@ -2761,6 +2761,11 @@
             "description" : "Filter by product type IDs referenced in rules. Multiple values combine with OR.",
             "disabled" : true
           }, {
+            "key" : "brand",
+            "value" : "",
+            "description" : "When set, filters requirements by client partner brand (e.g. 'avanta').",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -3154,6 +3159,11 @@
             "key" : "contractorIds",
             "value" : "",
             "description" : "When set with subcontractor permissions, filters to instances for these contractor ids.",
+            "disabled" : true
+          }, {
+            "key" : "brand",
+            "value" : "",
+            "description" : "When set, filters requirements by the client company partner brand (e.g. 'avanta').",
             "disabled" : true
           }, {
             "key" : "page",
@@ -4011,6 +4021,11 @@
             "disabled" : true
           }, {
             "key" : "projectIds",
+            "value" : "",
+            "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "hideLinkedToProject",
             "value" : "",
             "description" : "",
             "disabled" : true
