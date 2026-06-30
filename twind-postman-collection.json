@@ -2766,6 +2766,11 @@
             "description" : "When set, filters requirements by client partner brand (e.g. 'avanta').",
             "disabled" : true
           }, {
+            "key" : "clientApprovalResourceAssignments",
+            "value" : "",
+            "description" : "When true, only requirements that trigger client approval of resource assignments; when false, only those that do not.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",

@@ -5132,6 +5132,15 @@ paths:
           type: string
           description: "When set, filters requirements by client partner brand (e.g.\
             \ 'avanta')."
+      - name: clientApprovalResourceAssignments
+        in: query
+        description: "When true, only requirements that trigger client approval of\
+          \ resource assignments; when false, only those that do not."
+        required: false
+        schema:
+          type: boolean
+          description: "When true, only requirements that trigger client approval\
+            \ of resource assignments; when false, only those that do not."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -10399,6 +10408,9 @@ components:
     ErpPropertiesConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    ExternalManagementConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     GapMm:
       type: object
       properties:
@@ -10598,6 +10610,7 @@ components:
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
+          - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
@@ -12344,6 +12357,7 @@ components:
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
+          - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
@@ -12426,9 +12440,17 @@ components:
           format: uuid
         userJourneys:
           $ref: "#/components/schemas/UserJourneys"
+        external:
+          type: boolean
+        owningCompanyId:
+          type: string
+          format: uuid
+        owningCompanyName:
+          type: string
       required:
       - companyId
       - companyName
+      - external
       - products
       - taxId
     UserCompanyPermissions:
@@ -12634,6 +12656,11 @@ components:
         owningCompanyId:
           type: string
           format: uuid
+        ownsExternalCompanies:
+          type: boolean
+          description: True if this company owns at least one external company (respecting
+            the active filter). Populated by the admin company list; null elsewhere.
+            Used to decide whether the row is expandable.
         active:
           type: boolean
       required:
@@ -12733,6 +12760,7 @@ components:
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
+          - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
