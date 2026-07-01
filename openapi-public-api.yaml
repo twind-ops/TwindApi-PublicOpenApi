@@ -12162,6 +12162,25 @@ components:
       - name
       - resources
       - siteId
+    ClientCompany:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+        brand:
+          type: string
+        external:
+          type: boolean
+      required:
+      - external
+      - id
+      - name
+      - taxId
     Company:
       type: object
       properties:
@@ -12196,7 +12215,7 @@ components:
         contractor:
           $ref: "#/components/schemas/Company"
         client:
-          $ref: "#/components/schemas/Company"
+          $ref: "#/components/schemas/ClientCompany"
         sites:
           type: array
           items:
@@ -15584,7 +15603,7 @@ components:
         contractor:
           $ref: "#/components/schemas/Company"
         client:
-          $ref: "#/components/schemas/Company"
+          $ref: "#/components/schemas/ClientCompany"
         sites:
           type: array
           deprecated: true
