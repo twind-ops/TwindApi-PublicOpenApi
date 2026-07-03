@@ -10448,6 +10448,9 @@ components:
       required:
       - enabled
       - level
+    MandatoryRisksConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     MarginsMm:
       type: object
       properties:
@@ -10612,6 +10615,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -11100,6 +11104,9 @@ components:
           items:
             $ref: "#/components/schemas/ResourceCreateClassificationDto"
           uniqueItems: true
+        employeeJobPosition:
+          type: string
+          description: The employee's default job position title. Optional.
       required:
       - classifications
       - countryId
@@ -11160,6 +11167,34 @@ components:
             format: uuid
       required:
       - ids
+    FinalizeInstructionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        values:
+          $ref: "#/components/schemas/UpdateDocumentDto"
+      required:
+      - id
+      - values
+    FinalizeReplaceDocumentsDto:
+      type: object
+      properties:
+        finalizations:
+          type: array
+          items:
+            $ref: "#/components/schemas/FinalizeInstructionDto"
+          minItems: 1
+        deleteIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+      required:
+      - deleteIds
+      - finalizations
     BulkSubmissionRequestDto:
       type: object
       properties:
@@ -11542,6 +11577,10 @@ components:
           items:
             $ref: "#/components/schemas/ResourceCreateClassificationDto"
           uniqueItems: true
+        employeeJobPosition:
+          type: string
+          description: The employee's default job position. Omit to leave unchanged;
+            send null to clear; send a value to set.
     UpdateNotesDto:
       type: object
       properties:
@@ -12378,6 +12417,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -12675,6 +12715,8 @@ components:
         owningCompanyId:
           type: string
           format: uuid
+        owningCompanyName:
+          type: string
         ownsExternalCompanies:
           type: boolean
           description: True if this company owns at least one external company (respecting
@@ -12781,6 +12823,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -15312,6 +15355,8 @@ components:
           type: string
         isAssignable:
           type: boolean
+        employeeJobPosition:
+          type: string
       required:
       - classifications
       - companyId
