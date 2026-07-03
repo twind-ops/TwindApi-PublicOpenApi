@@ -12082,6 +12082,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        employeeJobPosition:
+          type: string
+          description: "Job position assigned to the employee for this contract. When\
+            \ the employee is assigned to several engagements on the site, the position\
+            \ of the most recently created assignment that defines one is returned;\
+            \ assignments without a position are ignored. Null when no assignment\
+            \ on the site defines a position, and for non-employee resources."
       required:
       - name
       - resourceId
@@ -16143,6 +16150,10 @@ components:
           $ref: "#/components/schemas/ResourceClassification"
         temporaryAuthorization:
           $ref: "#/components/schemas/TemporaryAuthorizationSummary"
+        mandatoryRiskIssues:
+          type: array
+          items:
+            $ref: "#/components/schemas/MandatoryRiskIssue"
       required:
       - accessControlType
       - clientId
@@ -16201,6 +16212,37 @@ components:
       - name
       - statuses
       - subjectType
+    MandatoryRiskIssue:
+      type: object
+      properties:
+        key:
+          type: string
+        riskId:
+          type: string
+          format: uuid
+        riskName:
+          type: string
+        activityId:
+          type: string
+          format: uuid
+        activityName:
+          type: string
+        contractId:
+          type: string
+          format: uuid
+        contractName:
+          type: string
+        reason:
+          type: string
+      required:
+      - activityId
+      - activityName
+      - contractId
+      - contractName
+      - key
+      - reason
+      - riskId
+      - riskName
     RequirementIssues:
       type: object
       properties:
