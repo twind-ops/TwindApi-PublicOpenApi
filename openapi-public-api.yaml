@@ -5123,6 +5123,20 @@ paths:
             format: uuid
             description: Filter by product type IDs referenced in rules. Multiple
               values combine with OR.
+      - name: projectIds
+        in: query
+        description: Filter by project IDs referenced in rules. Multiple values combine
+          with OR. Only applied when the Projects add-on is enabled.
+        required: false
+        schema:
+          type: array
+          description: Filter by project IDs referenced in rules. Multiple values
+            combine with OR. Only applied when the Projects add-on is enabled.
+          items:
+            type: string
+            format: uuid
+            description: Filter by project IDs referenced in rules. Multiple values
+              combine with OR. Only applied when the Projects add-on is enabled.
       - name: brand
         in: query
         description: "When set, filters requirements by client partner brand (e.g.\
