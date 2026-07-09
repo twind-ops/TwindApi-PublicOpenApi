@@ -15077,6 +15077,10 @@ components:
           description: Timestamp set when AIA flagged the evidence as 'Client consulted'
             (INQUIRY). Only populated for evidences in PENDING_REVIEW status; otherwise
             null.
+        reason:
+          type: string
+          description: Reviewer note for the most recent rejection. Only populated
+            for evidences in REJECTED status; otherwise null.
       required:
       - status
     RequirementInstanceAsContractor:
