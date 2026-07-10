@@ -3294,6 +3294,11 @@
             "description" : "When true, restricts to agreement-type requirements.",
             "disabled" : true
           }, {
+            "key" : "onlyResourceAssignmentApprovalRequirements",
+            "value" : "",
+            "description" : "When true, restricts to instances whose requirement is flagged as relevant when reviewing resource assignments. Ignored when the client company does not have the resource-assignment approval product.",
+            "disabled" : true
+          }, {
             "key" : "fromStartDate",
             "value" : "Wed Jan 01 00:00:00 UTC 2025",
             "description" : "Lower bound on requirement start date (inclusive), when applicable.",
@@ -4038,6 +4043,11 @@
             "key" : "hideLinkedToProject",
             "value" : "",
             "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "approvalState",
+            "value" : "",
+            "description" : "Filter by derived approval state (Approval of Resource Assignments product): PENDING_VALIDATION (open pending request), APPROVED / PARTIALLY_APPROVED / REJECTED (latest resolved outcome), NONE (never had a request). Only meaningful while the product is active for the client company.",
             "disabled" : true
           }, {
             "key" : "page",

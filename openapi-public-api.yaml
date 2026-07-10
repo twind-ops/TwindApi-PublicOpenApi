@@ -6162,6 +6162,17 @@ paths:
         schema:
           type: boolean
           description: "When true, restricts to agreement-type requirements."
+      - name: onlyResourceAssignmentApprovalRequirements
+        in: query
+        description: "When true, restricts to instances whose requirement is flagged\
+          \ as relevant when reviewing resource assignments. Ignored when the client\
+          \ company does not have the resource-assignment approval product."
+        required: false
+        schema:
+          type: boolean
+          description: "When true, restricts to instances whose requirement is flagged\
+            \ as relevant when reviewing resource assignments. Ignored when the client\
+            \ company does not have the resource-assignment approval product."
       - name: fromStartDate
         in: query
         description: "Lower bound on requirement start date (inclusive), when applicable."
@@ -7477,6 +7488,21 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: approvalState
+        in: query
+        description: "Filter by derived approval state (Approval of Resource Assignments\
+          \ product): PENDING_VALIDATION (open pending request), APPROVED / PARTIALLY_APPROVED\
+          \ / REJECTED (latest resolved outcome), NONE (never had a request). Only\
+          \ meaningful while the product is active for the client company."
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING_VALIDATION
+          - APPROVED
+          - PARTIALLY_APPROVED
+          - REJECTED
+          - NONE
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -9373,6 +9399,11 @@ components:
           items:
             type: string
             format: uuid
+        employeeJobPosition:
+          type: string
+          description: "Optional job position for an employee resource. When omitted\
+            \ for an employee, the employee's stored default position is used. Ignored\
+            \ for non-employee resources."
       required:
       - resourceId
       - riskIds
@@ -12743,6 +12774,11 @@ components:
           description: True if this company owns at least one external company (respecting
             the active filter). Populated by the admin company list; null elsewhere.
             Used to decide whether the row is expandable.
+        matchingClientCompany:
+          $ref: "#/components/schemas/MatchingClientCompanyDto"
+          description: The real (non-external) Twind company that shares this company's
+            tax id and has an active Client Plan. Populated only for external companies
+            when such a match exists; null otherwise.
         active:
           type: boolean
       required:
@@ -12753,6 +12789,20 @@ components:
       - id
       - name
       - products
+      - taxId
+    MatchingClientCompanyDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
       - taxId
     QuotaDto:
       type: object
@@ -15640,9 +15690,12 @@ components:
           type: string
         description:
           type: string
+        projectMandatory:
+          type: boolean
       required:
       - id
       - name
+      - projectMandatory
     PageResponseGetContractRisksQueryResult:
       type: object
       properties:
@@ -15698,6 +15751,17 @@ components:
           $ref: "#/components/schemas/Manager"
         project:
           $ref: "#/components/schemas/ProjectRef"
+        approvalState:
+          type: string
+          enum:
+          - PENDING_VALIDATION
+          - APPROVED
+          - PARTIALLY_APPROVED
+          - REJECTED
+          - NONE
+        pendingValidationCount:
+          type: integer
+          format: int32
       required:
       - client
       - contractor
