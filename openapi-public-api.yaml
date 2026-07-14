@@ -9497,7 +9497,7 @@ components:
         companyTaxId:
           type: string
           description: Tax or company registration ID for the visitor organization.
-          minLength: 1
+            Optional — visitors often do not know their company's tax ID.
         files:
           type: array
           description: "S3 object keys for uploaded visitor documents, after uploading\
@@ -9506,7 +9506,6 @@ components:
             type: string
       required:
       - companyName
-      - companyTaxId
       - visitorIdentity
       - visitorIdentityType
       - visitorName
@@ -9910,6 +9909,28 @@ components:
       - dateFrom
       - dateTo
       - siteId
+    ContractClientValidationDto:
+      type: object
+      description: Client-validation toggles for one resource type on a contract.
+      properties:
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+          - PRODUCT
+        clientValidatesAssignments:
+          type: boolean
+          description: Assignments and modifications of this resource type require
+            client validation.
+        clientValidatesRemovals:
+          type: boolean
+          description: Removals of this resource type require client validation.
+      required:
+      - clientValidatesAssignments
+      - clientValidatesRemovals
+      - resourceType
     ContractSiteDtoV2:
       type: object
       description: A site assignment with its own activity list and an optional explicit
@@ -9980,6 +10001,16 @@ components:
             type: string
           description: Optional key-value properties to attach to the contract. Keys
             are part of the `ContractPropertyKey` enum (e.g. `ORDER_CODE`).
+        resourceClientValidations:
+          type: array
+          description: Optional per-resource-type client-validation settings (Approval
+            of Resource Assignments product). Each entry sets the pair for its resource
+            type; both booleans false stores no row (the no-client-validation default).
+            Including this field with entries requires the RESOURCE_ASSIGNMENT_APPROVAL_WRITE
+            permission (403 otherwise) and is only applied while the product is active
+            for the client company; an empty list is a no-op and needs no extra permission.
+          items:
+            $ref: "#/components/schemas/ContractClientValidationDto"
       required:
       - contractorId
       - dateFrom
@@ -10636,6 +10667,9 @@ components:
               $ref: "#/components/schemas/LevelConfig"
       required:
       - levels
+    SpecialWorksConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     SsoConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -10670,6 +10704,7 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
+          - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -11270,6 +11305,11 @@ components:
           type: string
         photo:
           type: string
+        type:
+          type: string
+          enum:
+          - COMMON
+          - SPECIAL_WORK
       required:
       - name
     RegisterDto:
@@ -12479,6 +12519,7 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
+          - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -12904,6 +12945,7 @@ components:
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
+          - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
@@ -13112,7 +13154,6 @@ components:
           type: string
       required:
       - companyName
-      - companyTaxId
       - firstName
       - identity
       - lastName
@@ -13157,7 +13198,6 @@ components:
             type: string
       required:
       - companyName
-      - companyTaxId
       - files
       - visitorFirstName
       - visitorId
@@ -13207,10 +13247,10 @@ components:
           description: Company name.
         taxId:
           type: string
-          description: Company tax or registration id.
+          description: Company tax or registration id. Optional — visitors may register
+            without one.
       required:
       - name
-      - taxId
     GetCompanyVisitsResponse:
       type: object
       description: One visit register record in the company visit list.
@@ -13385,7 +13425,6 @@ components:
             type: string
       required:
       - companyName
-      - companyTaxId
       - entry
       - files
       - reason
@@ -15918,6 +15957,11 @@ components:
           type: string
         photo:
           type: string
+        type:
+          type: string
+          enum:
+          - COMMON
+          - SPECIAL_WORK
         createdAt:
           type: string
           format: date-time
@@ -15926,6 +15970,7 @@ components:
       - createdAt
       - id
       - name
+      - type
     PagedModelActivityDto:
       type: object
       properties:
@@ -16315,6 +16360,11 @@ components:
         contractName:
           type: string
         reason:
+          type: string
+        projectId:
+          type: string
+          format: uuid
+        projectName:
           type: string
       required:
       - activityId
