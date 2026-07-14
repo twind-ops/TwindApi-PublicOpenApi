@@ -15,7 +15,10 @@ Before you integrate, ensure you have the following:
   header.
 - **Company id** — The client company (`companyId`) issuing the authorization.
 - **Resource and site ids** — The UUIDs of the resources and sites to authorize.
-  Obtain resource IDs from the access control status endpoints and site IDs from
+  Obtain resource IDs from the assigned-resources endpoints
+  <!-- markdownlint-disable-next-line MD051 -->
+  (see [Find resource IDs assigned to your contracts](client-access-control-status.md#find-resource-ids-assigned-to-your-contracts))
+  and site IDs from
   <!-- markdownlint-disable-next-line MD051 -->
   [`GET /v1/companies/{companyId}/sites`](#tag/sites/GET/v1/companies/{companyId}/sites).
 

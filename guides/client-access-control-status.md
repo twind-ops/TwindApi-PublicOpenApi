@@ -31,6 +31,59 @@ X-Api-Key: your-api-key-here
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
 > repository.
 
+## Find resource IDs assigned to your contracts
+
+Most access-control flows need a **`resourceId`** — the UUID of the specific
+employee, vehicle, or equipment. These IDs come from the **assigned resources**
+endpoints, which list every resource deployed on contracts where your company
+acts as client, across the whole contract tree (direct contractors and their
+subcontractors).
+
+Two views are available:
+
+- **Lightweight** — one row per resource (`id`, `name`, `resourceType`). Use it
+  when you only need the IDs.
+  <!-- markdownlint-disable-next-line MD051 -->
+  [`GET /v1/companies/{id}/assigned-resources`](#tag/assigned-resources/GET/v1/companies/{id}/assigned-resources)
+- **Detailed** — adds per-resource attributes plus an `assignments` array with
+  every (contract, site) deployment and, for employees, the risks applied there.
+  <!-- markdownlint-disable-next-line MD051 -->
+  [`GET /v2/companies/{id}/assigned-resources-detailed/as-client`](#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-client)
+
+Both support filtering by `q` (name search), `resourceTypes` (`EMPLOYEE`,
+`VEHICLE`, `EQUIPMENT`) and `contractorIds`. Max page size: 100. See
+[See Assigned Resources and Their Risks](client-contracts-assigned-resources.md)
+for the full walkthrough.
+
+### Example: cURL — list assigned resource IDs
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/assigned-resources?resourceTypes=EMPLOYEE&page=0&size=100" \
+  -H "X-Api-Key: your-api-key-here" \
+  -H "Accept: application/json"
+```
+
+**Response** (`200 OK`, trimmed)
+
+```json
+{
+  "content": [
+    {
+      "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "name": "Jane Doe",
+      "resourceType": "EMPLOYEE"
+    }
+  ],
+  "page": { "size": 100, "number": 0, "totalElements": 1, "totalPages": 1 }
+}
+```
+
+Keep the `id` values — they are the `resourceId` you pass to the status,
+access-register, and temporary-authorization endpoints below. Site IDs come from
+<!-- markdownlint-disable-next-line MD051 -->
+[`GET /v1/companies/{companyId}/sites`](#tag/sites/GET/v1/companies/{companyId}/sites).
+
 ## Understanding access control statuses
 
 Each resource-site combination carries one of three statuses:
