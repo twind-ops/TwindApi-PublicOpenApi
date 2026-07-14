@@ -13,7 +13,7 @@ Before you start, ensure you have the following:
 
 ## Step 1: List the resources assigned to your contracts
 
-Two views are available. The lightweight one returns one row per resource (id, name, type) — useful for lookups and filters. The detailed one adds per-resource attributes plus an array describing every assignment (contract, site, activity) where that resource is currently deployed, with the risks assigned on each one.
+Two views are available. The lightweight one returns one row per resource (id, name, type) — useful for lookups and filters. The detailed one adds per-resource attributes plus an `assignments` array describing every deployment (contract, site, activities) where that resource is currently deployed, with the risks assigned on each one.
 
 [`GET /v1/companies/{id}/assigned-resources`](#tag/assigned-resources/GET/v1/companies/{id}/assigned-resources) · [`GET /v2/companies/{id}/assigned-resources-detailed/as-client`](#tag/assigned-resources/GET/v2/companies/{id}/assigned-resources-detailed/as-client)
 
@@ -32,19 +32,17 @@ Response (`200 OK`, trimmed):
 {
   "content": [
     {
-      "id": "00000000-0000-0000-0000-000000000030",
+      "resourceId": "00000000-0000-0000-0000-000000000030",
       "name": "John Smith",
-      "resourceType": "EMPLOYEE",
-      "firstName": "John",
-      "lastName": "Smith",
-      "identity": "12345678Z",
-      "engagements": [
+      "discriminator": "EMPLOYEE",
+      "assignments": [
         {
-          "assignmentId": "00000000-0000-0000-0000-000000000150",
           "contract": { "id": "00000000-0000-0000-0000-000000000010", "name": "Plant maintenance 2026" },
           "site": { "id": "00000000-0000-0000-0000-000000000020", "name": "North Plant" },
-          "activity": { "id": "00000000-0000-0000-0000-000000000090", "name": "Electrical maintenance" },
-          "assignedRisks": [
+          "activities": [
+            { "id": "00000000-0000-0000-0000-000000000090", "name": "Electrical maintenance" }
+          ],
+          "risks": [
             { "id": "00000000-0000-0000-0000-000000000080", "name": "Work at height" }
           ]
         }
@@ -55,7 +53,7 @@ Response (`200 OK`, trimmed):
 }
 ```
 
-The `engagements` JSON property lists the resource's **assignments**: each entry is one (contract, site, activity) deployment with its risks. Pagination is per resource — a resource deployed on N assignments is a single entry. Keep the `contract.id` and `site.id` for the next steps.
+The `assignments` JSON property lists the resource's deployments: each entry is one (contract, site) deployment with its `activities` and `risks`. Pagination is per resource — a resource deployed on N assignments is a single entry. Keep the `contract.id` and `site.id` for the next steps.
 
 ## Step 2: See a contract's deployment overview
 
