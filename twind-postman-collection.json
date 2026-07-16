@@ -4047,7 +4047,12 @@
           }, {
             "key" : "approvalState",
             "value" : "",
-            "description" : "Filter by derived approval state (Approval of Resource Assignments product): PENDING_VALIDATION (open pending request), APPROVED / PARTIALLY_APPROVED / REJECTED (latest resolved outcome), NONE (never had a request). Only meaningful while the product is active for the client company.",
+            "description" : "Deprecated — use 'validationState'. Filter by derived approval state (Approval of Resource Assignments product): PENDING_VALIDATION / APPROVED / PARTIALLY_APPROVED / REJECTED / NONE.",
+            "disabled" : true
+          }, {
+            "key" : "validationState",
+            "value" : "",
+            "description" : "Filter by derived validation state (Approval of Resource Assignments product): PENDING_VALIDATION (≥1 item still pending), RESOLVED (items exist, all decided), NONE (never had a request). Only meaningful while the product is active for the client company.",
             "disabled" : true
           }, {
             "key" : "page",

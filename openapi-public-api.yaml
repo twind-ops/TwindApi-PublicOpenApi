@@ -7490,11 +7490,11 @@ paths:
           default: false
       - name: approvalState
         in: query
-        description: "Filter by derived approval state (Approval of Resource Assignments\
-          \ product): PENDING_VALIDATION (open pending request), APPROVED / PARTIALLY_APPROVED\
-          \ / REJECTED (latest resolved outcome), NONE (never had a request). Only\
-          \ meaningful while the product is active for the client company."
+        description: "Deprecated — use 'validationState'. Filter by derived approval\
+          \ state (Approval of Resource Assignments product): PENDING_VALIDATION /\
+          \ APPROVED / PARTIALLY_APPROVED / REJECTED / NONE."
         required: false
+        deprecated: true
         schema:
           type: string
           enum:
@@ -7502,6 +7502,19 @@ paths:
           - APPROVED
           - PARTIALLY_APPROVED
           - REJECTED
+          - NONE
+      - name: validationState
+        in: query
+        description: "Filter by derived validation state (Approval of Resource Assignments\
+          \ product): PENDING_VALIDATION (≥1 item still pending), RESOLVED (items\
+          \ exist, all decided), NONE (never had a request). Only meaningful while\
+          \ the product is active for the client company."
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING_VALIDATION
+          - RESOLVED
           - NONE
       - name: page
         in: query
@@ -10044,6 +10057,12 @@ components:
     ApprovalResourceAssignmentsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          reviewedByCtaima:
+            type: boolean
+      required:
+      - reviewedByCtaima
     AutomaticReviewConfig:
       type: object
       properties:
@@ -10565,6 +10584,9 @@ components:
             - SUBCONTRACTING_CHAIN
       required:
       - calculationMode
+    PendingCriticalAgreementsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ProductTypeConfig:
       discriminator:
         propertyName: type
@@ -10698,6 +10720,7 @@ components:
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
+          - $ref: "#/components/schemas/PendingCriticalAgreementsConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
@@ -12513,6 +12536,7 @@ components:
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
+          - $ref: "#/components/schemas/PendingCriticalAgreementsConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
@@ -12939,6 +12963,7 @@ components:
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
+          - $ref: "#/components/schemas/PendingCriticalAgreementsConfig"
           - $ref: "#/components/schemas/ProjectsConfig"
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
@@ -14537,6 +14562,8 @@ components:
         relatedRequirement:
           type: string
           format: uuid
+        documentType:
+          $ref: "#/components/schemas/DocumentType"
         templateFile:
           type: string
         canBeSetInFuture:
@@ -15792,21 +15819,33 @@ components:
           $ref: "#/components/schemas/ProjectRef"
         approvalState:
           type: string
+          deprecated: true
+          description: Use validationState instead. Will be removed once consumers
+            migrate.
           enum:
           - PENDING_VALIDATION
           - APPROVED
           - PARTIALLY_APPROVED
           - REJECTED
           - NONE
+        validationState:
+          type: string
+          enum:
+          - PENDING_VALIDATION
+          - RESOLVED
+          - NONE
         pendingValidationCount:
           type: integer
           format: int32
+        hasSubcontracts:
+          type: boolean
       required:
       - client
       - contractor
       - dateFrom
       - dateTo
       - engagements
+      - hasSubcontracts
       - id
       - level
       - mainContractor
