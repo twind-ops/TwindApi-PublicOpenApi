@@ -484,6 +484,11 @@
             "value" : "",
             "description" : "When set, excludes employees already assigned to this contract",
             "disabled" : true
+          }, {
+            "key" : "excludeResourceIds",
+            "value" : "",
+            "description" : "Excludes these resource ids from the result (e.g. rows the client has staged but not yet saved)",
+            "disabled" : true
           } ]
         },
         "description" : "Returns a paginated list of employees for a contractor company. Used to locate the internal `resourceId` needed for contract engagement assignment. The `q` parameter performs a partial match against `firstName`, `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:** `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
@@ -542,6 +547,11 @@
             "value" : "",
             "description" : "When set, excludes vehicles already assigned to this contract",
             "disabled" : true
+          }, {
+            "key" : "excludeResourceIds",
+            "value" : "",
+            "description" : "Excludes these resource ids from the result (e.g. rows the client has staged but not yet saved)",
+            "disabled" : true
           } ]
         },
         "description" : "Returns a paginated list of vehicles for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
@@ -594,6 +604,11 @@
             "key" : "excludeAssignedToContractId",
             "value" : "",
             "description" : "When set, excludes equipment already assigned to this contract",
+            "disabled" : true
+          }, {
+            "key" : "excludeResourceIds",
+            "value" : "",
+            "description" : "Excludes these resource ids from the result (e.g. rows the client has staged but not yet saved)",
             "disabled" : true
           } ]
         },
@@ -3332,6 +3347,11 @@
             "key" : "managerIds",
             "value" : "",
             "description" : "Filter by contract manager user ids; only instances whose contract has a manager in this set are included.",
+            "disabled" : true
+          }, {
+            "key" : "onlyMineToReview",
+            "value" : "",
+            "description" : "When true, restricts results to requirement instances the current user has permission to review. Has no effect when requirement permissions are not enforced or the user is not scoped to specific teams.",
             "disabled" : true
           }, {
             "key" : "page",
