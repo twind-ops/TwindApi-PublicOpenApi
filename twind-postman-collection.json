@@ -350,6 +350,11 @@
             "description" : "Optional: narrow results to activities used by these contracts' engagements. Applied as an additional AND filter that takes precedence over `selected`: selected ids outside the contract scope are excluded.",
             "disabled" : true
           }, {
+            "key" : "holdingSharedParent",
+            "value" : "",
+            "description" : "Optional: return only holding activities when true.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -474,6 +479,11 @@
             "value" : "",
             "description" : "Optional employee resource IDs",
             "disabled" : true
+          }, {
+            "key" : "excludeAssignedToContractId",
+            "value" : "",
+            "description" : "When set, excludes employees already assigned to this contract",
+            "disabled" : true
           } ]
         },
         "description" : "Returns a paginated list of employees for a contractor company. Used to locate the internal `resourceId` needed for contract engagement assignment. The `q` parameter performs a partial match against `firstName`, `lastName`, `identity` (DNI/passport/SSN), and `email`. **Allowed sort fields:** `firstName`, `lastName`, `identity`, `email`, `phone`, `country.name`. **Sort format:** `sort=field,direction` (e.g. `?sort=lastName,asc`)."
@@ -527,6 +537,11 @@
             "value" : "",
             "description" : "Optional vehicle resource IDs",
             "disabled" : true
+          }, {
+            "key" : "excludeAssignedToContractId",
+            "value" : "",
+            "description" : "When set, excludes vehicles already assigned to this contract",
+            "disabled" : true
           } ]
         },
         "description" : "Returns a paginated list of vehicles for the company. Supports optional text search (q), subcontractor scope, and contractor filters."
@@ -574,6 +589,11 @@
             "key" : "contractorIds",
             "value" : "",
             "description" : "Filter to equipment belonging to these contractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "excludeAssignedToContractId",
+            "value" : "",
+            "description" : "When set, excludes equipment already assigned to this contract",
             "disabled" : true
           } ]
         },
@@ -854,6 +874,11 @@
             "key" : "projectIds",
             "value" : "",
             "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "hasRejectedAssignments",
+            "value" : "",
+            "description" : "When true, return only contracts with at least one REJECTED resource-assignment item (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments feature is active.",
             "disabled" : true
           }, {
             "key" : "page",

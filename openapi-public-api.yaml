@@ -605,6 +605,12 @@ paths:
           items:
             type: string
             format: uuid
+      - name: holdingSharedParent
+        in: query
+        description: "Optional: return only holding activities when true."
+        required: false
+        schema:
+          type: boolean
       - name: companyId
         in: path
         description: Company ID (client)
@@ -1117,6 +1123,14 @@ paths:
           items:
             type: string
             format: uuid
+      - name: hasRejectedAssignments
+        in: query
+        description: "When true, return only contracts with at least one REJECTED\
+          \ resource-assignment item (Approval of Resource Assignments). Only meaningful\
+          \ while the client-approval-resource-assignments feature is active."
+        required: false
+        schema:
+          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -1241,6 +1255,13 @@ paths:
           items:
             type: string
             format: uuid
+      - name: excludeAssignedToContractId
+        in: query
+        description: "When set, excludes employees already assigned to this contract"
+        required: false
+        schema:
+          type: string
+          format: uuid
       responses:
         "200":
           description: Successfully retrieved list
@@ -1664,6 +1685,13 @@ paths:
           items:
             type: string
             format: uuid
+      - name: excludeAssignedToContractId
+        in: query
+        description: "When set, excludes vehicles already assigned to this contract"
+        required: false
+        schema:
+          type: string
+          format: uuid
       responses:
         "200":
           description: Successfully retrieved list
@@ -2043,6 +2071,13 @@ paths:
           items:
             type: string
             format: uuid
+      - name: excludeAssignedToContractId
+        in: query
+        description: "When set, excludes equipment already assigned to this contract"
+        required: false
+        schema:
+          type: string
+          format: uuid
       responses:
         "200":
           description: Successfully retrieved list
@@ -10518,6 +10553,9 @@ components:
       required:
       - horizontal
       - vertical
+    HoldingCompanyConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     InternalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -10715,6 +10753,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
+          - $ref: "#/components/schemas/HoldingCompanyConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -11015,6 +11054,8 @@ components:
         trainingCourseId:
           type: string
           format: uuid
+        holdingSharedParent:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -11333,6 +11374,8 @@ components:
           enum:
           - COMMON
           - SPECIAL_WORK
+        holdingSharedParent:
+          type: boolean
       required:
       - name
     RegisterDto:
@@ -12197,7 +12240,12 @@ components:
             \ of the most recently created assignment that defines one is returned;\
             \ assignments without a position are ignored. Null when no assignment\
             \ on the site defines a position, and for non-employee resources."
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
       required:
+      - activities
       - name
       - resourceId
       - resourceType
@@ -12388,11 +12436,14 @@ components:
           $ref: "#/components/schemas/ManagerRefV2"
         project:
           $ref: "#/components/schemas/ProjectRef"
+        hasUnresolvedMandatoryRiskConflicts:
+          type: boolean
       required:
       - client
       - contractor
       - dateFrom
       - dateTo
+      - hasUnresolvedMandatoryRiskConflicts
       - id
       - level
       - mainContractor
@@ -12531,6 +12582,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
+          - $ref: "#/components/schemas/HoldingCompanyConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -12623,10 +12675,16 @@ components:
           format: uuid
         owningCompanyName:
           type: string
+        parentId:
+          type: string
+          format: uuid
+        isHolding:
+          type: boolean
       required:
       - companyId
       - companyName
       - external
+      - isHolding
       - products
       - taxId
     UserCompanyPermissions:
@@ -12834,6 +12892,9 @@ components:
           format: uuid
         owningCompanyName:
           type: string
+        parentId:
+          type: string
+          format: uuid
         ownsExternalCompanies:
           type: boolean
           description: True if this company owns at least one external company (respecting
@@ -12958,6 +13019,7 @@ components:
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
+          - $ref: "#/components/schemas/HoldingCompanyConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -13815,6 +13877,8 @@ components:
           - DEPENDANT
         paymentRequired:
           type: boolean
+        holdingShared:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -13829,6 +13893,7 @@ components:
       - evidenceType
       - expirationType
       - hasTemplate
+      - holdingShared
       - id
       - multipleInstanceRequest
       - name
@@ -13982,6 +14047,8 @@ components:
           trainingCourseId:
             type: string
             format: uuid
+          holdingShared:
+            type: boolean
           documentType:
             $ref: "#/components/schemas/DocumentType"
           automaticReviewer:
@@ -14006,6 +14073,7 @@ components:
       - enableDoesNotApply
       - evidenceType
       - expirationType
+      - holdingShared
       - id
       - isEditable
       - multipleInstanceRequest
@@ -14123,6 +14191,8 @@ components:
           trainingCourseId:
             type: string
             format: uuid
+          holdingShared:
+            type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -14134,6 +14204,7 @@ components:
       - enableDoesNotApply
       - evidenceType
       - expirationType
+      - holdingShared
       - id
       - isEditable
       - multipleInstanceRequest
@@ -15076,9 +15147,14 @@ components:
         brand:
           type: string
           description: Client company partner brand (e.g. 'avanta') when set.
+        pendingCriticalAgreementsEnabled:
+          type: boolean
+          description: "Whether the client has the Pending Critical Agreements add-on\
+            \ enabled, meaning its critical agreements are subject to enforcement."
       required:
       - id
       - name
+      - pendingCriticalAgreementsEnabled
       - taxId
     RequirementContractData:
       type: object
@@ -15837,7 +15913,12 @@ components:
         pendingValidationCount:
           type: integer
           format: int32
+        rejectedValidationCount:
+          type: integer
+          format: int32
         hasSubcontracts:
+          type: boolean
+        hasUnresolvedMandatoryRiskConflicts:
           type: boolean
       required:
       - client
@@ -15846,6 +15927,7 @@ components:
       - dateTo
       - engagements
       - hasSubcontracts
+      - hasUnresolvedMandatoryRiskConflicts
       - id
       - level
       - mainContractor
@@ -16001,12 +16083,15 @@ components:
           enum:
           - COMMON
           - SPECIAL_WORK
+        holdingShared:
+          type: boolean
         createdAt:
           type: string
           format: date-time
       required:
       - companyId
       - createdAt
+      - holdingShared
       - id
       - name
       - type
