@@ -1125,9 +1125,21 @@ paths:
             format: uuid
       - name: hasRejectedAssignments
         in: query
+        description: "Deprecated — use 'hasUnacknowledgedRejectedAssignments' instead.\
+          \ When true, return only contracts with at least one REJECTED resource-assignment\
+          \ item, regardless of acknowledgement (Approval of Resource Assignments).\
+          \ Only meaningful while the client-approval-resource-assignments feature\
+          \ is active."
+        required: false
+        deprecated: true
+        schema:
+          type: boolean
+      - name: hasUnacknowledgedRejectedAssignments
+        in: query
         description: "When true, return only contracts with at least one REJECTED\
-          \ resource-assignment item (Approval of Resource Assignments). Only meaningful\
-          \ while the client-approval-resource-assignments feature is active."
+          \ resource-assignment item that has not yet been acknowledged by the contractor\
+          \ (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments\
+          \ feature is active."
         required: false
         schema:
           type: boolean
@@ -10676,6 +10688,36 @@ components:
     ProductTypeConfig:
       discriminator:
         propertyName: type
+        mapping:
+          client_plan: "#/components/schemas/ClientPlanConfig"
+          contractor_plan: "#/components/schemas/ContractorPlanConfig"
+          eu_category: "#/components/schemas/EUCategoryConfig"
+          documental_management: "#/components/schemas/DocumentalManagementConfig"
+          employee_type: "#/components/schemas/EmployeeTypeConfig"
+          mobile_app: "#/components/schemas/MobileAppConfig"
+          internal_management: "#/components/schemas/InternalManagementConfig"
+          work_permits: "#/components/schemas/WorkPermitsConfig"
+          sso: "#/components/schemas/SsoConfig"
+          backup: "#/components/schemas/BackupConfig"
+          access_control_api: "#/components/schemas/AccessControlApiConfig"
+          site_hierarchy: "#/components/schemas/SiteHierarchyConfig"
+          projects: "#/components/schemas/ProjectsConfig"
+          public_api: "#/components/schemas/PublicApiConfig"
+          requirements_api: "#/components/schemas/RequirementsApiConfig"
+          companies_contracts_api: "#/components/schemas/CompaniesContractsApiConfig"
+          resources_api: "#/components/schemas/ResourcesApiConfig"
+          training: "#/components/schemas/TrainingConfig"
+          scheduled_links: "#/components/schemas/ScheduledLinksConfig"
+          payment_authorization: "#/components/schemas/PaymentAuthorizationConfig"
+          payment_authorization_api: "#/components/schemas/PaymentAuthorizationApiConfig"
+          erp_properties: "#/components/schemas/ErpPropertiesConfig"
+          custom_access_cards: "#/components/schemas/CustomAccessCardsConfig"
+          approval_resource_assignments: "#/components/schemas/ApprovalResourceAssignmentsConfig"
+          mandatory_risks: "#/components/schemas/MandatoryRisksConfig"
+          external_management: "#/components/schemas/ExternalManagementConfig"
+          special_works: "#/components/schemas/SpecialWorksConfig"
+          pending_critical_agreements: "#/components/schemas/PendingCriticalAgreementsConfig"
+          holding_management: "#/components/schemas/HoldingCompanyConfig"
       properties:
         type:
           type: string
@@ -11128,6 +11170,15 @@ components:
             type: string
             format: uuid
           minItems: 1
+        origin:
+          type: string
+          description: "Optional. Flow that initiated the submission, used for trial\
+            \ feature-usage metering. No usage is recorded when omitted."
+          enum:
+          - REQUIREMENT_FORWARD
+          - REQUIREMENT_RETROACTIVE
+          - REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB
+          - DOCUMENT_HUB
       required:
       - requirementInstanceIds
     CreateUploadEvidenceDto:
@@ -11170,6 +11221,15 @@ components:
           type: string
           format: date-time
           description: Submission creation time; defaults to server time when omitted.
+        origin:
+          type: string
+          description: "Optional. Flow that initiated the submission, used for trial\
+            \ feature-usage metering. No usage is recorded when omitted."
+          enum:
+          - REQUIREMENT_FORWARD
+          - REQUIREMENT_RETROACTIVE
+          - REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB
+          - DOCUMENT_HUB
       required:
       - filePaths
       - issueDate
@@ -12017,6 +12077,51 @@ components:
       required:
       - content
       - page
+    SiteInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        breadcrumb:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteNodeItem"
+      required:
+      - breadcrumb
+      - id
+      - level
+      - name
+    SiteNodeItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        level:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+      required:
+      - id
+      - level
+      - name
     SubcontractRequestV2:
       type: object
       properties:
@@ -12029,11 +12134,21 @@ components:
         siteId:
           type: string
           format: uuid
+        siteName:
+          type: string
         activityIds:
           type: array
           items:
             type: string
             format: uuid
+        activityName:
+          type: array
+          items:
+            type: string
+        scope:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteInfo"
         contractor:
           $ref: "#/components/schemas/IdAndNameV2"
         subcontractor:
@@ -12053,15 +12168,30 @@ components:
           format: date-time
       required:
       - activityIds
+      - activityName
       - contractor
       - createdAt
       - dateFrom
       - dateTo
       - parentContractId
       - requestId
+      - scope
       - siteId
+      - siteName
       - status
       - subcontractor
+    ContractMandatoryRiskConflictV2:
+      type: object
+      properties:
+        employee:
+          $ref: "#/components/schemas/IdAndNameV2"
+        missingRisks:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+      required:
+      - employee
+      - missingRisks
     ContractSiteV2:
       type: object
       properties:
@@ -12135,6 +12265,10 @@ components:
           format: date-time
         project:
           $ref: "#/components/schemas/ProjectRef"
+        mandatoryRiskConflicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractMandatoryRiskConflictV2"
       required:
       - client
       - contractor
@@ -12144,6 +12278,7 @@ components:
       - hasSubcontracts
       - id
       - manager
+      - mandatoryRiskConflicts
       - name
       - sites
       - subcontracting
@@ -13789,26 +13924,6 @@ components:
       - id
       - level
       - name
-    SiteNodeItem:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        level:
-          type: string
-          enum:
-          - BUSINESS
-          - SITE_GROUP
-          - SITE
-          - ZONE
-          - AREA
-      required:
-      - id
-      - level
-      - name
     ContractorSiteHierarchyDto:
       type: object
       properties:
@@ -14393,31 +14508,6 @@ components:
           - NATIONAL_COMPANY
           - EU_COMPANY
           - NON_EU_COMPANY
-    SiteInfo:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        level:
-          type: string
-          enum:
-          - BUSINESS
-          - SITE_GROUP
-          - SITE
-          - ZONE
-          - AREA
-        breadcrumb:
-          type: array
-          items:
-            $ref: "#/components/schemas/SiteNodeItem"
-      required:
-      - breadcrumb
-      - id
-      - level
-      - name
     RequirementStats:
       type: object
       properties:
@@ -15115,6 +15205,11 @@ components:
       type: object
       discriminator:
         propertyName: type
+        mapping:
+          EMPLOYEE: "#/components/schemas/Employee"
+          VEHICLE: "#/components/schemas/Vehicle"
+          EQUIPMENT: "#/components/schemas/Equipment"
+          PRODUCT: "#/components/schemas/Product"
       properties:
         id:
           type: string
@@ -15980,6 +16075,12 @@ components:
           type: integer
           format: int32
         rejectedValidationCount:
+          type: integer
+          format: int32
+          deprecated: true
+          description: Use unacknowledgedRejectedCount instead. Counts all rejected
+            items regardless of acknowledgement.
+        unacknowledgedRejectedCount:
           type: integer
           format: int32
         hasSubcontracts:

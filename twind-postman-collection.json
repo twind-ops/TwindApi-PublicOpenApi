@@ -893,7 +893,12 @@
           }, {
             "key" : "hasRejectedAssignments",
             "value" : "",
-            "description" : "When true, return only contracts with at least one REJECTED resource-assignment item (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments feature is active.",
+            "description" : "Deprecated — use 'hasUnacknowledgedRejectedAssignments' instead. When true, return only contracts with at least one REJECTED resource-assignment item, regardless of acknowledgement (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments feature is active.",
+            "disabled" : true
+          }, {
+            "key" : "hasUnacknowledgedRejectedAssignments",
+            "value" : "",
+            "description" : "When true, return only contracts with at least one REJECTED resource-assignment item that has not yet been acknowledged by the contractor (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments feature is active.",
             "disabled" : true
           }, {
             "key" : "page",
