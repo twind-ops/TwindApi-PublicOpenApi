@@ -5927,6 +5927,19 @@ paths:
         schema:
           type: boolean
           description: "When true, restricts to agreement-type requirements."
+      - name: prioritizeAgreements
+        in: query
+        description: "When true (together with 'onlyCriticalRequirements'), agreement-type\
+          \ requirements are ordered first. Intended for the default sort only: it\
+          \ is NOT suppressed server-side when an explicit sort is present, so the\
+          \ caller must omit it under a manual column sort."
+        required: false
+        schema:
+          type: boolean
+          description: "When true (together with 'onlyCriticalRequirements'), agreement-type\
+            \ requirements are ordered first. Intended for the default sort only:\
+            \ it is NOT suppressed server-side when an explicit sort is present, so\
+            \ the caller must omit it under a manual column sort."
       - name: onlyExpiringInFifteenDays
         in: query
         description: "When true, restricts to instances with evidence expiring within\
@@ -12348,11 +12361,37 @@ components:
         client:
           $ref: "#/components/schemas/IdAndNameV2"
         contractor:
-          $ref: "#/components/schemas/IdAndNameV2"
+          $ref: "#/components/schemas/ContractorRefV2"
+        level:
+          type: integer
+          format: int32
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+        isExpired:
+          type: boolean
+        anyPendingApproval:
+          type: boolean
+        allowSubcontract:
+          type: boolean
+        onlyClientCanSubcontract:
+          type: boolean
+        maxSubcontractingLevel:
+          type: integer
+          format: int32
+        needsAuthorisation:
+          type: boolean
         sites:
           type: array
           items:
             $ref: "#/components/schemas/ContractTreeSiteV2"
+        pendingRequests:
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingSubcontractRequestV2"
         children:
           type: array
           items:
@@ -12360,11 +12399,20 @@ components:
         project:
           $ref: "#/components/schemas/ProjectRef"
       required:
+      - allowSubcontract
+      - anyPendingApproval
       - children
       - client
       - contractor
+      - dateFrom
+      - dateTo
       - id
+      - isExpired
+      - level
       - name
+      - needsAuthorisation
+      - onlyClientCanSubcontract
+      - pendingRequests
       - sites
     ContractTreeSiteV2:
       type: object
@@ -12399,6 +12447,51 @@ components:
       - level
       - name
       - siteId
+    ContractorRefV2:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        taxId:
+          type: string
+      required:
+      - id
+      - name
+      - taxId
+    PendingSubcontractRequestV2:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        subcontractor:
+          $ref: "#/components/schemas/IdAndNameV2"
+        siteId:
+          type: string
+          format: uuid
+        siteName:
+          type: string
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        dateFrom:
+          type: string
+          format: date
+        dateTo:
+          type: string
+          format: date
+      required:
+      - activities
+      - dateFrom
+      - dateTo
+      - requestId
+      - siteId
+      - siteName
+      - subcontractor
     AssignedResourceV2:
       type: object
       properties:

@@ -3196,6 +3196,11 @@
             "description" : "When true, restricts to agreement-type requirements.",
             "disabled" : true
           }, {
+            "key" : "prioritizeAgreements",
+            "value" : "",
+            "description" : "When true (together with 'onlyCriticalRequirements'), agreement-type requirements are ordered first. Intended for the default sort only: it is NOT suppressed server-side when an explicit sort is present, so the caller must omit it under a manual column sort.",
+            "disabled" : true
+          }, {
             "key" : "onlyExpiringInFifteenDays",
             "value" : "",
             "description" : "When true, restricts to instances with evidence expiring within the next fifteen days.",
