@@ -16521,6 +16521,17 @@ components:
       - id
       - name
       - status
+    BlockingContractor:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     ContractAndActivityAcceptability:
       type: object
       properties:
@@ -16637,6 +16648,12 @@ components:
           enum:
           - PERMISSIVE
           - RESTRICTIVE
+        subcontractingChainMode:
+          type: string
+          enum:
+          - RESOURCE_AND_COMPANY
+          - DIRECT_CONTRACTOR
+          - ALL_CONTRACTORS
         issues:
           type: array
           items:
@@ -16645,6 +16662,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IssueRequirement"
+        blockingAncestorContractors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockingContractor"
         statusPerContractActivity:
           type: array
           items:
@@ -16667,6 +16688,7 @@ components:
             $ref: "#/components/schemas/MandatoryRiskIssue"
       required:
       - accessControlType
+      - blockingAncestorContractors
       - clientId
       - contractor
       - engagements
@@ -16677,6 +16699,7 @@ components:
       - site
       - status
       - statusPerContractActivity
+      - subcontractingChainMode
     IssueRequirement:
       type: object
       properties:
@@ -17161,6 +17184,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IssueRequirement"
+        blockingAncestorContractors:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockingContractor"
         contracts:
           type: array
           items:
@@ -17175,6 +17202,7 @@ components:
             $ref: "#/components/schemas/GetAccessControlActiveEntry"
       required:
       - activities
+      - blockingAncestorContractors
       - client
       - contractor
       - contracts
