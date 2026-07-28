@@ -8559,6 +8559,39 @@ paths:
           type: string
           maxLength: 255
           minLength: 0
+      - name: subjectTypes
+        in: query
+        description: "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT,\
+          \ CONTRACTOR)"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+      - name: subjectIds
+        in: query
+        description: Filter by subject IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: documentTypeIds
+        in: query
+        description: Filter by document type IDs
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -12193,6 +12226,30 @@ components:
       - siteName
       - status
       - subcontractor
+    ContractActivityV2:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        hasUnresolvedMandatoryRiskConflicts:
+          type: boolean
+          description: True when this activity's assigned resources do not cover its
+            active mandatory-risk rules. False when covered or when the mandatory-risks
+            add-on is off.
+        uncoveredMandatoryRisks:
+          type: array
+          description: Mandatory risks (id + name) not covered for this activity.
+            Empty when covered or when the mandatory-risks add-on is off.
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+      required:
+      - hasUnresolvedMandatoryRiskConflicts
+      - id
+      - name
+      - uncoveredMandatoryRisks
     ContractMandatoryRiskConflictV2:
       type: object
       properties:
@@ -12224,7 +12281,7 @@ components:
         activities:
           type: array
           items:
-            $ref: "#/components/schemas/IdAndNameV2"
+            $ref: "#/components/schemas/ContractActivityV2"
         scopeSites:
           type: array
           items:
@@ -12282,7 +12339,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ContractMandatoryRiskConflictV2"
+        activitiesWithMandatoryRiskConflicts:
+          type: integer
+          format: int32
+          description: Number of activities on this contract whose assigned resources
+            do not cover their active mandatory-risk rules. 0 when the mandatory-risks
+            add-on is off.
       required:
+      - activitiesWithMandatoryRiskConflicts
       - client
       - contractor
       - createdAt

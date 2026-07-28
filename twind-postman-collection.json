@@ -4692,6 +4692,21 @@
             "description" : "Optional search query to filter document names",
             "disabled" : true
           }, {
+            "key" : "subjectTypes",
+            "value" : "",
+            "description" : "Filter by subject types (e.g. EMPLOYEE, VEHICLE, EQUIPMENT, CONTRACTOR)",
+            "disabled" : true
+          }, {
+            "key" : "subjectIds",
+            "value" : "",
+            "description" : "Filter by subject IDs",
+            "disabled" : true
+          }, {
+            "key" : "documentTypeIds",
+            "value" : "",
+            "description" : "Filter by document type IDs",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
