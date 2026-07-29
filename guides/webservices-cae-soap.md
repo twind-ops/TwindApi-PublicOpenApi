@@ -70,12 +70,12 @@ Every request carries a `userId` / `userClave` credential pair **in the SOAP bod
 (never as an HTTP header). Two credential models are supported, and both resolve to the
 same company.
 
-### Flow A — Legacy user / password *(unchanged)*
+### Flow A — Legacy user / password
 
 If you were provisioned with a SOAP `userId` and `userClave`, keep using them exactly as
 before. Nothing about this flow changes: the same credentials, the same behavior.
 
-### Flow B — API key as `userId` / `userClave` *(product‑gated)*
+### Flow B — API key as `userId` / `userClave`
 
 Companies holding the **"WebServices CAE compatible"** product can authenticate the SOAP
 surface with an **API key** instead of a hand‑provisioned user/password:
