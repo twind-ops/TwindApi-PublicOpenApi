@@ -123,6 +123,13 @@ const GUIDES_DATA = [
             description: "Attach documentation files to a visitor profile and link them to visit entries.",
             icon: "assets/icon-visitor.svg",
           },
+          {
+            id: "webservices-cae-soap",
+            file: "webservices-cae-soap.md",
+            title: "WebServices CAE (SOAP)",
+            description: "Query worker and vehicle access status over the legacy WCF-compatible SOAP surface, authenticating with user/password or an API key.",
+            icon: "assets/icon-visitor.svg",
+          },
         ],
       },
       {
