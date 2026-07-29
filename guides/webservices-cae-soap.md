@@ -25,8 +25,8 @@ illustrative.
 ## Prerequisites
 
 - **Company set up in Twind** with access‑control data (contractors, resources, sites).
-- **Credentials for the SOAP surface** — either the legacy user/password you were
-  provisioned with, or an API key (see [Authentication](#authentication)).
+- **An API key** — the credential for the SOAP surface (see
+  [Authentication](#authentication)).
 - A SOAP client (generated from the WSDL) or the ability to POST a raw SOAP 1.1
   envelope with `Content-Type: text/xml`.
 
@@ -67,23 +67,17 @@ Refer to the WSDL for the exact element names and types of the response.
 ## Authentication
 
 Every request carries a `userId` / `userClave` credential pair **in the SOAP body**
-(never as an HTTP header). Two credential models are supported, and both resolve to the
-same company.
+(never as an HTTP header).
 
-### Flow A — Legacy user / password
+### API key as `userId` / `userClave`
 
-If you were provisioned with a SOAP `userId` and `userClave`, keep using them exactly as
-before. Nothing about this flow changes: the same credentials, the same behavior.
-
-### Flow B — API key as `userId` / `userClave`
-
-Companies holding the **"WebServices CAE compatible"** product can authenticate the SOAP
-surface with an **API key** instead of a hand‑provisioned user/password:
+Companies holding the **"WebServices CAE compatible"** product authenticate the SOAP
+surface with an **API key**:
 
 - Send an **API key's *name*** as the **`userId`**.
 - Send **that same key's *value*** as the **`userClave`**.
 
-Rules for this flow:
+Rules:
 
 - The **`userId` must be the name of one of your company's *active* API keys.** Manage
   your keys as described in the [API Authentication Guide](get-api-token.md).
@@ -119,8 +113,9 @@ The `CT_EstadoVehiculos` request is identical except for the operation element n
 
 ## Errors
 
-- **Authentication failure** — a single generic SOAP fault (see Flow B above). It does
-  not reveal whether the `userId` or the `userClave` was at fault.
+- **Authentication failure** — a single generic SOAP fault (see
+  [Authentication](#authentication) above). It does not reveal whether the `userId` or
+  the `userClave` was at fault.
 - **Invalid `centro`** — if the supplied site UUID is not one the caller can see, the
   operation returns no rows for that site rather than an error.
 
