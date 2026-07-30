@@ -37,6 +37,8 @@ the current access‑control status for the company's resources.
 
 ### `CT_EstadoTrabajadores` — worker status
 
+**WSDL:** <https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl>
+
 Returns the **employees** (resources of type `EMPLOYEE` with a non‑empty identity
 document) known to the company's access control, with their per‑site authorization
 state.
@@ -47,6 +49,8 @@ state.
   **not** filter the result.
 
 ### `CT_EstadoVehiculos` — vehicle status
+
+**WSDL:** <https://webservice.twind.io/CT_EstadoVehiculos.svc/wsdl>
 
 Returns the **vehicles** (resources of type `VEHICLE` with a non‑empty plate) with their
 per‑site authorization state. Accepts the same optional **`centro`** filter.
