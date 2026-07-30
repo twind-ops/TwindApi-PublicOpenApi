@@ -10,15 +10,15 @@ Two operations are available today:
 
 | Operation | Purpose | Endpoint | WSDL |
 | --- | --- | --- | --- |
-| `CT_EstadoTrabajadores` | Worker (employee) access status for a company | `POST /CT_EstadoTrabajadores.svc` | `GET /CT_EstadoTrabajadores.svc?wsdl` |
-| `CT_EstadoVehiculos` | Vehicle access status for a company | `POST /CT_EstadoVehiculos.svc` | `GET /CT_EstadoVehiculos.svc?wsdl` |
+| `CT_EstadoTrabajadores` | Worker (employee) access status for a company | `POST https://webservice.twind.io/CT_EstadoTrabajadores.svc` | `GET https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl` |
+| `CT_EstadoVehiculos` | Vehicle access status for a company | `POST https://webservice.twind.io/CT_EstadoVehiculos.svc` | `GET https://webservice.twind.io/CT_EstadoVehiculos.svc/wsdl` |
 
 > **Building a new integration?** If you are starting from scratch, prefer the REST
 > [Access Control](client-access-control-status.md) endpoints — they use standard
 > API‑key authentication and JSON. The SOAP surface exists to keep the large base of
 > existing CAE turnstile integrations working.
 
-The `?wsdl` document is the **authoritative contract** for each operation (namespaces,
+The WSDL document is the **authoritative contract** for each operation (namespaces,
 element names, and types). Use it to generate your client; the examples below are
 illustrative.
 
@@ -37,8 +37,6 @@ the current access‑control status for the company's resources.
 
 ### `CT_EstadoTrabajadores` — worker status
 
-**WSDL:** <https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl>
-
 Returns the **employees** (resources of type `EMPLOYEE` with a non‑empty identity
 document) known to the company's access control, with their per‑site authorization
 state.
@@ -49,8 +47,6 @@ state.
   **not** filter the result.
 
 ### `CT_EstadoVehiculos` — vehicle status
-
-**WSDL:** <https://webservice.twind.io/CT_EstadoVehiculos.svc/wsdl>
 
 Returns the **vehicles** (resources of type `VEHICLE` with a non‑empty plate) with their
 per‑site authorization state. Accepts the same optional **`centro`** filter.
