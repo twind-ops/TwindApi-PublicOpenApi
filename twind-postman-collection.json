@@ -843,7 +843,7 @@
           }, {
             "key" : "showSubcontracts",
             "value" : "",
-            "description" : "",
+            "description" : "When true, also return the contracts held by the company's subcontractors (everything below it in the subcontracting tree). The company's own contracts are always returned, whether it holds them directly from the client or through being subcontracted.",
             "disabled" : true
           }, {
             "key" : "dateFrom",
@@ -1946,7 +1946,7 @@
           }, {
             "key" : "resourceIds",
             "value" : "",
-            "description" : "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'. Obtain resource IDs from access-control endpoints (resource.id field)",
+            "description" : "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'. Obtain resource IDs from [GET /access-register/filters/resources](#tag/access-register-controller), which lists every resource with access-register history (including unassigned/deleted ones)",
             "disabled" : true
           }, {
             "key" : "contractorId",
@@ -2526,7 +2526,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
       }
     }, {
       "name" : "Get access control status by client",
@@ -3848,7 +3848,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Paginated sites of **client** companies the contractor works with. **Search:** optional `q` filters sites by text. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
+        "description" : "Paginated sites of **client** companies the contractor works with. Only sites at **SITE** level are returned: engagements scoped at a deeper level (zone, area) are reported as their site ancestor, and `children` is always empty. **Search:** optional `q` filters sites by the reported site name. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
       }
     }, {
       "name" : "Client site hierarchy as contractor",

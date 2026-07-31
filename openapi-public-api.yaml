@@ -1059,6 +1059,10 @@ paths:
             format: uuid
       - name: showSubcontracts
         in: query
+        description: "When true, also return the contracts held by the company's subcontractors\
+          \ (everything below it in the subcontracting tree). The company's own contracts\
+          \ are always returned, whether it holds them directly from the client or\
+          \ through being subcontracted."
         required: false
         schema:
           type: boolean
@@ -3489,8 +3493,10 @@ paths:
           format: uuid
       - name: resourceIds
         in: query
-        description: Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'.
-          Obtain resource IDs from access-control endpoints (resource.id field)
+        description: "Filter by resource IDs (multi-value). Replaces deprecated 'resourceId'.\
+          \ Obtain resource IDs from [GET /access-register/filters/resources](#tag/access-register-controller),\
+          \ which lists every resource with access-register history (including unassigned/deleted\
+          \ ones)"
         required: false
         schema:
           type: array
@@ -4423,11 +4429,16 @@ paths:
       description: "Retrieves paginated access control statuses for resources when\
         \ the company acts as a contractor. Results are filtered based on the user's\
         \ client company and site visibility. Subcontractor filtering (`companyScope`\
-        \ and `contractorIds`). **Allowed sort fields:** `client_name` (client company\
-        \ name); `contractor_name` (contractor company name); `resource_name` (resource\
-        \ name: employee, vehicle, or equipment); `site_name` (site name, default);\
-        \ `end_of_access` (end of access date). **Sort format:** `?sort=field,direction`\
-        \ (e.g. `?sort=site_name,asc`)."
+        \ and `contractorIds`). Results are always reported at site level: when a\
+        \ client uses site hierarchy, assignments at deeper levels (zone, area) are\
+        \ grouped into their site ancestor and the reported status is the rollup for\
+        \ that branch. `activeEntry` follows the same rule — an entry registered at\
+        \ a deeper level is attributed to the site, so its `siteId` names the reported\
+        \ site rather than identifying where the entry was registered. **Allowed sort\
+        \ fields:** `client_name` (client company name); `contractor_name` (contractor\
+        \ company name); `resource_name` (resource name: employee, vehicle, or equipment);\
+        \ `site_name` (site name, default); `end_of_access` (end of access date).\
+        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
       operationId: getAccessControlStatusByContractor
       parameters:
       - name: companyId
@@ -7048,8 +7059,10 @@ paths:
       - Sites
       summary: List client sites as contractor
       description: "Paginated sites of **client** companies the contractor works with.\
-        \ **Search:** optional `q` filters sites by text. **Pagination:** `page`,\
-        \ `size`. **Sort:** default **name** ascending."
+        \ Only sites at **SITE** level are returned: engagements scoped at a deeper\
+        \ level (zone, area) are reported as their site ancestor, and `children` is\
+        \ always empty. **Search:** optional `q` filters sites by the reported site\
+        \ name. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
       operationId: findAllAsContractor
       parameters:
       - name: q
@@ -10036,11 +10049,21 @@ components:
         siteId:
           type: string
           format: uuid
+          deprecated: true
+          description: Deprecated — use 'sites'. Mutually exclusive with 'sites'.
         activityIds:
           type: array
+          deprecated: true
+          description: Deprecated — use 'sites'. Mutually exclusive with 'sites'.
           items:
             type: string
             format: uuid
+        sites:
+          type: array
+          description: "One or more sites of the parent contract, each with its own\
+            \ activities."
+          items:
+            $ref: "#/components/schemas/SubcontractSiteDtoV2"
         dateFrom:
           type: string
           format: date
@@ -10051,10 +10074,22 @@ components:
           type: string
           format: date-time
       required:
-      - activityIds
       - contractorIds
       - dateFrom
       - dateTo
+    SubcontractSiteDtoV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        activityIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+      required:
+      - activityIds
       - siteId
     ContractClientValidationDto:
       type: object
@@ -10764,6 +10799,7 @@ components:
           special_works: "#/components/schemas/SpecialWorksConfig"
           pending_critical_agreements: "#/components/schemas/PendingCriticalAgreementsConfig"
           holding_management: "#/components/schemas/HoldingCompanyConfig"
+          webservices_cae: "#/components/schemas/WebServicesCaeConfig"
       properties:
         type:
           type: string
@@ -10905,10 +10941,14 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - id
     TrainingConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    WebServicesCaeConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     WorkPermitsConfig:
@@ -12949,6 +12989,7 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - config
@@ -13393,6 +13434,7 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - config
@@ -13558,6 +13600,67 @@ components:
       required:
       - id
       - name
+    AccessControlConfigChangeEventDto:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: When the change happened.
+        changes:
+          type: array
+          description: The access-control settings changed by this event.
+          items:
+            $ref: "#/components/schemas/Change"
+        actor:
+          $ref: "#/components/schemas/Actor"
+          description: The user who performed the change.
+      required:
+      - actor
+      - changes
+      - timestamp
+    Actor:
+      type: object
+      properties:
+        id:
+          type: string
+          description: "User id of the actor, when available."
+        name:
+          type: string
+          description: "Display name of the actor, when available."
+        email:
+          type: string
+          description: "Email of the actor, when available."
+    Change:
+      type: object
+      properties:
+        setting:
+          type: string
+          description: Which access-control setting changed.
+          enum:
+          - ACCESS_CONTROL_TYPE
+          - SUBCONTRACTING_CHAIN_MODE
+        previousValue:
+          type: string
+          description: Value before the change; null if it had no prior value.
+        newValue:
+          type: string
+          description: Value after the change.
+      required:
+      - newValue
+      - setting
+    PageResponseAccessControlConfigChangeEventDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/AccessControlConfigChangeEventDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     CompanyClientData:
       type: object
       properties:
@@ -15757,6 +15860,8 @@ components:
           type: string
         reason:
           type: string
+        rejectionReasonCode:
+          type: string
         files:
           type: array
           items:
@@ -16593,6 +16698,22 @@ components:
           format: uuid
         name:
           type: string
+        requirements:
+          type: array
+          items:
+            $ref: "#/components/schemas/BlockingRequirement"
+      required:
+      - id
+      - name
+      - requirements
+    BlockingRequirement:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
       required:
       - id
       - name
@@ -17300,18 +17421,6 @@ components:
       required:
       - id
       - name
-    Actor:
-      type: object
-      properties:
-        id:
-          type: string
-          description: "User id of the actor, when available."
-        name:
-          type: string
-          description: "Display name of the actor, when available."
-        email:
-          type: string
-          description: "Email of the actor, when available."
     PageResponsePaymentAuthorizationHistoryEventDto:
       type: object
       properties:
