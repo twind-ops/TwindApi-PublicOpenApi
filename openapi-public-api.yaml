@@ -611,6 +611,12 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: onlySpecialWork
+        in: query
+        description: "Optional: return only Special Work activities when true."
+        required: false
+        schema:
+          type: boolean
       - name: companyId
         in: path
         description: Company ID (client)
@@ -12572,7 +12578,7 @@ components:
           type: string
           format: uuid
         subcontractor:
-          $ref: "#/components/schemas/IdAndNameV2"
+          $ref: "#/components/schemas/ContractorRefV2"
         siteId:
           type: string
           format: uuid

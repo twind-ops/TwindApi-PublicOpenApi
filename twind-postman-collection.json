@@ -355,6 +355,11 @@
             "description" : "Optional: return only holding activities when true.",
             "disabled" : true
           }, {
+            "key" : "onlySpecialWork",
+            "value" : "",
+            "description" : "Optional: return only Special Work activities when true.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
