@@ -4186,7 +4186,7 @@
             "description" : ""
           } ]
         },
-        "description" : "Creates a pending subcontract request per contractorId in the body, bundling all activityIds into one row.",
+        "description" : "Creates a pending subcontract request per contractorId in the body, bundling all sites and activities into one row.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",

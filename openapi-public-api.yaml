@@ -7710,7 +7710,7 @@ paths:
       - Subcontracts
       summary: Request subcontract
       description: "Creates a pending subcontract request per contractorId in the\
-        \ body, bundling all activityIds into one row."
+        \ body, bundling all sites and activities into one row."
       operationId: requestSubcontract
       parameters:
       - name: contractorId
@@ -10703,6 +10703,9 @@ components:
     HoldingCompanyConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    InspectionsIncidentsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     InternalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -10806,6 +10809,7 @@ components:
           pending_critical_agreements: "#/components/schemas/PendingCriticalAgreementsConfig"
           holding_management: "#/components/schemas/HoldingCompanyConfig"
           webservices_cae: "#/components/schemas/WebServicesCaeConfig"
+          inspections_incidents: "#/components/schemas/InspectionsIncidentsConfig"
       properties:
         type:
           type: string
@@ -10932,6 +10936,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -11574,8 +11579,17 @@ components:
           enum:
           - COMMON
           - SPECIAL_WORK
-        holdingSharedParent:
-          type: boolean
+        holdingShareScope:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
+        holdingSharedCompanyIds:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - name
     RegisterDto:
@@ -12214,6 +12228,33 @@ components:
       - id
       - level
       - name
+    SubcontractRequestSiteV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        siteName:
+          type: string
+        activityIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+        activityName:
+          type: array
+          items:
+            type: string
+        scope:
+          type: array
+          items:
+            $ref: "#/components/schemas/SiteInfo"
+      required:
+      - activityIds
+      - activityName
+      - scope
+      - siteId
+      - siteName
     SubcontractRequestV2:
       type: object
       properties:
@@ -12241,6 +12282,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteInfo"
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubcontractRequestSiteV2"
         contractor:
           $ref: "#/components/schemas/IdAndNameV2"
         subcontractor:
@@ -12270,6 +12315,7 @@ components:
       - scope
       - siteId
       - siteName
+      - sites
       - status
       - subcontractor
     ContractActivityV2:
@@ -12571,6 +12617,22 @@ components:
       - id
       - name
       - taxId
+    PendingSubcontractRequestSiteV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        siteName:
+          type: string
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+      required:
+      - activities
+      - siteId
+      - siteName
     PendingSubcontractRequestV2:
       type: object
       properties:
@@ -12588,6 +12650,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingSubcontractRequestSiteV2"
         dateFrom:
           type: string
           format: date
@@ -12601,6 +12667,7 @@ components:
       - requestId
       - siteId
       - siteName
+      - sites
       - subcontractor
     AssignedResourceV2:
       type: object
@@ -12980,6 +13047,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -13309,6 +13377,17 @@ components:
           description: The real (non-external) Twind company that shares this company's
             tax id and has an active Client Plan. Populated only for external companies
             when such a match exists; null otherwise.
+        isHoldingParent:
+          type: boolean
+          description: True if this company has the Holding Management product active.
+        isHoldingSubsidiary:
+          type: boolean
+          description: True if this company is a subsidiary in a holding (has a parent
+            company).
+        inHolding:
+          type: boolean
+          description: True if this company is either a holding parent or a holding
+            subsidiary.
         active:
           type: boolean
       required:
@@ -13317,6 +13396,9 @@ components:
       - createdAt
       - external
       - id
+      - inHolding
+      - isHoldingParent
+      - isHoldingSubsidiary
       - name
       - products
       - subcontractingChainMode
@@ -13425,6 +13507,7 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
@@ -16520,12 +16603,24 @@ components:
           - SPECIAL_WORK
         holdingShared:
           type: boolean
+        holdingShareScope:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
+        holdingSharedCompanyIds:
+          type: array
+          items:
+            type: string
+            format: uuid
         createdAt:
           type: string
           format: date-time
       required:
       - companyId
       - createdAt
+      - holdingShareScope
       - holdingShared
       - id
       - name
