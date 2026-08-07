@@ -16,7 +16,10 @@ Before you integrate, ensure you have the following:
 - **Company id** — The company (`companyId`) whose access register you are
   managing.
 - **Resource and site ids** — The UUIDs of the resource and site. Obtain
-  resource IDs from the access control status endpoints and site IDs from
+  resource IDs from the assigned-resources endpoints
+  <!-- markdownlint-disable-next-line MD051 -->
+  (see [Find resource IDs assigned to your contracts](client-access-control-status.md#find-resource-ids-assigned-to-your-contracts))
+  and site IDs from
   <!-- markdownlint-disable-next-line MD051 -->
   [`GET /v1/companies/{companyId}/sites`](#tag/sites/GET/v1/companies/{companyId}/sites).
 
