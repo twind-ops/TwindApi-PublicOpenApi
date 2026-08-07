@@ -14,8 +14,6 @@ Two operations are available today:
 - **Endpoint:** `POST https://webservice.twind.io/CT_EstadoTrabajadores.svc`
 - **WSDL:** `GET https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl`
 
----
-
 **`CT_EstadoVehiculos`**
 
 - **Purpose:** Vehicle access status for a company
