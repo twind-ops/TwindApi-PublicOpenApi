@@ -8,36 +8,19 @@ without code changes.
 
 Two operations are available today:
 
-<table style="table-layout: fixed; width: 100%;">
-  <colgroup>
-    <col style="width: 27%" />
-    <col style="width: 25%" />
-    <col style="width: 24%" />
-    <col style="width: 24%" />
-  </colgroup>
-  <thead>
-    <tr>
-      <th>Operation</th>
-      <th>Purpose</th>
-      <th>Endpoint</th>
-      <th>WSDL</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td><code>CT_EstadoTrabajadores</code></td>
-      <td>Worker (employee) access status for a company</td>
-      <td><code style="word-break: break-all;">POST https://webservice.twind.io/CT_EstadoTrabajadores.svc</code></td>
-      <td><code style="word-break: break-all;">GET https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl</code></td>
-    </tr>
-    <tr>
-      <td><code>CT_EstadoVehiculos</code></td>
-      <td>Vehicle access status for a company</td>
-      <td><code style="word-break: break-all;">POST https://webservice.twind.io/CT_EstadoVehiculos.svc</code></td>
-      <td><code style="word-break: break-all;">GET https://webservice.twind.io/CT_EstadoVehiculos.svc/wsdl</code></td>
-    </tr>
-  </tbody>
-</table>
+**`CT_EstadoTrabajadores`**
+
+- **Purpose:** Worker (employee) access status for a company
+- **Endpoint:** `POST https://webservice.twind.io/CT_EstadoTrabajadores.svc`
+- **WSDL:** `GET https://webservice.twind.io/CT_EstadoTrabajadores.svc/wsdl`
+
+---
+
+**`CT_EstadoVehiculos`**
+
+- **Purpose:** Vehicle access status for a company
+- **Endpoint:** `POST https://webservice.twind.io/CT_EstadoVehiculos.svc`
+- **WSDL:** `GET https://webservice.twind.io/CT_EstadoVehiculos.svc/wsdl`
 
 > **Building a new integration?** If you are starting from scratch, prefer the REST
 > [Access Control](client-access-control-status.md) endpoints — they use standard
