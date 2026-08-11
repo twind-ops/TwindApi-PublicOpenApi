@@ -577,8 +577,15 @@ paths:
       - Lookups
       summary: List client activities
       description: "Returns a paginated list of activities defined for the company\
-        \ (client configuration). **Sort format:** `sort=name,asc` (default: name\
-        \ ascending)."
+        \ (client configuration). Optionally filter by `type` (SPECIAL_WORK or COMMON).\
+        \ `type` reflects the company's current Special Works entitlement: activities\
+        \ stored as SPECIAL_WORK are reported as COMMON, and excluded from a `type=SPECIAL_WORK`\
+        \ filter, if the Special Works add-on is not enabled for this company. **Allowed\
+        \ sort fields:** `name` (default), `description`, `createdAt`, `type`. **Sort\
+        \ format:** `sort=name,asc` (default: name ascending). Sorting by `type` falls\
+        \ back to `name` ascending, regardless of the requested direction, once the\
+        \ Special Works add-on is disabled for this company (every activity is reported\
+        \ as COMMON, so there is no type order left to apply)."
       operationId: findAll_5
       parameters:
       - name: q
@@ -613,10 +620,22 @@ paths:
           type: boolean
       - name: onlySpecialWork
         in: query
-        description: "Optional: return only Special Work activities when true."
+        description: "Optional: return only Special Work activities when true. Returns\
+          \ an empty page if the company's Special Works add-on is disabled, since\
+          \ no activity is reported as SPECIAL_WORK in that case."
         required: false
         schema:
           type: boolean
+      - name: type
+        in: query
+        description: "Optional: filter by activity type (SPECIAL_WORK or COMMON),\
+          \ reflecting the company's current Special Works entitlement."
+        required: false
+        schema:
+          type: string
+          enum:
+          - COMMON
+          - SPECIAL_WORK
       - name: companyId
         in: path
         description: Company ID (client)
@@ -10229,6 +10248,25 @@ components:
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    AccidentRateConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          hoursPerEmployeeCeiling:
+            type: integer
+            format: int32
+          requireNoGaps:
+            type: boolean
+          lockAmendmentsAtCutOff:
+            type: boolean
+          remindBeforeCutOff:
+            type: boolean
+      required:
+      - hoursPerEmployeeCeiling
+      - lockAmendmentsAtCutOff
+      - remindBeforeCutOff
+      - requireNoGaps
     ApprovalResourceAssignmentsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -10554,6 +10592,19 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/ContractorPlanTrial"
+          status:
+            type: string
+            enum:
+            - incomplete
+            - incomplete_expired
+            - trialing
+            - active
+            - past_due
+            - canceled
+            - unpaid
+            - paused
+          isSubscriptionPaused:
+            type: boolean
           effectivePlan:
             type: string
             enum:
@@ -10563,7 +10614,9 @@ components:
             - PLAN_3
       required:
       - effectivePlan
+      - isSubscriptionPaused
       - plan
+      - status
       - trials
     ContractorPlanTrial:
       type: object
@@ -10810,6 +10863,7 @@ components:
           holding_management: "#/components/schemas/HoldingCompanyConfig"
           webservices_cae: "#/components/schemas/WebServicesCaeConfig"
           inspections_incidents: "#/components/schemas/InspectionsIncidentsConfig"
+          accident_rate: "#/components/schemas/AccidentRateConfig"
       properties:
         type:
           type: string
@@ -10924,6 +10978,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/AccidentRateConfig"
           - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
@@ -12902,6 +12957,15 @@ components:
           $ref: "#/components/schemas/ProjectRef"
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
+        specialWorks:
+          type: array
+          description: "Distinct Special Works activities among this contract's engagements.\
+            \ Empty when the Special Works add-on is off for the client, or when the\
+            \ contract has none. Read-only projection of engagement data (Phase A);\
+            \ will union with contract-level Special Works attachments once the write\
+            \ path lands."
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
       required:
       - client
       - contractor
@@ -12916,6 +12980,24 @@ components:
       - requirements
       - resources
       - sites
+      - specialWorks
+    ContractSiteActivityV2:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        hasUnresolvedMandatoryRiskConflicts:
+          type: boolean
+          description: "True when this engagement (site+activity pair) has unresolved\
+            \ mandatory-risk conflicts, from either the mandatory-risk add-on rules\
+            \ or Special Works. False when covered or when neither applies."
+      required:
+      - hasUnresolvedMandatoryRiskConflicts
+      - id
+      - name
     ContractSiteSummaryV2:
       type: object
       properties:
@@ -12935,7 +13017,7 @@ components:
         activities:
           type: array
           items:
-            $ref: "#/components/schemas/IdAndNameV2"
+            $ref: "#/components/schemas/ContractSiteActivityV2"
         scopeSites:
           type: array
           items:
@@ -13035,6 +13117,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/AccidentRateConfig"
           - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
@@ -13495,6 +13578,7 @@ components:
         config:
           oneOf:
           - $ref: "#/components/schemas/AccessControlApiConfig"
+          - $ref: "#/components/schemas/AccidentRateConfig"
           - $ref: "#/components/schemas/ApprovalResourceAssignmentsConfig"
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
@@ -15602,6 +15686,20 @@ components:
         name:
           type: string
           description: Activity name.
+        contractEngagementId:
+          type: string
+          format: uuid
+          description: Contract engagement the activity belongs to. Only populated
+            on work permit payloads.
+        type:
+          type: string
+          description: "Effective activity type. SPECIAL_WORK only when the activity's\
+            \ owning client company has the Special Works add-on active; COMMON otherwise,\
+            \ regardless of how the activity is stored. Null on payloads that do not\
+            \ populate it."
+          enum:
+          - COMMON
+          - SPECIAL_WORK
       required:
       - id
       - name
@@ -16438,6 +16536,15 @@ components:
           type: boolean
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
+        specialWorks:
+          type: array
+          description: "Distinct Special Works activities among this contract's engagements.\
+            \ Empty when the Special Works add-on is off for the client, or when the\
+            \ contract has none. Read-only projection of engagement data (Phase A);\
+            \ will union with contract-level Special Works attachments once the write\
+            \ path lands."
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
       required:
       - client
       - contractor
@@ -16454,6 +16561,7 @@ components:
       - requirements
       - resources
       - sites
+      - specialWorks
     EngagementSummary:
       type: object
       properties:
@@ -16468,8 +16576,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteInfo"
+        hasUnresolvedMandatoryRiskConflicts:
+          type: boolean
+          description: "True when this engagement (site+activity pair) has unresolved\
+            \ mandatory-risk conflicts, from either the mandatory-risk add-on rules\
+            \ or Special Works. False when covered or when neither applies."
       required:
       - activity
+      - hasUnresolvedMandatoryRiskConflicts
       - id
       - scopeSites
       - site
@@ -16837,6 +16951,14 @@ components:
           format: uuid
         activityName:
           type: string
+        activityType:
+          type: string
+          description: Effective activity type. SPECIAL_WORK only when the activity's
+            owning client company has the Special Works add-on active; COMMON otherwise.
+            Null on payloads that do not populate it.
+          enum:
+          - COMMON
+          - SPECIAL_WORK
         allowed:
           type: boolean
         status:
@@ -17047,6 +17169,14 @@ components:
           format: uuid
         activityName:
           type: string
+        activityType:
+          type: string
+          description: Effective activity type. SPECIAL_WORK only when the activity's
+            owning client company has the Special Works add-on active; COMMON otherwise.
+            Null on payloads that do not populate it.
+          enum:
+          - COMMON
+          - SPECIAL_WORK
         contractId:
           type: string
           format: uuid

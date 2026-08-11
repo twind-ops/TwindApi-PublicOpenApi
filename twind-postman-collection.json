@@ -357,7 +357,12 @@
           }, {
             "key" : "onlySpecialWork",
             "value" : "",
-            "description" : "Optional: return only Special Work activities when true.",
+            "description" : "Optional: return only Special Work activities when true. Returns an empty page if the company's Special Works add-on is disabled, since no activity is reported as SPECIAL_WORK in that case.",
+            "disabled" : true
+          }, {
+            "key" : "type",
+            "value" : "",
+            "description" : "Optional: filter by activity type (SPECIAL_WORK or COMMON), reflecting the company's current Special Works entitlement.",
             "disabled" : true
           }, {
             "key" : "page",
@@ -376,7 +381,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns a paginated list of activities defined for the company (client configuration). **Sort format:** `sort=name,asc` (default: name ascending)."
+        "description" : "Returns a paginated list of activities defined for the company (client configuration). Optionally filter by `type` (SPECIAL_WORK or COMMON). `type` reflects the company's current Special Works entitlement: activities stored as SPECIAL_WORK are reported as COMMON, and excluded from a `type=SPECIAL_WORK` filter, if the Special Works add-on is not enabled for this company. **Allowed sort fields:** `name` (default), `description`, `createdAt`, `type`. **Sort format:** `sort=name,asc` (default: name ascending). Sorting by `type` falls back to `name` ascending, regardless of the requested direction, once the Special Works add-on is disabled for this company (every activity is reported as COMMON, so there is no type order left to apply)."
       }
     }, {
       "name" : "List sites",
