@@ -119,6 +119,16 @@
             "description" : "Optional list of contractor company IDs to filter contracts by",
             "disabled" : true
           }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "Optional contract ID to restrict results to its contractor",
+            "disabled" : true
+          }, {
+            "key" : "siteId",
+            "value" : "",
+            "description" : "Optional site ID (L3) to restrict results to contractors engaged there",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -3721,6 +3731,11 @@
             "key" : "selected",
             "value" : "",
             "description" : "Optional restrict to these subcontractor company IDs",
+            "disabled" : true
+          }, {
+            "key" : "includeDeleted",
+            "value" : "",
+            "description" : "When true, also include contractors whose contracts or company records are soft-deleted (used by the backup flow, which is a historical snapshot)",
             "disabled" : true
           }, {
             "key" : "page",

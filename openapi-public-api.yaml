@@ -259,6 +259,21 @@ paths:
           items:
             type: string
             format: uuid
+      - name: contractId
+        in: query
+        description: Optional contract ID to restrict results to its contractor
+        required: false
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: query
+        description: Optional site ID (L3) to restrict results to contractors engaged
+          there
+        required: false
+        schema:
+          type: string
+          format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -5052,6 +5067,7 @@ paths:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
       - name: selected
         in: query
         description: "Pre-selected requirement IDs to ensure inclusion in the result\
@@ -6798,6 +6814,15 @@ paths:
           items:
             type: string
             format: uuid
+      - name: includeDeleted
+        in: query
+        description: "When true, also include contractors whose contracts or company\
+          \ records are soft-deleted (used by the backup flow, which is a historical\
+          \ snapshot)"
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -9866,6 +9891,7 @@ components:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
         templateFile:
           type: string
           description: Object storage key for a template file; blank clears the template
@@ -10381,10 +10407,10 @@ components:
         heightMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10417,10 +10443,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10443,10 +10469,10 @@ components:
         sizeMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10491,10 +10517,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10545,10 +10571,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11226,6 +11252,7 @@ components:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
         templateFile:
           type: string
         critical:
@@ -12609,6 +12636,8 @@ components:
             $ref: "#/components/schemas/ContractTreeNodeV2"
         project:
           $ref: "#/components/schemas/ProjectRef"
+        resourceCounts:
+          $ref: "#/components/schemas/ContractTreeResourceCountsV2"
       required:
       - allowSubcontract
       - anyPendingApproval
@@ -12624,7 +12653,28 @@ components:
       - needsAuthorisation
       - onlyClientCanSubcontract
       - pendingRequests
+      - resourceCounts
       - sites
+    ContractTreeResourceCountsV2:
+      type: object
+      properties:
+        employees:
+          type: integer
+          format: int32
+        vehicles:
+          type: integer
+          format: int32
+        equipment:
+          type: integer
+          format: int32
+        products:
+          type: integer
+          format: int32
+      required:
+      - employees
+      - equipment
+      - products
+      - vehicles
     ContractTreeSiteV2:
       type: object
       properties:
@@ -12652,11 +12702,14 @@ components:
           - APPROVED
         hasChildren:
           type: boolean
+        resourceCounts:
+          $ref: "#/components/schemas/ContractTreeResourceCountsV2"
       required:
       - activities
       - hasChildren
       - level
       - name
+      - resourceCounts
       - siteId
     ContractorRefV2:
       type: object
@@ -12966,9 +13019,20 @@ components:
             \ path lands."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        contractorId:
+          type: string
+          format: uuid
+          description: Convenience alias for contractor.id
+        siteIds:
+          type: array
+          description: "Convenience alias for sites.map { it.siteId }"
+          items:
+            type: string
+            format: uuid
       required:
       - client
       - contractor
+      - contractorId
       - dateFrom
       - dateTo
       - hasUnresolvedMandatoryRiskConflicts
@@ -12979,6 +13043,7 @@ components:
       - principal
       - requirements
       - resources
+      - siteIds
       - sites
       - specialWorks
     ContractSiteActivityV2:
@@ -13227,13 +13292,16 @@ components:
         parentId:
           type: string
           format: uuid
-        isHolding:
+        isHoldingParent:
+          type: boolean
+        isHoldingSubsidiary:
           type: boolean
       required:
       - companyId
       - companyName
       - external
-      - isHolding
+      - isHoldingParent
+      - isHoldingSubsidiary
       - products
       - taxId
     UserCompanyPermissions:
@@ -14451,6 +14519,7 @@ components:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
         hasTemplate:
           type: boolean
         expirationType:
@@ -14617,6 +14686,7 @@ components:
             - UPLOAD
             - AGREEMENT
             - TRAINING
+            - ACCIDENT_REPORT
           expirationType:
             type: string
             enum:
@@ -14761,6 +14831,7 @@ components:
             - UPLOAD
             - AGREEMENT
             - TRAINING
+            - ACCIDENT_REPORT
           expirationType:
             type: string
             enum:
@@ -15178,6 +15249,7 @@ components:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
         isCritical:
           type: boolean
         enableDoesNotApply:
@@ -15821,6 +15893,7 @@ components:
           - UPLOAD
           - AGREEMENT
           - TRAINING
+          - ACCIDENT_REPORT
         critical:
           type: boolean
           description: Whether the requirement is marked critical for compliance.
@@ -16545,9 +16618,21 @@ components:
             \ path lands."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        contractorId:
+          type: string
+          format: uuid
+          description: Convenience alias for contractor.id
+        siteIds:
+          type: array
+          description: "IDs of the sites directly engaged by this contract, i.e. sites.map\
+            \ { it.id }"
+          items:
+            type: string
+            format: uuid
       required:
       - client
       - contractor
+      - contractorId
       - dateFrom
       - dateTo
       - engagements
@@ -16560,6 +16645,7 @@ components:
       - principal
       - requirements
       - resources
+      - siteIds
       - sites
       - specialWorks
     EngagementSummary:
