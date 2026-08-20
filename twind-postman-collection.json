@@ -365,6 +365,16 @@
             "description" : "Optional: return only holding activities when true.",
             "disabled" : true
           }, {
+            "key" : "holdingShareScope",
+            "value" : "",
+            "description" : "Optional (requirement-rule picker, M5-123): return only activities eligible for a holding requirement of this scope — i.e. shared with all the requirement's target companies. `SPECIFIC_COMPANIES` requires `holdingSharedCompanyIds`. Ignored when the holding feature is inactive.",
+            "disabled" : true
+          }, {
+            "key" : "holdingSharedCompanyIds",
+            "value" : "",
+            "description" : "Optional (requirement-rule picker, M5-123): the requirement's target companies, used with `holdingShareScope=SPECIFIC_COMPANIES` to keep only activities shared with all of them.",
+            "disabled" : true
+          }, {
             "key" : "onlySpecialWork",
             "value" : "",
             "description" : "Optional: return only Special Work activities when true. Returns an empty page if the company's Special Works add-on is disabled, since no activity is reported as SPECIAL_WORK in that case.",

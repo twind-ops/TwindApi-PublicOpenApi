@@ -633,6 +633,30 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: holdingShareScope
+        in: query
+        description: "Optional (requirement-rule picker, M5-123): return only activities\
+          \ eligible for a holding requirement of this scope — i.e. shared with all\
+          \ the requirement's target companies. `SPECIFIC_COMPANIES` requires `holdingSharedCompanyIds`.\
+          \ Ignored when the holding feature is inactive."
+        required: false
+        schema:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
+      - name: holdingSharedCompanyIds
+        in: query
+        description: "Optional (requirement-rule picker, M5-123): the requirement's\
+          \ target companies, used with `holdingShareScope=SPECIFIC_COMPANIES` to\
+          \ keep only activities shared with all of them."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: onlySpecialWork
         in: query
         description: "Optional: return only Special Work activities when true. Returns\
@@ -9975,6 +9999,17 @@ components:
           format: uuid
           description: Training course to link to this requirement. Only valid when
             evidenceType is TRAINING.
+        holdingShareScope:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
+        holdingSharedCompanyIds:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - acceptanceCriteria
       - appliedTo
@@ -10407,10 +10442,10 @@ components:
         heightMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10443,10 +10478,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10469,10 +10504,10 @@ components:
         sizeMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10517,10 +10552,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10571,10 +10606,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11323,8 +11358,17 @@ components:
         trainingCourseId:
           type: string
           format: uuid
-        holdingSharedParent:
-          type: boolean
+        holdingShareScope:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
+        holdingSharedCompanyIds:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - acceptanceCriteria
       - appliedTo
@@ -12410,9 +12454,12 @@ components:
           type: string
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
-          description: True when this activity's assigned resources do not cover its
-            active mandatory-risk rules. False when covered or when the mandatory-risks
-            add-on is off.
+          description: "True when the buyer's active mandatory-risk coverage rules\
+            \ for this activity are not all held by this engagement's own live, unblocked\
+            \ employees. Each engagement is judged on its own assignments, so a subcontractor's\
+            \ employees never cover its parent. False when covered, or when neither\
+            \ the mandatory-risks nor the Special Works add-on enforces this activity\
+            \ for the buyer."
         uncoveredMandatoryRisks:
           type: array
           description: Mandatory risks (id + name) not covered for this activity.
@@ -12516,9 +12563,8 @@ components:
         activitiesWithMandatoryRiskConflicts:
           type: integer
           format: int32
-          description: Number of activities on this contract whose assigned resources
-            do not cover their active mandatory-risk rules. 0 when the mandatory-risks
-            add-on is off.
+          description: Number of activities on this contract flagged by hasUnresolvedMandatoryRiskConflicts.
+            0 when neither the mandatory-risks nor the Special Works add-on applies.
       required:
       - activitiesWithMandatoryRiskConflicts
       - client
@@ -13056,9 +13102,12 @@ components:
           type: string
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
-          description: "True when this engagement (site+activity pair) has unresolved\
-            \ mandatory-risk conflicts, from either the mandatory-risk add-on rules\
-            \ or Special Works. False when covered or when neither applies."
+          description: "True when the buyer's active mandatory-risk coverage rules\
+            \ for this activity are not all held by this engagement's own live, unblocked\
+            \ employees. Each engagement is judged on its own assignments, so a subcontractor's\
+            \ employees never cover its parent. False when covered, or when neither\
+            \ the mandatory-risks nor the Special Works add-on enforces this activity\
+            \ for the buyer."
       required:
       - hasUnresolvedMandatoryRiskConflicts
       - id
@@ -13776,9 +13825,12 @@ components:
           format: uuid
         name:
           type: string
+        taxId:
+          type: string
       required:
       - id
       - name
+      - taxId
     PagedModelCompanyBasicDataDto:
       type: object
       properties:
@@ -14562,6 +14614,12 @@ components:
           type: boolean
         holdingShared:
           type: boolean
+        holdingShareScope:
+          type: string
+          enum:
+          - INDEPENDENT
+          - ALL_COMPANIES
+          - SPECIFIC_COMPANIES
       required:
       - acceptanceCriteria
       - appliedTo
@@ -14576,6 +14634,7 @@ components:
       - evidenceType
       - expirationType
       - hasTemplate
+      - holdingShareScope
       - holdingShared
       - id
       - multipleInstanceRequest
@@ -14733,6 +14792,12 @@ components:
             format: uuid
           holdingShared:
             type: boolean
+          holdingShareScope:
+            type: string
+            enum:
+            - INDEPENDENT
+            - ALL_COMPANIES
+            - SPECIFIC_COMPANIES
           documentType:
             $ref: "#/components/schemas/DocumentType"
           automaticReviewer:
@@ -14757,6 +14822,7 @@ components:
       - enableDoesNotApply
       - evidenceType
       - expirationType
+      - holdingShareScope
       - holdingShared
       - id
       - isEditable
@@ -14878,6 +14944,12 @@ components:
             format: uuid
           holdingShared:
             type: boolean
+          holdingShareScope:
+            type: string
+            enum:
+            - INDEPENDENT
+            - ALL_COMPANIES
+            - SPECIFIC_COMPANIES
       required:
       - acceptanceCriteria
       - appliedTo
@@ -14889,6 +14961,7 @@ components:
       - enableDoesNotApply
       - evidenceType
       - expirationType
+      - holdingShareScope
       - holdingShared
       - id
       - isEditable
@@ -16664,9 +16737,12 @@ components:
             $ref: "#/components/schemas/SiteInfo"
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
-          description: "True when this engagement (site+activity pair) has unresolved\
-            \ mandatory-risk conflicts, from either the mandatory-risk add-on rules\
-            \ or Special Works. False when covered or when neither applies."
+          description: "True when the buyer's active mandatory-risk coverage rules\
+            \ for this activity are not all held by this engagement's own live, unblocked\
+            \ employees. Each engagement is judged on its own assignments, so a subcontractor's\
+            \ employees never cover its parent. False when covered, or when neither\
+            \ the mandatory-risks nor the Special Works add-on enforces this activity\
+            \ for the buyer."
       required:
       - activity
       - hasUnresolvedMandatoryRiskConflicts
@@ -17996,6 +18072,19 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PaymentAuthorizationByContractActivityRef"
+        sitesAndActivities:
+          type: array
+          description: "Sites engaged on this contract, each carrying only the activities\
+            \ actually engaged at that site, with their effective activity type. Supersedes\
+            \ the flat `sites` and `activities` pair, which lists the contract's sites\
+            \ and its activities independently and so cannot express which activity\
+            \ happens at which site. Contains the same sites as `sites`, in the same\
+            \ order, without the site level and breadcrumb — read those from `sites`\
+            \ when needed. `type` is the effective type: SPECIAL_WORK only when the\
+            \ owning client company has the Special Works add-on active, COMMON otherwise\
+            \ regardless of how the activity is stored."
+          items:
+            $ref: "#/components/schemas/PaymentAuthorizationByContractSiteActivitiesRef"
       required:
       - activities
       - id
@@ -18050,6 +18139,26 @@ components:
       - contract
       - contractor
       - paymentStatus
+    PaymentAuthorizationByContractSiteActivitiesRef:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Site id. Matches the `id` of the same site in `sites`.
+        name:
+          type: string
+          description: Site name.
+        activities:
+          type: array
+          description: "Activities engaged at this site, each carrying its effective\
+            \ type."
+          items:
+            $ref: "#/components/schemas/Activity"
+      required:
+      - activities
+      - id
+      - name
     PaymentAuthorizationByContractSiteRef:
       type: object
       properties:
