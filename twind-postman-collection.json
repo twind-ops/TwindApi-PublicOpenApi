@@ -352,7 +352,7 @@
           }, {
             "key" : "selected",
             "value" : "",
-            "description" : "",
+            "description" : "Optional: activity ids that must stay in the result even when they do not match `q`. Combined with `q` as a union, never widening the company scope; without `q` it narrows the result to these ids. With `sort=selected` and no search text, `selected` ids only order the result — the full catalog is returned, with these ids pinned to the top.",
             "disabled" : true
           }, {
             "key" : "contractIds",
@@ -401,7 +401,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns a paginated list of activities defined for the company (client configuration). Optionally filter by `type` (SPECIAL_WORK or COMMON). `type` reflects the company's current Special Works entitlement: activities stored as SPECIAL_WORK are reported as COMMON, and excluded from a `type=SPECIAL_WORK` filter, if the Special Works add-on is not enabled for this company. **Allowed sort fields:** `name` (default), `description`, `createdAt`, `type`. **Sort format:** `sort=name,asc` (default: name ascending). Sorting by `type` falls back to `name` ascending, regardless of the requested direction, once the Special Works add-on is disabled for this company (every activity is reported as COMMON, so there is no type order left to apply)."
+        "description" : "Returns a paginated list of activities defined for the company (client configuration). Optionally filter by `type` (SPECIAL_WORK or COMMON). `type` reflects the company's current Special Works entitlement: activities stored as SPECIAL_WORK are reported as COMMON, and excluded from a `type=SPECIAL_WORK` filter, if the Special Works add-on is not enabled for this company. **Allowed sort fields:** `name` (default), `description`, `createdAt`, `type`, `selected`. **Sort format:** `sort=name,asc` (default: name ascending). Sorting by `type` falls back to `name` ascending, regardless of the requested direction, once the Special Works add-on is disabled for this company (every activity is reported as COMMON, so there is no type order left to apply). Sorting by `selected` pins the ids passed in `selected` to the top of the page (`sort=selected,desc` pushes them to the bottom instead), each block ordered by `name` ascending; it falls back to `name` ascending when `selected` is omitted or empty. With `sort=selected` and no search text, `selected` ids only order the result — the full catalog is returned; otherwise `selected` filters as before."
       }
     }, {
       "name" : "List sites",
