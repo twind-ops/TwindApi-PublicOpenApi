@@ -11412,6 +11412,7 @@ components:
           - REQUIREMENT_RETROACTIVE
           - REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB
           - DOCUMENT_HUB
+          - DOCUMENT_HUB_BULK
       required:
       - requirementInstanceIds
     CreateUploadEvidenceDto:
@@ -11463,6 +11464,18 @@ components:
           - REQUIREMENT_RETROACTIVE
           - REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB
           - DOCUMENT_HUB
+          - DOCUMENT_HUB_BULK
+        sourceEvidenceId:
+          type: string
+          format: uuid
+          description: "Optional. When this upload retroactively re-submits an evidence\
+            \ that already exists (origin = REQUIREMENT_RETROACTIVE / REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB),\
+            \ the id of that source evidence, recorded as provenance."
+        sourceDocumentId:
+          type: string
+          format: uuid
+          description: "Optional. When this upload re-submits a Document Hub document,\
+            \ the id of that source company_document, recorded as provenance."
       required:
       - filePaths
       - issueDate
