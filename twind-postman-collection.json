@@ -2851,6 +2851,16 @@
             "description" : "When true, only requirements that trigger client approval of resource assignments; when false, only those that do not.",
             "disabled" : true
           }, {
+            "key" : "holdingShareScope",
+            "value" : "",
+            "description" : "Optional (related-requirement picker): return only requirements eligible as the related requirement of a holding requirement of this scope — i.e. shared with all the requirement's target companies. `SPECIFIC_COMPANIES` requires `holdingSharedCompanyIds`. Ignored when the holding feature is inactive.",
+            "disabled" : true
+          }, {
+            "key" : "holdingSharedCompanyIds",
+            "value" : "",
+            "description" : "Optional (related-requirement picker): the requirement's target companies, used with `holdingShareScope=SPECIFIC_COMPANIES` to keep only requirements shared with all of them.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2867,7 +2877,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `paymentRequired`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `paymentRequired`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`, `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Create requirement configuration",
