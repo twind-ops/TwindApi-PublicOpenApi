@@ -1221,6 +1221,15 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: showPendingSubcontracts
+        in: query
+        description: "When true, also include pending (not-yet-approved) subcontract\
+          \ requests where this company is the invited subcontractor, flagged with\
+          \ pendingApproval=true. Default false."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -10024,6 +10033,11 @@ components:
           type: boolean
           description: Whether this requirement must be reviewed on the resource assignment
             review page when auto approvals are disabled.
+        signatureRequired:
+          type: boolean
+          description: Whether accepting this agreement requires a handwritten signature.
+            Only meaningful when evidenceType is AGREEMENT and the company holds the
+            Signable Agreements add-on.
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
@@ -10960,6 +10974,7 @@ components:
           webservices_cae: "#/components/schemas/WebServicesCaeConfig"
           inspections_incidents: "#/components/schemas/InspectionsIncidentsConfig"
           accident_rate: "#/components/schemas/AccidentRateConfig"
+          signable_agreements: "#/components/schemas/SignableAgreementsConfig"
       properties:
         type:
           type: string
@@ -11048,6 +11063,9 @@ components:
     ScheduledLinksConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    SignableAgreementsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     SiteHierarchyConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11099,6 +11117,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
+          - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
@@ -11390,6 +11409,11 @@ components:
           type: boolean
         clientApprovalResourceAssignments:
           type: boolean
+        signatureRequired:
+          type: boolean
+          description: Whether accepting this agreement requires a handwritten signature.
+            Only meaningful when evidenceType is AGREEMENT and the company holds the
+            Signable Agreements add-on.
         trainingCourseId:
           type: string
           format: uuid
@@ -13113,6 +13137,12 @@ components:
             \ path lands."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        pendingApproval:
+          type: boolean
+          description: "True for a subcontract this company has been invited to that\
+            \ is still awaiting client approval, i.e. a `subcontract_request` with\
+            \ no contract row yet. Only ever true when the list was fetched with showPendingSubcontracts=true.\
+            \ See the id doc on the V1 shape."
         contractorId:
           type: string
           format: uuid
@@ -13134,6 +13164,7 @@ components:
       - level
       - mainContractor
       - name
+      - pendingApproval
       - principal
       - requirements
       - resources
@@ -13304,6 +13335,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
+          - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
@@ -13768,6 +13800,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
+          - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
@@ -14837,6 +14870,8 @@ components:
             type: boolean
           clientApprovalResourceAssignments:
             type: boolean
+          signatureRequired:
+            type: boolean
           trainingCourseId:
             type: string
             format: uuid
@@ -14988,6 +15023,8 @@ components:
           paymentRequired:
             type: boolean
           clientApprovalResourceAssignments:
+            type: boolean
+          signatureRequired:
             type: boolean
           trainingCourseId:
             type: string
@@ -16741,6 +16778,16 @@ components:
             \ path lands."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        pendingApproval:
+          type: boolean
+          description: "True for a subcontract this company has been invited to that\
+            \ is still awaiting client approval, i.e. a `subcontract_request` with\
+            \ no contract row yet. Only ever true when the list was fetched with showPendingSubcontracts=true.\
+            \ Unrelated to the resource-assignment validation fields (validationState\
+            \ / pendingValidationCount). Active/scheduled/expired is deliberately\
+            \ NOT returned: it stays derived from dateFrom/dateTo by the caller, in\
+            \ the viewer's own timezone. Note that `id` is a `subcontract_request`\
+            \ id on such an entry, not a contract id."
         contractorId:
           type: string
           format: uuid
@@ -16765,6 +16812,7 @@ components:
       - level
       - mainContractor
       - name
+      - pendingApproval
       - principal
       - requirements
       - resources

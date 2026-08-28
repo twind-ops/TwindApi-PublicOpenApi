@@ -931,6 +931,11 @@
             "description" : "When true, return only contracts with at least one REJECTED resource-assignment item that has not yet been acknowledged by the contractor (Approval of Resource Assignments). Only meaningful while the client-approval-resource-assignments feature is active.",
             "disabled" : true
           }, {
+            "key" : "showPendingSubcontracts",
+            "value" : "",
+            "description" : "When true, also include pending (not-yet-approved) subcontract requests where this company is the invited subcontractor, flagged with pendingApproval=true. Default false.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
