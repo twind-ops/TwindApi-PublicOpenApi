@@ -325,8 +325,10 @@ paths:
       tags:
       - Companies
       summary: List client companies
-      description: Retrieves paginated list of client companies for a contractor.
-        Use this endpoint to obtain client IDs for filtering in access-control endpoints.
+      description: "Retrieves paginated list of client companies for a contractor.\
+        \ Use this endpoint to obtain client IDs for filtering in access-control endpoints.\
+        \ **Selection:** `selected` restricts to given client company ids, unioned\
+        \ with `q` when both are present."
       operationId: findClients
       parameters:
       - name: contractorId
@@ -342,6 +344,17 @@ paths:
         required: false
         schema:
           type: string
+      - name: selected
+        in: query
+        description: "Optional: client company ids that must stay in the result even\
+          \ when they do not match `q`. Combined with `q` as a union. Without `q`\
+          \ it narrows the result to these ids."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7180,7 +7193,9 @@ paths:
         \ Only sites at **SITE** level are returned: engagements scoped at a deeper\
         \ level (zone, area) are reported as their site ancestor, and `children` is\
         \ always empty. **Search:** optional `q` filters sites by the reported site\
-        \ name. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
+        \ name. **Selection:** `selected` restricts to given site ids, unioned with\
+        \ `q` when both are present. **Pagination:** `page`, `size`. **Sort:** default\
+        \ **name** ascending."
       operationId: findAllAsContractor
       parameters:
       - name: q
@@ -7189,6 +7204,17 @@ paths:
         required: false
         schema:
           type: string
+      - name: selected
+        in: query
+        description: "Optional: site ids that must stay in the result even when they\
+          \ do not match `q`. Combined with `q` as a union. Without `q` it narrows\
+          \ the result to these ids."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7551,8 +7577,10 @@ paths:
       tags:
       - Contracts
       summary: Get contract tree
-      description: Returns the full contract hierarchy tree. Each node shows sites
-        with their activities bundle.
+      description: "Returns the full contract hierarchy tree. Each node shows sites\
+        \ with their activities bundle. `contractId` also accepts the id of a pending\
+        \ (not-yet-approved) subcontract request, which resolves to the tree of the\
+        \ contract chain it hangs off."
       operationId: getContractTree
       parameters:
       - name: companyId
@@ -13011,6 +13039,38 @@ components:
       - dateTo
       - hasSubcontracts
       - subcontractor
+    AssignedResourceWithSitesV2:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        resourceType:
+          type: string
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+          - PRODUCT
+        identity:
+          type: string
+        classification:
+          $ref: "#/components/schemas/IdAndNameV2"
+        employeeJobPosition:
+          type: string
+        photo:
+          type: string
+        sites:
+          type: array
+          items:
+            $ref: "#/components/schemas/ResourceSiteAssignmentV2"
+      required:
+      - name
+      - resourceId
+      - resourceType
+      - sites
     ContractResourcesV2:
       type: object
       properties:
@@ -13021,9 +13081,44 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/SiteResourcesV2"
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignedResourceWithSitesV2"
       required:
       - contractId
+      - resources
       - sites
+    ResourceSiteAssignmentV2:
+      type: object
+      properties:
+        siteId:
+          type: string
+          format: uuid
+        siteName:
+          type: string
+        siteLevel:
+          type: string
+          enum:
+          - BUSINESS
+          - SITE_GROUP
+          - SITE
+          - ZONE
+          - AREA
+        activities:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        risks:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+      required:
+      - activities
+      - risks
+      - siteId
+      - siteLevel
+      - siteName
     SiteResourcesV2:
       type: object
       properties:
@@ -13143,6 +13238,24 @@ components:
             \ is still awaiting client approval, i.e. a `subcontract_request` with\
             \ no contract row yet. Only ever true when the list was fetched with showPendingSubcontracts=true.\
             \ See the id doc on the V1 shape."
+        hasSubcontracts:
+          type: boolean
+          description: "True when at least one subcontract hangs off this contract\
+            \ and is visible to the caller. Always false on a pendingApproval entry:\
+            \ a request that has not been approved yet cannot have subcontracts of\
+            \ its own."
+        pendingValidationCount:
+          type: integer
+          format: int32
+          description: "Resource-assignment items still awaiting client validation.\
+            \ Absent when the Approval of Resource Assignments product is inactive,\
+            \ and on a pendingApproval entry, which has no assignments."
+        unacknowledgedRejectedCount:
+          type: integer
+          format: int32
+          description: "Rejected resource-assignment items the contractor has not\
+            \ acknowledged yet. Absent when the Approval of Resource Assignments product\
+            \ is inactive, and on a pendingApproval entry, which has no assignments."
         contractorId:
           type: string
           format: uuid
@@ -13159,6 +13272,7 @@ components:
       - contractorId
       - dateFrom
       - dateTo
+      - hasSubcontracts
       - hasUnresolvedMandatoryRiskConflicts
       - id
       - level
@@ -16060,6 +16174,11 @@ components:
         paymentRequired:
           type: boolean
           description: Whether the requirement must be fulfilled for payment authorization.
+        signatureRequired:
+          type: boolean
+          description: "Whether accepting this agreement requires a handwritten signature,\
+            \ rather than the confirmation checkbox alone. Only ever true for an AGREEMENT\
+            \ requirement."
       required:
       - critical
       - id

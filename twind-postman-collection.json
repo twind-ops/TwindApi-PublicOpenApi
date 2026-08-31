@@ -167,6 +167,11 @@
             "description" : "Search query to filter clients by name",
             "disabled" : true
           }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional: client company ids that must stay in the result even when they do not match `q`. Combined with `q` as a union. Without `q` it narrows the result to these ids.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -183,7 +188,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated list of client companies for a contractor. Use this endpoint to obtain client IDs for filtering in access-control endpoints."
+        "description" : "Retrieves paginated list of client companies for a contractor. Use this endpoint to obtain client IDs for filtering in access-control endpoints. **Selection:** `selected` restricts to given client company ids, unioned with `q` when both are present."
       }
     }, {
       "name" : "List company users",
@@ -3882,6 +3887,11 @@
             "description" : "Optional search on site name or related text handled by the query",
             "disabled" : true
           }, {
+            "key" : "selected",
+            "value" : "",
+            "description" : "Optional: site ids that must stay in the result even when they do not match `q`. Combined with `q` as a union. Without `q` it narrows the result to these ids.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -3898,7 +3908,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Paginated sites of **client** companies the contractor works with. Only sites at **SITE** level are returned: engagements scoped at a deeper level (zone, area) are reported as their site ancestor, and `children` is always empty. **Search:** optional `q` filters sites by the reported site name. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
+        "description" : "Paginated sites of **client** companies the contractor works with. Only sites at **SITE** level are returned: engagements scoped at a deeper level (zone, area) are reported as their site ancestor, and `children` is always empty. **Search:** optional `q` filters sites by the reported site name. **Selection:** `selected` restricts to given site ids, unioned with `q` when both are present. **Pagination:** `page`, `size`. **Sort:** default **name** ascending."
       }
     }, {
       "name" : "Client site hierarchy as contractor",
@@ -4053,7 +4063,7 @@
             "description" : "Contract ID"
           } ]
         },
-        "description" : "Returns the full contract hierarchy tree. Each node shows sites with their activities bundle."
+        "description" : "Returns the full contract hierarchy tree. Each node shows sites with their activities bundle. `contractId` also accepts the id of a pending (not-yet-approved) subcontract request, which resolves to the tree of the contract chain it hangs off."
       }
     }, {
       "name" : "Get contracts where my company is client",
