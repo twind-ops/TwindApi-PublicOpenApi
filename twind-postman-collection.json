@@ -2791,6 +2791,11 @@
             "description" : "When true, only requirements with a template file; when false, only without.",
             "disabled" : true
           }, {
+            "key" : "signatureRequired",
+            "value" : "",
+            "description" : "When true, only agreement requirements configured as signature-required; when false, only those not. R7b's \"Agreement with signature\" filter.",
+            "disabled" : true
+          }, {
             "key" : "hasRules",
             "value" : "",
             "description" : "When false, only requirements requested under any condition (empty rules); when true, only those with rules.",

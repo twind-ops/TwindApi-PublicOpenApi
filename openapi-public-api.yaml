@@ -5156,6 +5156,15 @@ paths:
           type: boolean
           description: "When true, only requirements with a template file; when false,\
             \ only without."
+      - name: signatureRequired
+        in: query
+        description: "When true, only agreement requirements configured as signature-required;\
+          \ when false, only those not. R7b's \"Agreement with signature\" filter."
+        required: false
+        schema:
+          type: boolean
+          description: "When true, only agreement requirements configured as signature-required;\
+            \ when false, only those not. R7b's \"Agreement with signature\" filter."
       - name: hasRules
         in: query
         description: "When false, only requirements requested under any condition\
@@ -6037,6 +6046,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: onlyCompanyRequirements
         in: query
         description: "When true, restricts to requirements that apply at company level.\
@@ -6362,6 +6372,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: onlyCompanyRequirements
         in: query
         description: "When true, restricts to requirements that apply at company level.\
@@ -8136,6 +8147,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: productTypeIds
         in: query
         description: Filter by product type IDs
@@ -8309,6 +8321,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: productTypeIds
         in: query
         description: Filter by product type IDs
@@ -8650,6 +8663,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -8733,6 +8747,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: subjectIds
         in: query
         description: Filter by subject IDs
@@ -8950,6 +8965,7 @@ paths:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
       - name: q
         in: query
         description: Optional search query for accent-insensitive partial match on
@@ -9962,6 +9978,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         multipleInstanceRequest:
           type: string
           description: How multiple requirement instances are created for the subject.
@@ -10165,6 +10182,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         subjectId:
           type: string
           format: uuid
@@ -11348,6 +11366,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         multipleInstanceRequest:
           type: string
           enum:
@@ -11712,6 +11731,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         subjectId:
           type: string
           format: uuid
@@ -13995,6 +14015,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
       required:
       - code
       - id
@@ -14730,6 +14751,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         multipleInstanceRequest:
           type: string
           enum:
@@ -14908,6 +14930,7 @@ components:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
           multipleInstanceRequest:
             type: string
             enum:
@@ -15062,6 +15085,7 @@ components:
             - CONTRACTOR
             - VEHICLE
             - PRODUCT
+            - VISITOR
           multipleInstanceRequest:
             type: string
             enum:
@@ -15445,6 +15469,9 @@ components:
             - NONE
             - VIEW_DETAILS
             - REVIEW
+        notDueUntil:
+          type: string
+          format: date
       required:
       - applicability
       - client
@@ -15502,6 +15529,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         multipleRequestInstance:
           type: string
           enum:
@@ -16297,6 +16325,13 @@ components:
             - NONE
             - VIEW_DETAILS
             - REVIEW
+        notDueUntil:
+          type: string
+          format: date
+          description: "The day an unfiled accident report becomes overdue, while\
+            \ that day is still ahead. Filing is open before it - show the date, do\
+            \ not withhold the action. Null for every other requirement, and once\
+            \ the day has passed."
       required:
       - applicableEngagements
       - client
@@ -16377,6 +16412,13 @@ components:
             - NONE
             - VIEW_DETAILS
             - REVIEW
+        notDueUntil:
+          type: string
+          format: date
+          description: "The day an unfiled accident report becomes overdue, while\
+            \ that day is still ahead. Filing is open before it - show the date, do\
+            \ not withhold the action. Null for every other requirement, and once\
+            \ the day has passed."
       required:
       - applicableEngagements
       - contractor
@@ -16645,6 +16687,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         name:
           type: string
         subtype:
@@ -16766,6 +16809,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         subtype:
           type: string
       required:
@@ -18215,6 +18259,7 @@ components:
           - CONTRACTOR
           - VEHICLE
           - PRODUCT
+          - VISITOR
         id:
           type: string
           format: uuid
