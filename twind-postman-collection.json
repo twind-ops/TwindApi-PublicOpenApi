@@ -1999,6 +1999,11 @@
             "description" : "Filter by counterparty company IDs (multi-value). Replaces deprecated 'contractorId'. Represents contractors when the authenticated company is the client, and vice-versa. Obtain contractor IDs from access-control endpoints (contractor.id field)",
             "disabled" : true
           }, {
+            "key" : "clientIds",
+            "value" : "",
+            "description" : "Filter by client company IDs (multi-value). Only valid together with 'contractorIds=<companyId>', which selects the records where the authenticated company is the contractor; there the counterparty is the client. Obtain client IDs from POST /filters/clients/options",
+            "disabled" : true
+          }, {
             "key" : "resourceType",
             "value" : "",
             "description" : "Deprecated — use 'resourceTypes' instead.",

@@ -3619,6 +3619,18 @@ paths:
           items:
             type: string
             format: uuid
+      - name: clientIds
+        in: query
+        description: "Filter by client company IDs (multi-value). Only valid together\
+          \ with 'contractorIds=<companyId>', which selects the records where the\
+          \ authenticated company is the contractor; there the counterparty is the\
+          \ client. Obtain client IDs from POST /filters/clients/options"
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: resourceType
         in: query
         description: Deprecated — use 'resourceTypes' instead.
@@ -10080,9 +10092,11 @@ components:
             review page when auto approvals are disabled.
         signatureRequired:
           type: boolean
-          description: Whether accepting this agreement requires a handwritten signature.
-            Only meaningful when evidenceType is AGREEMENT and the company holds the
-            Signable Agreements add-on.
+          description: "Whether accepting this agreement requires a handwritten signature.\
+            \ Only meaningful when evidenceType is AGREEMENT, the subject is a person\
+            \ who can sign, and the company holds the Signable Agreements add-on.\
+            \ Asking for it on a subject that is nobody rejects the creation, and\
+            \ clears the flag on an update."
         enable:
           type: boolean
           description: "When true, enables the requirement on edit, when false, keeps\
@@ -11021,6 +11035,7 @@ components:
           inspections_incidents: "#/components/schemas/InspectionsIncidentsConfig"
           accident_rate: "#/components/schemas/AccidentRateConfig"
           signable_agreements: "#/components/schemas/SignableAgreementsConfig"
+          visitor_scheduling: "#/components/schemas/VisitorSchedulingConfig"
       properties:
         type:
           type: string
@@ -11168,11 +11183,15 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/VisitorSchedulingConfig"
           - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
       - id
     TrainingConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    VisitorSchedulingConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     WebServicesCaeConfig:
@@ -11458,9 +11477,11 @@ components:
           type: boolean
         signatureRequired:
           type: boolean
-          description: Whether accepting this agreement requires a handwritten signature.
-            Only meaningful when evidenceType is AGREEMENT and the company holds the
-            Signable Agreements add-on.
+          description: "Whether accepting this agreement requires a handwritten signature.\
+            \ Only meaningful when evidenceType is AGREEMENT, the subject is a person\
+            \ who can sign, and the company holds the Signable Agreements add-on.\
+            \ Asking for it on a subject that is nobody rejects the creation, and\
+            \ clears the flag on an update."
         trainingCourseId:
           type: string
           format: uuid
@@ -13078,8 +13099,6 @@ components:
           type: string
         classification:
           $ref: "#/components/schemas/IdAndNameV2"
-        employeeJobPosition:
-          type: string
         photo:
           type: string
         sites:
@@ -13133,6 +13152,13 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        employeeJobPosition:
+          type: string
+          description: "Job position assigned to the employee for this site. When\
+            \ the employee is assigned to several engagements on the site, the position\
+            \ of the most recently created assignment that defines one is returned;\
+            \ assignments without a position are ignored. Null when no assignment\
+            \ on the site defines a position, and for non-employee resources."
       required:
       - activities
       - risks
@@ -13474,6 +13500,7 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/VisitorSchedulingConfig"
           - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
@@ -13939,6 +13966,7 @@ components:
           - $ref: "#/components/schemas/SpecialWorksConfig"
           - $ref: "#/components/schemas/SsoConfig"
           - $ref: "#/components/schemas/TrainingConfig"
+          - $ref: "#/components/schemas/VisitorSchedulingConfig"
           - $ref: "#/components/schemas/WebServicesCaeConfig"
           - $ref: "#/components/schemas/WorkPermitsConfig"
       required:
