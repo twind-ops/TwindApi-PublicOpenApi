@@ -1523,10 +1523,30 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: unassign
+        in: query
+        description: When true the resource is first unassigned from every contract
+          that does not block its deletion. Contracts whose removal the client validates
+          are sent as removal requests and the deletion is deferred (202) until they
+          are approved. Check what blocks the deletion with `GET .../deletion-blockers`.
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "204":
           description: Successfully deleted
-          content: {}
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
+        "202":
+          description: Removal requests were sent to the client; the resource is kept
+            until they are approved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
         "400":
           description: "`EMPLOYEE_ASSIGNED_TO_CONTRACT`: employee is still assigned\
             \ to one or more active contract engagements. To unassign: (1) find active\
@@ -1963,10 +1983,30 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: unassign
+        in: query
+        description: When true the resource is first unassigned from every contract
+          that does not block its deletion. Contracts whose removal the client validates
+          are sent as removal requests and the deletion is deferred (202) until they
+          are approved. Check what blocks the deletion with `GET .../deletion-blockers`.
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "204":
           description: Successfully deleted
-          content: {}
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
+        "202":
+          description: Removal requests were sent to the client; the resource is kept
+            until they are approved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
         "400":
           description: "`VEHICLE_ASSIGNED_TO_CONTRACT`: vehicle is still assigned\
             \ to one or more active contract engagements. To unassign: (1) find active\
@@ -2359,10 +2399,30 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: unassign
+        in: query
+        description: When true the resource is first unassigned from every contract
+          that does not block its deletion. Contracts whose removal the client validates
+          are sent as removal requests and the deletion is deferred (202) until they
+          are approved. Check what blocks the deletion with `GET .../deletion-blockers`.
+        required: false
+        schema:
+          type: boolean
+          default: false
       responses:
         "204":
           description: Successfully deleted
-          content: {}
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
+        "202":
+          description: Removal requests were sent to the client; the resource is kept
+            until they are approved
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ResourceDeletionPendingApprovalResponse"
         "400":
           description: "`EQUIPMENT_ASSIGNED_TO_CONTRACT`: equipment is still assigned\
             \ to one or more active contract engagements. To unassign: (1) find active\
@@ -10743,6 +10803,9 @@ components:
     CompaniesContractsApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    ComplianceStatisticsConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ContractorPlanConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -10879,6 +10942,9 @@ components:
             $ref: "#/components/schemas/CardConfig"
       required:
       - mode
+    DocumentaConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     DocumentalManagementConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11036,6 +11102,8 @@ components:
           accident_rate: "#/components/schemas/AccidentRateConfig"
           signable_agreements: "#/components/schemas/SignableAgreementsConfig"
           visitor_scheduling: "#/components/schemas/VisitorSchedulingConfig"
+          compliance_statistics: "#/components/schemas/ComplianceStatisticsConfig"
+          documenta: "#/components/schemas/DocumentaConfig"
       properties:
         type:
           type: string
@@ -11158,8 +11226,10 @@ components:
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
+          - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
@@ -13475,8 +13545,10 @@ components:
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
+          - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
@@ -13941,8 +14013,10 @@ components:
           - $ref: "#/components/schemas/BackupConfig"
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
+          - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
@@ -17240,10 +17314,16 @@ components:
           $ref: "#/components/schemas/TemporaryAuthorizationSummary"
         specificLocation:
           $ref: "#/components/schemas/SiteInfo"
+        skippedAgreementRequirementInstanceIds:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
       - at
       - origin
       - registeredById
+      - skippedAgreementRequirementInstanceIds
       - status
     GetAccessRegisterClient:
       type: object
@@ -17664,7 +17744,25 @@ components:
           - UNDER_GRACE_PERIOD
           - EXPIRED
           - PENDING_VALIDITY
+        requirementId:
+          type: string
+          format: uuid
+        requirementInstanceId:
+          type: string
+          format: uuid
+        evidenceType:
+          type: string
+          enum:
+          - UPLOAD
+          - AGREEMENT
+          - TRAINING
+          - ACCIDENT_REPORT
+        signatureRequired:
+          type: boolean
+        isAgreement:
+          type: boolean
       required:
+      - isAgreement
       - name
       - status
     ResourceClassification:
@@ -18751,6 +18849,33 @@ components:
       - code
       - id
       - name
+    PendingApprovalContract:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        contractName:
+          type: string
+        clientId:
+          type: string
+          format: uuid
+        clientName:
+          type: string
+      required:
+      - clientId
+      - clientName
+      - contractId
+      - contractName
+    ResourceDeletionPendingApprovalResponse:
+      type: object
+      properties:
+        pendingContracts:
+          type: array
+          items:
+            $ref: "#/components/schemas/PendingApprovalContract"
+      required:
+      - pendingContracts
     RoleName:
       type: string
     Permission:

@@ -1078,6 +1078,12 @@
             "key" : "companyId",
             "value" : "{{companyId}}",
             "description" : "Company ID. UUID of the company the employee belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ],
+          "query" : [ {
+            "key" : "unassign",
+            "value" : "",
+            "description" : "When true the resource is first unassigned from every contract that does not block its deletion. Contracts whose removal the client validates are sent as removal requests and the deletion is deferred (202) until they are approved. Check what blocks the deletion with `GET .../deletion-blockers`.",
+            "disabled" : true
           } ]
         },
         "description" : "Soft-deletes an employee."
@@ -1247,6 +1253,12 @@
             "key" : "companyId",
             "value" : "{{companyId}}",
             "description" : "Company ID. UUID of the company the vehicle belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ],
+          "query" : [ {
+            "key" : "unassign",
+            "value" : "",
+            "description" : "When true the resource is first unassigned from every contract that does not block its deletion. Contracts whose removal the client validates are sent as removal requests and the deletion is deferred (202) until they are approved. Check what blocks the deletion with `GET .../deletion-blockers`.",
+            "disabled" : true
           } ]
         },
         "description" : "Soft-deletes a vehicle for the company."
@@ -1399,6 +1411,12 @@
             "key" : "companyId",
             "value" : "{{companyId}}",
             "description" : "Company ID. UUID of the company the equipment belongs to. Obtain it from `GET /v1/users/me/companies`."
+          } ],
+          "query" : [ {
+            "key" : "unassign",
+            "value" : "",
+            "description" : "When true the resource is first unassigned from every contract that does not block its deletion. Contracts whose removal the client validates are sent as removal requests and the deletion is deferred (202) until they are approved. Check what blocks the deletion with `GET .../deletion-blockers`.",
+            "disabled" : true
           } ]
         },
         "description" : "Soft-deletes equipment for the company."
