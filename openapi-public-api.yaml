@@ -10942,6 +10942,9 @@ components:
             $ref: "#/components/schemas/CardConfig"
       required:
       - mode
+    CustomCompanyTypesConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     DocumentaConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11104,6 +11107,7 @@ components:
           visitor_scheduling: "#/components/schemas/VisitorSchedulingConfig"
           compliance_statistics: "#/components/schemas/ComplianceStatisticsConfig"
           documenta: "#/components/schemas/DocumentaConfig"
+          custom_company_types: "#/components/schemas/CustomCompanyTypesConfig"
       properties:
         type:
           type: string
@@ -11229,6 +11233,7 @@ components:
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
@@ -13561,6 +13566,7 @@ components:
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
@@ -14031,6 +14037,7 @@ components:
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
+          - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
