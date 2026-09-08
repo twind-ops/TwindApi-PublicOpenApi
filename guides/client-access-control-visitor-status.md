@@ -84,10 +84,6 @@ curl -X GET \
 
 ```json
 {
-  "visitorId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "clientId": "ffffffff-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "siteId": "cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "subjectType": "VISITOR",
   "status": "ALLOWED"
 }
 ```
@@ -105,10 +101,6 @@ curl -X GET \
 
 ```json
 {
-  "visitorId": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "clientId": "ffffffff-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "siteId": "cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee",
-  "subjectType": "VISITOR",
   "status": "NOT_ALLOWED"
 }
 ```
@@ -121,26 +113,27 @@ of the three applies.
 
 ### Understanding the response fields
 
-- **`status`** — The only field that should drive your gate decision. Treat
-  anything other than `ALLOWED` as a denial.
-- **`subjectType`** — Always `VISITOR` on this endpoint; present for parity with
-  the worker access-control status shape.
-- **`clientId`** / **`siteId`** — Echo the request parameters, useful for
-  logging.
+- **`status`** — The only field in the response, and the only thing that
+  should drive your gate decision. Treat anything other than `ALLOWED` as a
+  denial.
 
 ## Validation and errors (overview)
 
 - **400** — Invalid `visitorId`, `siteId`, or `companyId` (malformed UUID or
-  missing `siteId`).
+  missing `siteId`), or `siteId` does not belong to `companyId`.
 - **401** — Missing or invalid API key.
-- **403** — Your integration does not have client access to this company, or
-  this client does not have the visitor-scheduling capability enabled.
+- **403** — Your integration does not have client access to this company, the
+  caller's team visibility does not include this site, or this client does
+  not have the visitor-scheduling capability enabled.
 - **500** — Internal server error; retry with exponential back-off.
 
-A `visitorId` that does not exist, or that belongs to a different client, does
-**not** produce a `404`. It resolves as `NOT_ALLOWED`, exactly like a valid
-visitor with no active authorization — so a mistyped or cross-client id fails
-safe (denies entry) rather than leaking whether the id exists elsewhere.
+`visitorId` and `siteId` are validated differently. A `siteId` that does not
+belong to `companyId` is rejected with a `400` — it never reaches status
+resolution. A `visitorId` that does not exist, or that belongs to a different
+client, does **not** produce a `404` the same way: it resolves as
+`NOT_ALLOWED`, exactly like a valid visitor with no active authorization — so
+a mistyped or cross-client visitor id fails safe (denies entry) rather than
+leaking whether the id exists elsewhere.
 
 ## Related flows
 
