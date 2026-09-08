@@ -13504,6 +13504,19 @@ components:
             $ref: "#/components/schemas/TeamRequirementAccess"
       required:
       - teams
+    HoldingParentInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        logo:
+          type: string
+      required:
+      - id
+      - name
     Language:
       type: object
       properties:
@@ -13651,13 +13664,15 @@ components:
           format: uuid
         owningCompanyName:
           type: string
-        parentId:
-          type: string
-          format: uuid
         isHoldingParent:
           type: boolean
         isHoldingSubsidiary:
           type: boolean
+        parentId:
+          type: string
+          format: uuid
+        holdingParent:
+          $ref: "#/components/schemas/HoldingParentInfo"
       required:
       - companyId
       - companyName
