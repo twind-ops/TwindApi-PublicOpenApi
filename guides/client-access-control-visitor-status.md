@@ -71,7 +71,7 @@ resolve status at presentation time, not once per visit.
 
 Returns the visitor's current access control status at the given site.
 
-### Example: cURL — resolve a visitor at a site
+### Example: cURL — resolve an authorized visitor
 
 ```bash
 curl -X GET \
@@ -90,6 +90,15 @@ curl -X GET \
   "subjectType": "VISITOR",
   "status": "ALLOWED"
 }
+```
+
+### Example: cURL — resolve a visitor with no active authorization
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/visitor/{visitorId}/access-control?siteId=cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee" \
+  -H "X-Api-Key: your-api-key-here" \
+  -H "Accept: application/json"
 ```
 
 **Response** (`200 OK`, no active authorization)
