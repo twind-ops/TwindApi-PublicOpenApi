@@ -124,6 +124,13 @@ const GUIDES_DATA = [
             icon: "assets/icon-visitor.svg",
           },
           {
+            id: "client-access-control-visitor-status",
+            file: "client-access-control-visitor-status.md",
+            title: "Query Visitor Authorization Status",
+            description: "Check whether a visitor is currently authorized to enter one of your sites — a separate surface from worker/resource access control.",
+            icon: "assets/icon-visitor.svg",
+          },
+          {
             id: "webservices-cae-soap",
             file: "webservices-cae-soap.md",
             title: "WebServices CAE (SOAP)",
