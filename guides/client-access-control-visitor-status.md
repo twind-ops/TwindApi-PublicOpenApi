@@ -50,14 +50,13 @@ X-Api-Key: your-api-key-here
 
 ## Understanding visitor authorization statuses
 
-Each visitor-site combination resolves to one of three statuses, evaluated fresh
+Each visitor-site combination resolves to one of two statuses, evaluated fresh
 on every request — never cached against a badge or credential:
 
 | Status | Meaning |
 | --- | --- |
 | `ALLOWED` | The visitor has an active, in-window authorization for this site. Let them through. |
 | `NOT_ALLOWED` | No active authorization — no visit was scheduled, it has not started yet, it has ended, or it was revoked. Deny entry. |
-| `PARTIALLY_ALLOWED` | Reserved for future use; not produced by this endpoint today. Treat the same as `NOT_ALLOWED` if you see it. |
 
 A **revoked** authorization takes effect at the next time you call this
 endpoint — there is no credential-side signal, so integrations that gate on a
@@ -120,20 +119,23 @@ of the three applies.
 ## Validation and errors (overview)
 
 - **400** — Invalid `visitorId`, `siteId`, or `companyId` (malformed UUID or
-  missing `siteId`), or `siteId` does not belong to `companyId`.
+  missing `siteId`).
 - **401** — Missing or invalid API key.
-- **403** — Your integration does not have client access to this company, the
-  caller's team visibility does not include this site, or this client does
-  not have the visitor-scheduling capability enabled.
+- **403** — Your integration does not have client access to this company; the
+  `siteId` does not belong to this client or is outside the caller's team
+  visibility (the two are not distinguished); or this client does not have
+  the visitor-scheduling capability enabled.
 - **500** — Internal server error; retry with exponential back-off.
 
-`visitorId` and `siteId` are validated differently. A `siteId` that does not
-belong to `companyId` is rejected with a `400` — it never reaches status
-resolution. A `visitorId` that does not exist, or that belongs to a different
-client, does **not** produce a `404` the same way: it resolves as
-`NOT_ALLOWED`, exactly like a valid visitor with no active authorization — so
-a mistyped or cross-client visitor id fails safe (denies entry) rather than
-leaking whether the id exists elsewhere.
+`visitorId` and `siteId` are validated differently. An invalid `siteId` (one
+that doesn't belong to this client, or that the caller can't see) is
+uniformly rejected with a `403` — it never reaches status resolution, and the
+response never distinguishes "no such site" from "site not visible to you." A
+`visitorId` that does not exist, or that belongs to a different client, is
+handled the opposite way: it resolves as `NOT_ALLOWED`, exactly like a valid
+visitor with no active authorization, rather than a `404` — so a mistyped or
+cross-client visitor id fails safe (denies entry) rather than disclosing
+whether the id exists elsewhere.
 
 ## Related flows
 
