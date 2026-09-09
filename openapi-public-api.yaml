@@ -14955,6 +14955,8 @@ components:
           - DEPENDANT
         paymentRequired:
           type: boolean
+        signatureRequired:
+          type: boolean
         holdingShared:
           type: boolean
         holdingShareScope:
@@ -14982,6 +14984,7 @@ components:
       - id
       - multipleInstanceRequest
       - name
+      - signatureRequired
       - subject
       - taxId
     PageResponseGetRequirementResponse:
@@ -15728,6 +15731,8 @@ components:
           type: boolean
         paymentRequired:
           type: boolean
+        signatureRequired:
+          type: boolean
       required:
       - acceptanceCriteria
       - appliedTo
@@ -15741,6 +15746,7 @@ components:
       - name
       - rules
       - saveInCustody
+      - signatureRequired
       - subject
     RequirementSubjectData:
       type: object
