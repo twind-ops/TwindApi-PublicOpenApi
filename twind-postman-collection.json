@@ -2874,6 +2874,11 @@
             "description" : "Filter by product type IDs referenced in rules. Multiple values combine with OR.",
             "disabled" : true
           }, {
+            "key" : "companyTypeIds",
+            "value" : "",
+            "description" : "Filter by company type IDs referenced in rules. Multiple values combine with OR.",
+            "disabled" : true
+          }, {
             "key" : "projectIds",
             "value" : "",
             "description" : "Filter by project IDs referenced in rules. Multiple values combine with OR. Only applied when the Projects add-on is enabled.",
@@ -2915,7 +2920,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `paymentRequired`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`, `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        "description" : "Returns paginated requirement configurations for the company acting as a client. **Filters (query parameters):** `name`, `selected`, `subject`, `multipleRequestInstance`, `expirationType`, `critical`, `paymentRequired`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`, `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`, `companyTypeIds`, `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based list parameters use OR within the same parameter and AND across different parameters. **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
       }
     }, {
       "name" : "Create requirement configuration",

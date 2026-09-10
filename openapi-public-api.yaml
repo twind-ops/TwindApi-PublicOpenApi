@@ -5096,9 +5096,10 @@ paths:
         \ `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`,\
         \ `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`,\
         \ `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`,\
-        \ `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based list parameters\
-        \ use OR within the same parameter and AND across different parameters. **Sort\
-        \ format:** use query parameter `sort=field,direction` (e.g. `?sort=name,asc`)."
+        \ `companyTypeIds`, `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based\
+        \ list parameters use OR within the same parameter and AND across different\
+        \ parameters. **Sort format:** use query parameter `sort=field,direction`\
+        \ (e.g. `?sort=name,asc`)."
       operationId: findAll_2
       parameters:
       - name: companyId
@@ -5388,6 +5389,20 @@ paths:
             type: string
             format: uuid
             description: Filter by product type IDs referenced in rules. Multiple
+              values combine with OR.
+      - name: companyTypeIds
+        in: query
+        description: Filter by company type IDs referenced in rules. Multiple values
+          combine with OR.
+        required: false
+        schema:
+          type: array
+          description: Filter by company type IDs referenced in rules. Multiple values
+            combine with OR.
+          items:
+            type: string
+            format: uuid
+            description: Filter by company type IDs referenced in rules. Multiple
               values combine with OR.
       - name: projectIds
         in: query
@@ -10027,6 +10042,9 @@ components:
         productType:
           type: string
           description: Rule key or expression for product type.
+        companyType:
+          type: string
+          description: Rule key or expression for the contractor's company type.
         euCategory:
           type: string
           description: EU category filter when applicable.
@@ -10475,6 +10493,54 @@ components:
           description: Whether subcontract creation requires client authorization.
       required:
       - allowed
+    CreateContractDraftDto:
+      type: object
+      description: "Details-only contract draft: commercial fields with no engagement\
+        \ (site/activity) required."
+      properties:
+        name:
+          type: string
+          description: Contract name.
+          maxLength: 300
+          minLength: 0
+        contractorId:
+          type: string
+          format: uuid
+          description: Contractor company ID.
+        managerId:
+          type: string
+          description: Internal manager user id for the contract.
+          minLength: 1
+        dateFrom:
+          type: string
+          format: date
+          description: Contract start date (inclusive).
+        dateTo:
+          type: string
+          format: date
+          description: Contract end date (inclusive).
+        projectId:
+          type: string
+          format: uuid
+          description: Optional project ID to link to the contract.
+        properties:
+          type: object
+          additionalProperties:
+            type: string
+          description: Optional key-value properties (e.g. SAP order code). Keys are
+            part of the `ContractPropertyKey` enum.
+        resourceClientValidations:
+          type: array
+          description: "Optional per-resource-type client-validation settings, applied\
+            \ once the draft is coordinated."
+          items:
+            $ref: "#/components/schemas/ContractClientValidationDto"
+      required:
+      - contractorId
+      - dateFrom
+      - dateTo
+      - managerId
+      - name
     AccessControlApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -15430,6 +15496,8 @@ components:
         employeeType:
           $ref: "#/components/schemas/IdAndName"
         productType:
+          $ref: "#/components/schemas/IdAndName"
+        companyType:
           $ref: "#/components/schemas/IdAndName"
         euCategory:
           type: string
