@@ -881,6 +881,11 @@
             "description" : "When true, also return the contracts held by the company's subcontractors (everything below it in the subcontracting tree). The company's own contracts are always returned, whether it holds them directly from the client or through being subcontracted.",
             "disabled" : true
           }, {
+            "key" : "rootsOnly",
+            "value" : "",
+            "description" : "When true, return only the caller's own contracts (contractor.id == companyId) — one row per root of the caller's visible tree, regardless of showSubcontracts. Used by the deduplicated Contract filters.",
+            "disabled" : true
+          }, {
             "key" : "dateFrom",
             "value" : "",
             "description" : "",
@@ -3985,7 +3990,7 @@
             "description" : "Client company ID"
           } ]
         },
-        "description" : "Creates a contract. Each site in the body carries its own activity list.",
+        "description" : "Creates a contract. Each site in the body carries its own activity list. When the client uses the Custom Company Types add-on, the contractor must already be classified through the contractor company type endpoint.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",
@@ -4141,6 +4146,11 @@
             "key" : "showSubcontracts",
             "value" : "",
             "description" : "",
+            "disabled" : true
+          }, {
+            "key" : "rootsOnly",
+            "value" : "",
+            "description" : "When true, return only the caller's root contracts (parent_id IS NULL) — one row per direct contract with its contractors, regardless of showSubcontracts. Used by the deduplicated Contract filters.",
             "disabled" : true
           }, {
             "key" : "dateFrom",

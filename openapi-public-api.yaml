@@ -1154,6 +1154,15 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: rootsOnly
+        in: query
+        description: "When true, return only the caller's own contracts (contractor.id\
+          \ == companyId) — one row per root of the caller's visible tree, regardless\
+          \ of showSubcontracts. Used by the deduplicated Contract filters."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: dateFrom
         in: query
         required: false
@@ -7415,8 +7424,9 @@ paths:
       tags:
       - Contracts
       summary: Create contract
-      description: Creates a contract. Each site in the body carries its own activity
-        list.
+      description: "Creates a contract. Each site in the body carries its own activity\
+        \ list. When the client uses the Custom Company Types add-on, the contractor\
+        \ must already be classified through the contractor company type endpoint."
       operationId: createContract
       parameters:
       - name: companyId
@@ -7776,6 +7786,15 @@ paths:
             format: uuid
       - name: showSubcontracts
         in: query
+        required: false
+        schema:
+          type: boolean
+          default: false
+      - name: rootsOnly
+        in: query
+        description: "When true, return only the caller's root contracts (parent_id\
+          \ IS NULL) — one row per direct contract with its contractors, regardless\
+          \ of showSubcontracts. Used by the deduplicated Contract filters."
         required: false
         schema:
           type: boolean
@@ -11061,6 +11080,9 @@ components:
     HoldingCompanyConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    IdCardConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     InspectionsIncidentsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11089,6 +11111,9 @@ components:
       required:
       - enabled
       - level
+    MandatoryEmployeePictureConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     MandatoryRisksConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11174,6 +11199,8 @@ components:
           compliance_statistics: "#/components/schemas/ComplianceStatisticsConfig"
           documenta: "#/components/schemas/DocumentaConfig"
           custom_company_types: "#/components/schemas/CustomCompanyTypesConfig"
+          mandatory_employee_picture: "#/components/schemas/MandatoryEmployeePictureConfig"
+          id_card: "#/components/schemas/IdCardConfig"
       properties:
         type:
           type: string
@@ -11307,8 +11334,10 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/IdCardConfig"
           - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
@@ -11383,6 +11412,11 @@ components:
           - APP
           - API
           example: WEB
+        entryIdCard:
+          type: string
+          description: Optional physical ID card number handed to the visitor at entry.
+          maxLength: 40
+          minLength: 0
       required:
       - entryAt
       - entryReason
@@ -12032,6 +12066,10 @@ components:
           format: date-time
         closeOpenEntries:
           type: boolean
+        entryIdCard:
+          type: string
+          maxLength: 40
+          minLength: 0
       required:
       - closeOpenEntries
       - companyId
@@ -13640,8 +13678,10 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/IdCardConfig"
           - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
@@ -14111,8 +14151,10 @@ components:
           - $ref: "#/components/schemas/ErpPropertiesConfig"
           - $ref: "#/components/schemas/ExternalManagementConfig"
           - $ref: "#/components/schemas/HoldingCompanyConfig"
+          - $ref: "#/components/schemas/IdCardConfig"
           - $ref: "#/components/schemas/InspectionsIncidentsConfig"
           - $ref: "#/components/schemas/InternalManagementConfig"
+          - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
@@ -14604,6 +14646,8 @@ components:
           - WEB
           - APP
           - API
+        idCard:
+          type: string
         registeredByFullName:
           type: string
       required:
@@ -17415,6 +17459,8 @@ components:
           items:
             type: string
             format: uuid
+        idCard:
+          type: string
       required:
       - at
       - origin
@@ -18183,6 +18229,8 @@ components:
         siteLevel:
           type: integer
           format: int32
+        idCard:
+          type: string
       required:
       - entryAt
       - id
