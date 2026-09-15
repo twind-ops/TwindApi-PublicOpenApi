@@ -12191,9 +12191,8 @@ components:
           description: "Optional key-value properties. When non-null, replaces all\
             \ existing properties: keys absent from this map are deleted, supplied\
             \ keys are upserted. Omit this field (null) to leave existing properties\
-            \ unchanged. The `ORDER_CODE` key is gated by the `ENABLE_SAP_NUMBER`\
-            \ feature flag and the `ERP Properties` system product — silently dropped\
-            \ when either is off."
+            \ unchanged. The `ORDER_CODE` key is gated by the `ERP Properties` system\
+            \ product — silently dropped when it is off."
       required:
       - removeAssignedResourcesConfirmed
     UpdateUserDto:
@@ -15908,7 +15907,8 @@ components:
           type: string
           description: "The employee's job position(s) across the engagement(s) this\
             \ requirement instance applies to. Only ever set when the subject is an\
-            \ employee. When the employee holds different positions on different engagements,\
+            \ employee and the client has the resource-assignment approval product\
+            \ active. When the employee holds different positions on different engagements,\
             \ every distinct position is listed, comma-separated."
       required:
       - id
