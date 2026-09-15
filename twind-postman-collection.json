@@ -3231,7 +3231,7 @@
           }, {
             "key" : "contractIds",
             "value" : "",
-            "description" : "Filter by one or more contract ids.",
+            "description" : "Filter by one or more contract ids. Root ids are expanded to all active subcontracts below them.",
             "disabled" : true
           }, {
             "key" : "siteId",
@@ -3384,7 +3384,7 @@
           }, {
             "key" : "contractIds",
             "value" : "",
-            "description" : "Filter by one or more contract ids.",
+            "description" : "Filter by one or more contract ids. Root ids are expanded to all active subcontracts below them.",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -4492,6 +4492,11 @@
             "description" : "Filter by document names",
             "disabled" : true
           }, {
+            "key" : "expiryStates",
+            "value" : "",
+            "description" : "Filter by expiry state (EXPIRING_SOON, EXPIRED); values are OR-ed",
+            "disabled" : true
+          }, {
             "key" : "q",
             "value" : "",
             "description" : "Search across document name, subject name, and document type",
@@ -4513,7 +4518,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns a paginated list of finalized documents created by the company, with optional filters and sort fields. **Allowed sort fields:** `subjectType`; `documentName`; `documentType`; `subjectName`; `issueDate`; `expirationDate`; `createdAt` (default descending). **Sort format:** `?sort=field,direction` (e.g. `?sort=documentName,asc`)."
+        "description" : "Returns a paginated list of finalized documents created by the company, with optional filters and sort fields. `expiryStates` keeps only documents whose expiration date is before today (`EXPIRED`) or falls within the configured expiring-soon window starting today (`EXPIRING_SOON`); several values are OR-ed, and documents without an expiration date never match. **Allowed sort fields:** `subjectType`; `documentName`; `documentType`; `subjectName`; `issueDate`; `expirationDate`; `createdAt` (default descending). **Sort format:** `?sort=field,direction` (e.g. `?sort=documentName,asc`)."
       }
     }, {
       "name" : "Create one or more finalized documents",
@@ -4988,7 +4993,7 @@
           }, {
             "key" : "contractIds",
             "value" : "",
-            "description" : "Filter contractors to those with at least one matching contract. Obtain contract IDs from the `by-contract` list response (field `contract.id`).",
+            "description" : "Filter contractors to those with at least one matching contract. Obtain contract IDs from the `by-contract` list response (field `contract.id`). Root ids are expanded to all active subcontracts below them.",
             "disabled" : true
           }, {
             "key" : "siteIds",
@@ -5091,7 +5096,7 @@
           }, {
             "key" : "contractIds",
             "value" : "",
-            "description" : "Filter by specific contract IDs. Obtain them from the `by-contract` list response (field `contract.id`).",
+            "description" : "Filter by specific contract IDs. Obtain them from the `by-contract` list response (field `contract.id`). Root ids are expanded to all active subcontracts below them.",
             "disabled" : true
           }, {
             "key" : "siteIds",
