@@ -3294,6 +3294,11 @@
             "description" : "When true, restricts to instances with evidence expiring within the next fifteen days.",
             "disabled" : true
           }, {
+            "key" : "expiryStates",
+            "value" : "",
+            "description" : "Filter by expiry state of the latest evidence: EXPIRED (expired with no replacement submitted) or EXPIRING_SOON (approved and expiring within the configured window, or under grace period). Values are OR-ed. Requires the expiry-management feature.",
+            "disabled" : true
+          }, {
             "key" : "onlyWithGDRequirements",
             "value" : "",
             "description" : "When true, restricts to instances tied to general duty (GD) requirements.",
@@ -4071,7 +4076,7 @@
             "description" : "Contract ID whose resources to set."
           } ]
         },
-        "description" : "Replaces the complete resource assignment for multiple (contract, site) pairs in a single atomic operation. Each entry defines the desired state for one site: resources included are assigned, resources currently assigned but absent are unassigned. All site assignments commit or roll back as a unit. Requires the 'assign-resources-batch' feature flag to be active.",
+        "description" : "Replaces the complete resource assignment for multiple (contract, site) pairs in a single atomic operation. Each entry defines the desired state for one site: resources included are assigned, resources currently assigned but absent are unassigned. All site assignments commit or roll back as a unit.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",

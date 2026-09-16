@@ -6191,6 +6191,28 @@ paths:
           type: boolean
           description: "When true, restricts to instances with evidence expiring within\
             \ the next fifteen days."
+      - name: expiryStates
+        in: query
+        description: "Filter by expiry state of the latest evidence: EXPIRED (expired\
+          \ with no replacement submitted) or EXPIRING_SOON (approved and expiring\
+          \ within the configured window, or under grace period). Values are OR-ed.\
+          \ Requires the expiry-management feature."
+        required: false
+        schema:
+          type: array
+          description: "Filter by expiry state of the latest evidence: EXPIRED (expired\
+            \ with no replacement submitted) or EXPIRING_SOON (approved and expiring\
+            \ within the configured window, or under grace period). Values are OR-ed.\
+            \ Requires the expiry-management feature."
+          items:
+            type: string
+            description: "Filter by expiry state of the latest evidence: EXPIRED (expired\
+              \ with no replacement submitted) or EXPIRING_SOON (approved and expiring\
+              \ within the configured window, or under grace period). Values are OR-ed.\
+              \ Requires the expiry-management feature."
+            enum:
+            - EXPIRING_SOON
+            - EXPIRED
       - name: onlyWithGDRequirements
         in: query
         description: "When true, restricts to instances tied to general duty (GD)\
@@ -7629,8 +7651,7 @@ paths:
         \ site) pairs in a single atomic operation. Each entry defines the desired\
         \ state for one site: resources included are assigned, resources currently\
         \ assigned but absent are unassigned. All site assignments commit or roll\
-        \ back as a unit. Requires the 'assign-resources-batch' feature flag to be\
-        \ active."
+        \ back as a unit."
       operationId: setContractResources
       parameters:
       - name: companyId
@@ -7675,7 +7696,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
         "403":
-          description: "Access denied: insufficient permissions or feature flag inactive"
+          description: "Access denied: insufficient permissions"
           content:
             application/problem+json:
               schema:
