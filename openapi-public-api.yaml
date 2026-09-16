@@ -10496,8 +10496,11 @@ components:
           type: object
           additionalProperties:
             type: string
-          description: Optional key-value properties to attach to the contract. Keys
-            are part of the `ContractPropertyKey` enum (e.g. `ORDER_CODE`).
+          description: "Optional key-value contract properties. Keys are `ContractPropertyKey`\
+            \ values: `ORDER_CODE` (contract reference, requires the ERP Properties\
+            \ product), `NOTES` (optional multi-line, client-only operational note,\
+            \ max 4000 chars, never shown to contractors). Keys the client's products\
+            \ do not allow are silently dropped."
         resourceClientValidations:
           type: array
           description: Optional per-resource-type client-validation settings (Approval
@@ -12188,11 +12191,13 @@ components:
           type: object
           additionalProperties:
             type: string
-          description: "Optional key-value properties. When non-null, replaces all\
-            \ existing properties: keys absent from this map are deleted, supplied\
-            \ keys are upserted. Omit this field (null) to leave existing properties\
-            \ unchanged. The `ORDER_CODE` key is gated by the `ERP Properties` system\
-            \ product — silently dropped when it is off."
+          description: "Optional key-value contract properties, applied with MERGE\
+            \ semantics: only keys present in this map are changed; omitted keys are\
+            \ left unchanged. Send a key with an empty value to clear (delete) it.\
+            \ Omit this field (null) to leave all properties unchanged. Keys are `ContractPropertyKey`\
+            \ values: `ORDER_CODE` (requires the `ERP Properties` product — silently\
+            \ dropped when it is off) and `NOTES` (optional multi-line, client-only\
+            \ note, max 4000 chars, never shown to contractors)."
       required:
       - removeAssignedResourcesConfirmed
     UpdateUserDto:
@@ -13871,6 +13876,11 @@ components:
           type: boolean
           description: "User-scoped marketing consent (true=opted-in, false=opted-out,\
             \ null=not captured yet)"
+        lastPasswordReset:
+          type: string
+          format: date-time
+          description: When the user last reset their password; null if they never
+            did
       required:
       - companiesPermissions
       - createdAt
@@ -14297,10 +14307,23 @@ components:
           type: string
         taxId:
           type: string
+        classification:
+          $ref: "#/components/schemas/MyCompanyClassificationDto"
       required:
       - id
       - name
       - taxId
+    MyCompanyClassificationDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     PagedModelCompanyBasicDataDto:
       type: object
       properties:
@@ -14860,6 +14883,9 @@ components:
           type: boolean
         canReview:
           type: boolean
+        lastPasswordReset:
+          type: string
+          format: date-time
       required:
       - canReview
       - email
