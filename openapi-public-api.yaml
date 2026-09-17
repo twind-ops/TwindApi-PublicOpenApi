@@ -16984,6 +16984,14 @@ components:
           format: date-time
         aiExtractionStatus:
           type: string
+        expiryState:
+          type: string
+          enum:
+          - EXPIRING_SOON
+          - EXPIRED
+        daysUntilExpiration:
+          type: integer
+          format: int32
       required:
       - aiExtractionStatus
       - createdAt
