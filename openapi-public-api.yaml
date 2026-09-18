@@ -11184,6 +11184,23 @@ components:
       - left
       - right
       - top
+    MfaConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          method:
+            type: string
+            enum:
+            - EMAIL
+          forMyUsers:
+            type: boolean
+          forMyContractors:
+            type: boolean
+      required:
+      - forMyContractors
+      - forMyUsers
+      - method
     MobileAppConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11248,6 +11265,7 @@ components:
           custom_company_types: "#/components/schemas/CustomCompanyTypesConfig"
           mandatory_employee_picture: "#/components/schemas/MandatoryEmployeePictureConfig"
           id_card: "#/components/schemas/IdCardConfig"
+          mfa: "#/components/schemas/MfaConfig"
       properties:
         type:
           type: string
@@ -11386,6 +11404,7 @@ components:
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
+          - $ref: "#/components/schemas/MfaConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -13731,6 +13750,7 @@ components:
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
+          - $ref: "#/components/schemas/MfaConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
@@ -14209,6 +14229,7 @@ components:
           - $ref: "#/components/schemas/InternalManagementConfig"
           - $ref: "#/components/schemas/MandatoryEmployeePictureConfig"
           - $ref: "#/components/schemas/MandatoryRisksConfig"
+          - $ref: "#/components/schemas/MfaConfig"
           - $ref: "#/components/schemas/MobileAppConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationApiConfig"
           - $ref: "#/components/schemas/PaymentAuthorizationConfig"
