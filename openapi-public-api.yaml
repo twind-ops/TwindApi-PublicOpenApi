@@ -10743,10 +10743,10 @@ components:
         heightMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10779,10 +10779,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10805,10 +10805,10 @@ components:
         sizeMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10853,10 +10853,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -10907,10 +10907,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -16179,15 +16179,17 @@ components:
     JsonNode:
       type: object
       properties:
-        string:
+        empty:
           type: boolean
         array:
           type: boolean
-        empty:
-          type: boolean
         "null":
           type: boolean
+        object:
+          type: boolean
         float:
+          type: boolean
+        string:
           type: boolean
         nodeType:
           type: string
@@ -16216,8 +16218,6 @@ components:
         missingNode:
           type: boolean
         valueNode:
-          type: boolean
-        object:
           type: boolean
         pojo:
           type: boolean
@@ -16263,9 +16263,9 @@ components:
             type: string
           identityType:
             type: string
-          displayId:
-            type: string
           name:
+            type: string
+          displayId:
             type: string
       required:
       - displayId
