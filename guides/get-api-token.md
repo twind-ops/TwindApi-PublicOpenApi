@@ -24,6 +24,8 @@ Twind exposes two environments. API keys are environment-specific: a key created
 
 ## Managing Your API Keys
 
+> **Required role:** Managing API keys requires the **Public API Manager** role. If you don't see the API section, ask a company administrator to grant you this role from **Settings → Company → Users → All** (`/settings/company/users/all`).
+
 Once your account is set up and the Access Control API product is enabled, navigate to the API configuration page for your environment:
 
 - **Production:** [https://app.twind.io/configuration/apis](https://app.twind.io/configuration/apis)
