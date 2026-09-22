@@ -11,11 +11,23 @@ Before you can use the API, ensure you have the following:
 
 > **Note:** After the Access Control API product is enabled, you may need to log out and log back in for the changes to take effect.
 
+## Environments
+
+Twind exposes two environments. API keys are environment-specific: a key created in one environment does not work in the other.
+
+| Environment | Application | API base URL |
+| --- | --- | --- |
+| Production | [https://app.twind.io](https://app.twind.io) | `https://app.twind.io/api` |
+| Preproduction | [https://app.twind-pre.com](https://app.twind-pre.com) | `https://app.twind-pre.com/api` |
+
+> **Tip:** Use Preproduction to build and test your integration, then switch the base URL (and API key) to Production when you go live.
+
 ## Managing Your API Keys
 
-Once your account is set up and the Access Control API product is enabled, navigate to:
+Once your account is set up and the Access Control API product is enabled, navigate to the API configuration page for your environment:
 
-**[https://app.twind.io/configuration/apis](https://app.twind.io/configuration/apis)**
+- **Production:** [https://app.twind.io/configuration/apis](https://app.twind.io/configuration/apis)
+- **Preproduction:** [https://app.twind-pre.com/configuration/apis](https://app.twind-pre.com/configuration/apis)
 
 ![TWIND API section](assets/get-api-token_api-section.png)
 
