@@ -17,11 +17,11 @@ servers:
   description: Twind API
   variables:
     host:
-      description: "Environment host: production or development"
+      description: "Environment host: production or preproduction"
       default: app.twind.io
       enum:
       - app.twind.io
-      - app.twinddev.com
+      - app.twind-pre.com
 security:
 - ApiKeyAuth: []
 tags:
@@ -10003,6 +10003,10 @@ components:
         name:
           type: string
           minLength: 1
+        code:
+          type: string
+          maxLength: 50
+          minLength: 0
         phonePrefix:
           type: string
         phone:
@@ -10743,10 +10747,10 @@ components:
         heightMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10779,10 +10783,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10805,10 +10809,10 @@ components:
         sizeMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10853,10 +10857,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -10907,10 +10911,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11586,6 +11590,10 @@ components:
         name:
           type: string
           minLength: 1
+        code:
+          type: string
+          maxLength: 50
+          minLength: 0
         phonePrefix:
           type: string
         phone:
@@ -14955,6 +14963,8 @@ components:
           type: string
           format: uuid
         name:
+          type: string
+        code:
           type: string
         phonePrefix:
           type: string
