@@ -2578,6 +2578,11 @@
             "description" : "When true, only show resources with access ending within the next 15 days",
             "disabled" : true
           }, {
+            "key" : "identity",
+            "value" : "",
+            "description" : "Filter by the subject's identifier (exact, case-insensitive), matched against whichever column carries it for the resource type: employee NIF, vehicle registration plate, equipment serial number, or product serial number.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2669,6 +2674,11 @@
             "key" : "siteLevel",
             "value" : "",
             "description" : "Filter by site hierarchy level",
+            "disabled" : true
+          }, {
+            "key" : "identity",
+            "value" : "",
+            "description" : "Filter by the subject's identifier (exact, case-insensitive), matched against whichever column carries it for the resource type: employee NIF, vehicle registration plate, equipment serial number, or product serial number.",
             "disabled" : true
           }, {
             "key" : "page",
@@ -4362,7 +4372,16 @@
             "description" : ""
           } ]
         },
-        "description" : "Approves the bundle request and materialises the child contract with one engagement per activity."
+        "description" : "Approves the bundle request and materialises the child contract with one engagement per activity. Optionally overrides the company type the requester picked for the subcontractor.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
       }
     }, {
       "name" : "Reject subcontract request",

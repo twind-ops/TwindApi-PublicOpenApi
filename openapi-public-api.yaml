@@ -4750,6 +4750,15 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: identity
+        in: query
+        description: "Filter by the subject's identifier (exact, case-insensitive),\
+          \ matched against whichever column carries it for the resource type: employee\
+          \ NIF, vehicle registration plate, equipment serial number, or product serial\
+          \ number."
+        required: false
+        schema:
+          type: string
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -4948,6 +4957,15 @@ paths:
           - SITE
           - ZONE
           - AREA
+      - name: identity
+        in: query
+        description: "Filter by the subject's identifier (exact, case-insensitive),\
+          \ matched against whichever column carries it for the resource type: employee\
+          \ NIF, vehicle registration plate, equipment serial number, or product serial\
+          \ number."
+        required: false
+        schema:
+          type: string
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -8087,7 +8105,8 @@ paths:
       - Subcontracts
       summary: Approve subcontract request
       description: Approves the bundle request and materialises the child contract
-        with one engagement per activity.
+        with one engagement per activity. Optionally overrides the company type the
+        requester picked for the subcontractor.
       operationId: approveSubcontractRequest
       parameters:
       - name: companyId
@@ -8102,6 +8121,11 @@ paths:
         schema:
           type: string
           format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApproveSubcontractRequestDto"
       responses:
         "200":
           description: OK
@@ -9843,6 +9867,19 @@ paths:
                 id: 3fa85f64-5717-4562-b3fc-2c963f66afa6
 components:
   schemas:
+    ApproveSubcontractRequestDto:
+      type: object
+      properties:
+        companyTypeId:
+          type: string
+          format: uuid
+          description: "Company type to classify the subcontractor with, replacing\
+            \ the one the requester suggested and any the client already held. Omit\
+            \ to accept the requester's suggestion. Required when that would leave\
+            \ the subcontractor unclassified while the client has the `Custom Company\
+            \ Types` add-on and at least one type defined; the approval is otherwise\
+            \ rejected with COMPANY_TYPE_REQUIRED_FOR_CONTRACT. Ignored when the client\
+            \ does not have the add-on."
     IdsResponse:
       type: object
       properties:
@@ -10413,6 +10450,21 @@ components:
         createdAt:
           type: string
           format: date-time
+        companyTypeByContractorId:
+          type: object
+          additionalProperties:
+            type: string
+            format: uuid
+          description: "Company type the requester suggests for each subcontractor,\
+            \ keyed by subcontractor company id. Read only by the request endpoints,\
+            \ and ignored by direct subcontract creation, which has no approval step\
+            \ to settle a suggestion at and still requires the subcontractor to be\
+            \ classified beforehand. Optional: on a request it is only recorded and\
+            \ binds nothing, the client settling the classification when approving.\
+            \ An entry the client cannot act on is discarded unchecked — the add-on\
+            \ is off, no type is defined yet, or the subcontractor is already classified\
+            \ and the client's own classification stands. An entry that is kept must\
+            \ belong to the client: a type belonging to another company is rejected."
       required:
       - contractorIds
       - dateFrom
@@ -12824,6 +12876,10 @@ components:
         createdAt:
           type: string
           format: date-time
+        proposedCompanyType:
+          $ref: "#/components/schemas/IdAndNameV2"
+        currentCompanyType:
+          $ref: "#/components/schemas/IdAndNameV2"
       required:
       - activityIds
       - activityName
@@ -14781,6 +14837,9 @@ components:
     GetVisitDetailsResponse:
       type: object
       properties:
+        visitorId:
+          type: string
+          format: uuid
         visitorFirstName:
           type: string
         visitorLastName:
@@ -14819,6 +14878,7 @@ components:
       - siteName
       - visitedPerson
       - visitorFirstName
+      - visitorId
       - visitorIdentity
       - visitorIdentityType
       - visitorLastName
