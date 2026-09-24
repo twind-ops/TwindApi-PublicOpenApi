@@ -148,7 +148,8 @@ curl -X GET \
         "type": "EMPLOYEE",
         "name": "Jane",
         "surname": "Doe",
-        "identityId": "ID123456"
+        "identity": "09547483E",
+        "identityType": "NIF"
       },
       "contractor": {
         "id": "bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee",
@@ -212,18 +213,19 @@ curl -X GET \
 
 When you know a resource's real-world identifier but not its `resourceId` UUID,
 use the **`identity`** query parameter on the list endpoint. It matches the
-resource's identity document against a single value:
+identifier against whichever column carries it for each resource type. The
+matched value is returned in a type-specific field of `resource`:
 
-| Resource type | `identity` value |
-| --- | --- |
-| `EMPLOYEE` | National ID / tax number (e.g. NIF `09547483E`) |
-| `VEHICLE` | Registration plate (matrícula) |
-| `EQUIPMENT` | Serial number |
+| Resource type | `identity` value | Response field |
+| --- | --- | --- |
+| `EMPLOYEE` | National ID / tax number (e.g. NIF `09547483E`) | `resource.identity` |
+| `VEHICLE` | Registration plate (matrícula) | `resource.registrationPlate` |
+| `EQUIPMENT` | Serial number | `resource.serialNumber` |
 
-The match is **exact** — the full identifier must be supplied. Partial values,
-prefixes, or wildcards are not supported and will return no results.
+The match is **exact and case-insensitive** — the full identifier must be
+supplied. Partial values, prefixes, or wildcards are not supported and will
+return no results.
 
-The matched value is returned in the `resource.identityId` field of each entry.
 Combine `identity` with `siteIds` to restrict the search to specific sites, and
 with `resourceTypes` when the same identifier could exist across resource types.
 
