@@ -208,6 +208,39 @@ curl -X GET \
 - **`statusPerContractActivity`** — Per-activity breakdown. Use this to identify
   exactly which activities are blocked and why.
 
+## Search access status by identifier (NIF, serial number, plate)
+
+When you know a resource's real-world identifier but not its `resourceId` UUID,
+use the **`identity`** query parameter on the list endpoint. It matches the
+resource's identity document against a single value:
+
+| Resource type | `identity` value |
+| --- | --- |
+| `EMPLOYEE` | National ID / tax number (e.g. NIF `09547483E`) |
+| `VEHICLE` | Registration plate (matrícula) |
+| `EQUIPMENT` | Serial number |
+
+The match is **exact** — the full identifier must be supplied. Partial values,
+prefixes, or wildcards are not supported and will return no results.
+
+The matched value is returned in the `resource.identityId` field of each entry.
+Combine `identity` with `siteIds` to restrict the search to specific sites, and
+with `resourceTypes` when the same identifier could exist across resource types.
+
+### Example: cURL — look up an employee by NIF at a site
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?identity=09547483E&siteIds={siteId}" \
+  -H "X-Api-Key: your-api-key-here" \
+  -H "Accept: application/json"
+```
+
+The response uses the same paginated
+[`PageResponseGetAccessControlResponse`](#tag/access-status/GET/v1/companies/{companyId}/access-control/as-client)
+shape as the list endpoint above. An identifier with no matching resource returns
+`200 OK` with an empty `content` array — not a `404`.
+
 ## Get status for a specific resource
 
 <!-- markdownlint-disable-next-line MD051 -->
