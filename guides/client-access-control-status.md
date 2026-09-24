@@ -148,7 +148,8 @@ curl -X GET \
         "type": "EMPLOYEE",
         "name": "Jane",
         "surname": "Doe",
-        "identityId": "ID123456"
+        "identity": "09547483E",
+        "identityType": "NIF"
       },
       "contractor": {
         "id": "bbbbbbbb-bbbb-cccc-dddd-eeeeeeeeeeee",
@@ -207,6 +208,40 @@ curl -X GET \
   `PARTIALLY_ALLOWED` status.
 - **`statusPerContractActivity`** — Per-activity breakdown. Use this to identify
   exactly which activities are blocked and why.
+
+## Search access status by identifier (NIF, serial number, plate)
+
+When you know a resource's real-world identifier but not its `resourceId` UUID,
+use the **`identity`** query parameter on the list endpoint. It matches the
+identifier against whichever column carries it for each resource type. The
+matched value is returned in a type-specific field of `resource`:
+
+| Resource type | `identity` value | Response field |
+| --- | --- | --- |
+| `EMPLOYEE` | National ID / tax number (e.g. NIF `09547483E`) | `resource.identity` |
+| `VEHICLE` | Registration plate (matrícula) | `resource.registrationPlate` |
+| `EQUIPMENT` | Serial number | `resource.serialNumber` |
+
+The match is **exact and case-insensitive** — the full identifier must be
+supplied. Partial values, prefixes, or wildcards are not supported and will
+return no results.
+
+Combine `identity` with `siteIds` to restrict the search to specific sites, and
+with `resourceTypes` when the same identifier could exist across resource types.
+
+### Example: cURL — look up an employee by NIF at a site
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?identity=09547483E&siteIds={siteId}" \
+  -H "X-Api-Key: your-api-key-here" \
+  -H "Accept: application/json"
+```
+
+The response uses the same paginated
+[`PageResponseGetAccessControlResponse`](#tag/access-status/GET/v1/companies/{companyId}/access-control/as-client)
+shape as the list endpoint above. An identifier with no matching resource returns
+`200 OK` with an empty `content` array — not a `404`.
 
 ## Get status for a specific resource
 
