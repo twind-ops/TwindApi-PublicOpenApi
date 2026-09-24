@@ -660,8 +660,7 @@ paths:
         in: query
         description: "Optional (requirement-rule picker, M5-123): return only activities\
           \ eligible for a holding requirement of this scope — i.e. shared with all\
-          \ the requirement's target companies. `SPECIFIC_COMPANIES` requires `holdingSharedCompanyIds`.\
-          \ Ignored when the holding feature is inactive."
+          \ the requirement's target companies. `SPECIFIC_COMPANIES` requires `holdingSharedCompanyIds`."
         required: false
         schema:
           type: string
@@ -5119,9 +5118,9 @@ paths:
       summary: List requirement configurations as client
       description: "Returns paginated requirement configurations for the company acting\
         \ as a client. **Filters (query parameters):** `name`, `selected`, `subject`,\
-        \ `multipleRequestInstance`, `expirationType`, `critical`, `paymentRequired`,\
-        \ `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`, `hasRules`,\
-        \ `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`,\
+        \ `excludeSubjects`, `multipleRequestInstance`, `expirationType`, `critical`,\
+        \ `paymentRequired`, `appliedTo`, `related`, `disabled`, `evidenceType`, `hasTemplate`,\
+        \ `hasRules`, `activityIds`, `siteIds`, `contractIds`, `contractorIds`, `euCategories`,\
         \ `riskIds`, `employeeTypeIds`, `vehicleTypeIds`, `equipmentTypeIds`, `productTypeIds`,\
         \ `companyTypeIds`, `holdingShareScope`, `holdingSharedCompanyIds`. Rule-based\
         \ list parameters use OR within the same parameter and AND across different\
@@ -5152,6 +5151,32 @@ paths:
           type: string
           description: "Filter by subject type string (enum name: e.g. EMPLOYEE, VEHICLE,\
             \ EQUIPMENT, COMPANY)."
+      - name: excludeSubjects
+        in: query
+        description: "Exclude requirements whose subject is any of these subject types\
+          \ (enum names matching `RequirementSubject`). Multiple values exclude all\
+          \ of them. Applied on top of `subject`, so it is meant to be used instead\
+          \ of it."
+        required: false
+        schema:
+          type: array
+          description: "Exclude requirements whose subject is any of these subject\
+            \ types (enum names matching `RequirementSubject`). Multiple values exclude\
+            \ all of them. Applied on top of `subject`, so it is meant to be used\
+            \ instead of it."
+          items:
+            type: string
+            description: "Exclude requirements whose subject is any of these subject\
+              \ types (enum names matching `RequirementSubject`). Multiple values\
+              \ exclude all of them. Applied on top of `subject`, so it is meant to\
+              \ be used instead of it."
+            enum:
+            - EMPLOYEE
+            - EQUIPMENT
+            - CONTRACTOR
+            - VEHICLE
+            - PRODUCT
+            - VISITOR
       - name: multipleRequestInstance
         in: query
         description: Filter by multiple-instance mode string (enum name matching `MultipleInstanceRequest`).
@@ -5468,8 +5493,7 @@ paths:
         description: "Optional (related-requirement picker): return only requirements\
           \ eligible as the related requirement of a holding requirement of this scope\
           \ — i.e. shared with all the requirement's target companies. `SPECIFIC_COMPANIES`\
-          \ requires `holdingSharedCompanyIds`. Ignored when the holding feature is\
-          \ inactive."
+          \ requires `holdingSharedCompanyIds`."
         required: false
         schema:
           type: string
@@ -6955,8 +6979,10 @@ paths:
       tags:
       - Company
       summary: Create contractor company for a client
-      description: Creates a new **contractor** company and links it to the client
-        company.
+      description: "Creates a new **contractor** company and links it to the client\
+        \ company. When the client has the `Custom Company Types` add-on active and\
+        \ at least one company type defined, `companyTypeId` classifies the invited\
+        \ company and is required."
       operationId: createContractor
       parameters:
       - name: id
@@ -6992,7 +7018,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
         "400":
-          description: Validation error
+          description: "Validation error, a missing `companyTypeId` the client's add-on\
+            \ requires, or a `companyTypeId` that the client does not own or cannot\
+            \ use"
           content:
             application/problem+json:
               schema:
@@ -11106,6 +11134,14 @@ components:
           format: date-time
         seedDemoData:
           type: boolean
+        companyTypeId:
+          type: string
+          format: uuid
+          description: "Company type to classify the invited company into, on `POST\
+            \ /v1/companies/{id}/contractors` only. Required when the inviting client\
+            \ has the `Custom Company Types` add-on active and at least one company\
+            \ type defined; rejected when the client does not have the add-on. List\
+            \ the client's types with `GET /v1/companies/{id}/company-types`."
       required:
       - contactEmail
       - contactLastName
@@ -14753,6 +14789,8 @@ components:
           format: uuid
         name:
           type: string
+        code:
+          type: string
       required:
       - id
       - name
@@ -14858,6 +14896,9 @@ components:
           type: string
         visitedPerson:
           type: string
+        siteId:
+          type: string
+          format: uuid
         siteName:
           type: string
         entry:
@@ -14875,6 +14916,7 @@ components:
       - entry
       - files
       - reason
+      - siteId
       - siteName
       - visitedPerson
       - visitorFirstName
