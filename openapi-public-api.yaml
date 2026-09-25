@@ -15038,6 +15038,10 @@ components:
         lastPasswordReset:
           type: string
           format: date-time
+        mfaType:
+          type: string
+          enum:
+          - EMAIL
       required:
       - canReview
       - email
