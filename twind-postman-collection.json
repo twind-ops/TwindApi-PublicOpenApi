@@ -4233,6 +4233,11 @@
             "description" : "Filter by derived validation state (Approval of Resource Assignments product): PENDING_VALIDATION (≥1 item still pending), RESOLVED (items exist, all decided), NONE (never had a request). Only meaningful while the product is active for the client company.",
             "disabled" : true
           }, {
+            "key" : "statuses",
+            "value" : "",
+            "description" : "Restrict the listing to these sources: DRAFT for pending contract drafts, ACTIVE for live contracts. Omit for ACTIVE only; drafts are returned only when DRAFT is requested explicitly. A draft carries no engagement, so requesting DRAFT together with siteIds, activityIds, contractId or any resource-assignment filter returns nothing.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",

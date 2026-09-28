@@ -7966,6 +7966,21 @@ paths:
           - PENDING_VALIDATION
           - RESOLVED
           - NONE
+      - name: statuses
+        in: query
+        description: "Restrict the listing to these sources: DRAFT for pending contract\
+          \ drafts, ACTIVE for live contracts. Omit for ACTIVE only; drafts are returned\
+          \ only when DRAFT is requested explicitly. A draft carries no engagement,\
+          \ so requesting DRAFT together with siteIds, activityIds, contractId or\
+          \ any resource-assignment filter returns nothing."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - DRAFT
+            - ACTIVE
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -13648,6 +13663,16 @@ components:
           description: "Rejected resource-assignment items the contractor has not\
             \ acknowledged yet. Absent when the Approval of Resource Assignments product\
             \ is inactive, and on a pendingApproval entry, which has no assignments."
+        status:
+          type: string
+          description: "DRAFT for a `contract_draft` row the client saved before the\
+            \ engagement was known, with no contract row yet; PENDING for a subcontract\
+            \ invitation still awaiting client approval; ACTIVE for a real, coordinated\
+            \ contract. See the id doc on the V1 shape."
+          enum:
+          - DRAFT
+          - ACTIVE
+          - PENDING
         contractorId:
           type: string
           format: uuid
@@ -13677,6 +13702,7 @@ components:
       - siteIds
       - sites
       - specialWorks
+      - status
     ContractSiteActivityV2:
       type: object
       properties:
@@ -14499,6 +14525,12 @@ components:
           - VEHICLE
           - EQUIPMENT
           - PRODUCT
+        identity:
+          type: string
+        registrationPlate:
+          type: string
+        serialNumber:
+          type: string
       required:
       - id
       - name
@@ -17414,6 +17446,21 @@ components:
             \ NOT returned: it stays derived from dateFrom/dateTo by the caller, in\
             \ the viewer's own timezone. Note that `id` is a `subcontract_request`\
             \ id on such an entry, not a contract id."
+        status:
+          type: string
+          description: "DRAFT for a `contract_draft` row the client saved before the\
+            \ engagement was known, with no contract row yet; PENDING for a subcontract\
+            \ invitation still awaiting client approval (see pendingApproval); ACTIVE\
+            \ for a real, coordinated contract. A DRAFT entry is only ever returned\
+            \ on a client-side listing fetched while the `contract-save-as-draft`\
+            \ flag is on, has no engagement, so sites, engagements, resources, requirements\
+            \ and the validation fields are all empty or null on it, and has an `id`\
+            \ that is a `contract_draft` id, not a contract id. A PENDING entry has\
+            \ an `id` that is a `subcontract_request` id, not a contract id."
+          enum:
+          - DRAFT
+          - ACTIVE
+          - PENDING
         contractorId:
           type: string
           format: uuid
@@ -17445,6 +17492,7 @@ components:
       - siteIds
       - sites
       - specialWorks
+      - status
     EngagementSummary:
       type: object
       properties:
