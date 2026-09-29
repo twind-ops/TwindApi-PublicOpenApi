@@ -2718,7 +2718,13 @@ paths:
           description: Resources assigned
           content: {}
         "400":
-          description: Invalid request
+          description: "`RESOURCES_DELETED`: one or more of the resources being assigned\
+            \ have been deleted. `RESOURCES_WITHOUT_CLASSIFICATION`: the client has\
+            \ the Employee Type add-on and one or more resources have no classification\
+            \ for it. `RESOURCES_WITHOUT_PHOTO`: the client has the Mandatory Employee\
+            \ Picture add-on and one or more of the employees being assigned has no\
+            \ picture. Each lists the offending resources in `resources`, with `id`,\
+            \ `name` and `type`."
           content:
             application/problem+json:
               schema:
@@ -3474,7 +3480,8 @@ paths:
                 $ref: "#/components/schemas/IdValue"
         "400":
           description: "Bad request: validation failed, site not valid for company,\
-            \ or visitor already has an open visit (ProblemDetail)"
+            \ visitor already has an open visit, or the registering terminal admits\
+            \ only scheduled visitors (`VISITOR_WALK_IN_NOT_ALLOWED`) (ProblemDetail)"
           content:
             application/problem+json:
               schema:
@@ -6700,8 +6707,10 @@ paths:
       tags:
       - Submissions
       summary: Submit agreement
-      description: Creates a submission for an agreement-type requirement instance
-        (no file upload).
+      description: "Creates a submission for an agreement-type requirement instance\
+        \ (no file upload). Only for agreements that do not require a signature: a\
+        \ signature-required agreement is refused with AGREEMENT_SIGNATURE_REQUIRED\
+        \ and has to be accepted through the signing flow."
       operationId: createAgreementEvidence
       parameters:
       - name: companyId
@@ -6981,8 +6990,8 @@ paths:
       summary: Create contractor company for a client
       description: "Creates a new **contractor** company and links it to the client\
         \ company. When the client has the `Custom Company Types` add-on active and\
-        \ at least one company type defined, `companyTypeId` classifies the invited\
-        \ company and is required."
+        \ at least one company type defined, `companyTypeIds` classifies the invited\
+        \ company with every listed type and at least one is required."
       operationId: createContractor
       parameters:
       - name: id
@@ -7018,9 +7027,9 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
         "400":
-          description: "Validation error, a missing `companyTypeId` the client's add-on\
-            \ requires, or a `companyTypeId` that the client does not own or cannot\
-            \ use"
+          description: "Validation error, a missing or empty `companyTypeIds` the\
+            \ client's add-on requires, or a company type that the client does not\
+            \ own or cannot use"
           content:
             application/problem+json:
               schema:
@@ -7730,7 +7739,13 @@ paths:
               schema:
                 type: object
         "400":
-          description: Invalid request
+          description: "`RESOURCES_DELETED`: one or more of the resources being assigned\
+            \ have been deleted. `RESOURCES_WITHOUT_CLASSIFICATION`: the client has\
+            \ the Employee Type add-on and one or more resources have no classification\
+            \ for it. `RESOURCES_WITHOUT_PHOTO`: the client has the Mandatory Employee\
+            \ Picture add-on and one or more of the employees being assigned has no\
+            \ picture. Each lists the offending resources in `resources`, with `id`,\
+            \ `name` and `type`."
           content:
             application/problem+json:
               schema:
@@ -8148,7 +8163,7 @@ paths:
       - Subcontracts
       summary: Approve subcontract request
       description: Approves the bundle request and materialises the child contract
-        with one engagement per activity. Optionally overrides the company type the
+        with one engagement per activity. Optionally overrides the company types the
         requester picked for the subcontractor.
       operationId: approveSubcontractRequest
       parameters:
@@ -9913,16 +9928,20 @@ components:
     ApproveSubcontractRequestDto:
       type: object
       properties:
-        companyTypeId:
-          type: string
-          format: uuid
-          description: "Company type to classify the subcontractor with, replacing\
-            \ the one the requester suggested and any the client already held. Omit\
-            \ to accept the requester's suggestion. Required when that would leave\
+        companyTypeIds:
+          type: array
+          description: "Company types to classify the subcontractor with, replacing\
+            \ the ones the requester suggested and any the client already held; duplicates\
+            \ are ignored and an empty list is the same as an absent field. Omit to\
+            \ accept the requester's suggestion, which only applies when the client\
+            \ has not classified the subcontractor yet. Required when that would leave\
             \ the subcontractor unclassified while the client has the `Custom Company\
             \ Types` add-on and at least one type defined; the approval is otherwise\
             \ rejected with COMPANY_TYPE_REQUIRED_FOR_CONTRACT. Ignored when the client\
             \ does not have the add-on."
+          items:
+            type: string
+            format: uuid
     IdsResponse:
       type: object
       properties:
@@ -10369,7 +10388,9 @@ components:
       properties:
         reason:
           type: string
-          description: Optional rejection reason.
+          description: "Rejection reason. Required when the evidence is a signature-required\
+            \ agreement, where a rejection invalidates the signature and asks for\
+            \ a new one."
         rejectedAcceptanceCriteria:
           type: array
           description: "Acceptance criteria keys or labels that failed review, when\
@@ -10493,21 +10514,24 @@ components:
         createdAt:
           type: string
           format: date-time
-        companyTypeByContractorId:
+        companyTypesByContractorId:
           type: object
           additionalProperties:
-            type: string
-            format: uuid
-          description: "Company type the requester suggests for each subcontractor,\
-            \ keyed by subcontractor company id. Read only by the request endpoints,\
-            \ and ignored by direct subcontract creation, which has no approval step\
-            \ to settle a suggestion at and still requires the subcontractor to be\
-            \ classified beforehand. Optional: on a request it is only recorded and\
-            \ binds nothing, the client settling the classification when approving.\
-            \ An entry the client cannot act on is discarded unchecked — the add-on\
-            \ is off, no type is defined yet, or the subcontractor is already classified\
-            \ and the client's own classification stands. An entry that is kept must\
-            \ belong to the client: a type belonging to another company is rejected."
+            type: array
+            items:
+              type: string
+              format: uuid
+          description: "Company types the requester suggests for each subcontractor,\
+            \ keyed by subcontractor company id; duplicates are ignored and an empty\
+            \ list is the same as no entry. Read only by the request endpoints, and\
+            \ ignored by direct subcontract creation, which has no approval step to\
+            \ settle a suggestion at and still requires the subcontractor to be classified\
+            \ beforehand. Optional: on a request it is only recorded and binds nothing,\
+            \ the client settling the classification when approving. An entry the\
+            \ client cannot act on is discarded unchecked — the add-on is off, no\
+            \ type is defined yet, or the subcontractor is already classified and\
+            \ the client's own classification stands. An entry that is kept must belong\
+            \ to the client: a type belonging to another company is rejected."
       required:
       - contractorIds
       - dateFrom
@@ -10700,6 +10724,10 @@ components:
             \ once the draft is coordinated."
           items:
             $ref: "#/components/schemas/ContractClientValidationDto"
+        subcontracting:
+          $ref: "#/components/schemas/SubcontractingDto"
+          description: Optional subcontracting configuration. Validated as on contract
+            creation; omit it to leave it unset.
       required:
       - contractorId
       - dateFrom
@@ -11149,14 +11177,17 @@ components:
           format: date-time
         seedDemoData:
           type: boolean
-        companyTypeId:
-          type: string
-          format: uuid
-          description: "Company type to classify the invited company into, on `POST\
-            \ /v1/companies/{id}/contractors` only. Required when the inviting client\
-            \ has the `Custom Company Types` add-on active and at least one company\
-            \ type defined; rejected when the client does not have the add-on. List\
-            \ the client's types with `GET /v1/companies/{id}/company-types`."
+        companyTypeIds:
+          type: array
+          description: "Company types to classify the invited company into, on `POST\
+            \ /v1/companies/{id}/contractors` only. At least one is required when\
+            \ the inviting client has the `Custom Company Types` add-on active and\
+            \ at least one company type defined; rejected when the client does not\
+            \ have the add-on. Duplicates are ignored. List the client's types with\
+            \ `GET /v1/companies/{id}/company-types`."
+          items:
+            type: string
+            format: uuid
       required:
       - contactEmail
       - contactLastName
@@ -11590,6 +11621,13 @@ components:
           description: Optional physical ID card number handed to the visitor at entry.
           maxLength: 40
           minLength: 0
+        deviceId:
+          type: string
+          description: "Terminal registering the entry. When it is an unattended terminal\
+            \ that admits only scheduled visitors, a walk-in is refused with `VISITOR_WALK_IN_NOT_ALLOWED`.\
+            \ Omit it outside a terminal."
+          maxLength: 255
+          minLength: 1
       required:
       - entryAt
       - entryReason
@@ -11985,6 +12023,12 @@ components:
           type: string
           format: date-time
           description: Submission timestamp; defaults to server time when omitted.
+        reason:
+          type: string
+          description: "Only for data migrations: why the acceptance was migrated\
+            \ as it is (for example, that the source system records no signature).\
+            \ Shown as the approval comment in the requirement history. Ignored outside\
+            \ a migration. At most 1000 characters."
       required:
       - requirementInstanceId
     CreateEquipmentDto:
@@ -12927,18 +12971,24 @@ components:
         createdAt:
           type: string
           format: date-time
-        proposedCompanyType:
-          $ref: "#/components/schemas/IdAndNameV2"
-        currentCompanyType:
-          $ref: "#/components/schemas/IdAndNameV2"
+        proposedCompanyTypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
+        currentCompanyTypes:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdAndNameV2"
       required:
       - activityIds
       - activityName
       - contractor
       - createdAt
+      - currentCompanyTypes
       - dateFrom
       - dateTo
       - parentContractId
+      - proposedCompanyTypes
       - requestId
       - scope
       - siteId
@@ -14475,9 +14525,15 @@ components:
           type: string
         taxId:
           type: string
-        classification:
-          $ref: "#/components/schemas/MyCompanyClassificationDto"
+        classifications:
+          type: array
+          description: "Company types the scoping client has assigned to this company,\
+            \ sorted by name. Empty when the company is unclassified or the client\
+            \ does not have the Custom Company Types add-on."
+          items:
+            $ref: "#/components/schemas/MyCompanyClassificationDto"
       required:
+      - classifications
       - id
       - name
       - taxId
@@ -17065,7 +17121,24 @@ components:
           type: boolean
         employeeJobPosition:
           type: string
+        assignmentBlockers:
+          type: array
+          description: "What prevents this employee from being assigned to the requested\
+            \ client's contracts. Empty when `isAssignable` is true. Only populated\
+            \ when `clientId` is supplied, since every blocker depends on that client's\
+            \ products."
+          items:
+            type: string
+            description: "What prevents this employee from being assigned to the requested\
+              \ client's contracts. Empty when `isAssignable` is true. Only populated\
+              \ when `clientId` is supplied, since every blocker depends on that client's\
+              \ products."
+            enum:
+            - MISSING_EMPLOYEE_TYPE
+            - MISSING_PHOTO
+          uniqueItems: true
       required:
+      - assignmentBlockers
       - classifications
       - companyId
       - countryId

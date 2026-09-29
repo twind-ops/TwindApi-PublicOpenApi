@@ -3546,7 +3546,7 @@
             "description" : "Contractor or client company id"
           } ]
         },
-        "description" : "Creates a submission for an agreement-type requirement instance (no file upload).",
+        "description" : "Creates a submission for an agreement-type requirement instance (no file upload). Only for agreements that do not require a signature: a signature-required agreement is refused with AGREEMENT_SIGNATURE_REQUIRED and has to be accepted through the signing flow.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",
@@ -3775,7 +3775,7 @@
             "description" : "Client company id that will own the relationship to the new contractor"
           } ]
         },
-        "description" : "Creates a new **contractor** company and links it to the client company. When the client has the `Custom Company Types` add-on active and at least one company type defined, `companyTypeId` classifies the invited company and is required.",
+        "description" : "Creates a new **contractor** company and links it to the client company. When the client has the `Custom Company Types` add-on active and at least one company type defined, `companyTypeIds` classifies the invited company with every listed type and at least one is required.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",
@@ -4382,7 +4382,7 @@
             "description" : ""
           } ]
         },
-        "description" : "Approves the bundle request and materialises the child contract with one engagement per activity. Optionally overrides the company type the requester picked for the subcontractor.",
+        "description" : "Approves the bundle request and materialises the child contract with one engagement per activity. Optionally overrides the company types the requester picked for the subcontractor.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",
