@@ -10728,6 +10728,13 @@ components:
           $ref: "#/components/schemas/SubcontractingDto"
           description: Optional subcontracting configuration. Validated as on contract
             creation; omit it to leave it unset.
+        companyTypeIds:
+          type: array
+          description: "Optional company types for the contractor; stored only, they\
+            \ do not classify the contractor."
+          items:
+            type: string
+            format: uuid
       required:
       - contractorId
       - dateFrom
@@ -17509,6 +17516,11 @@ components:
             \ path lands."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
+        archived:
+          type: boolean
+          description: "True when the contract has been archived. Unlike active/scheduled/expired,\
+            \ this is not derivable from dateFrom/dateTo, so it is returned rather\
+            \ than computed by the caller."
         pendingApproval:
           type: boolean
           description: "True for a subcontract this company has been invited to that\
@@ -17546,6 +17558,7 @@ components:
             type: string
             format: uuid
       required:
+      - archived
       - client
       - contractor
       - contractorId
