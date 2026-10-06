@@ -244,5 +244,5 @@ specified by [RFC 6838 — Media Type Specifications and Registration Procedures
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for
 assistance.*

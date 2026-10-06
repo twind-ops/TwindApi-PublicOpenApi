@@ -126,4 +126,4 @@ The `CT_EstadoVehiculos` request is identical except for the operation element n
 - **Invalid `centro`** — if the supplied site UUID is not one the caller can see, the
   operation returns no rows for that site rather than an error.
 
-For anything unexpected, contact [Twind Support](mailto:support@twind.com).
+For anything unexpected, contact [Twind Support](mailto:api-support@twind.io).

@@ -154,4 +154,4 @@ To change the scope later, use [`PATCH /v2/companies/{companyId}/contracts/{cont
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

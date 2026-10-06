@@ -6,8 +6,8 @@ This guide explains how to authenticate and use the Twind Access Control API.
 
 Before you can use the API, ensure you have the following:
 
-1. **A Twind account** - If you don't have one, contact [Twind Support](mailto:support@twind.com) to create your account.
-2. **Access Control API product enabled** - This product must be activated for your account. Contact [Twind Support](mailto:support@twind.com) to request activation.
+1. **A Twind account** - If you don't have one, contact [Twind Support](mailto:api-support@twind.io) to create your account.
+2. **Access Control API product enabled** - This product must be activated for your account. Contact [Twind Support](mailto:api-support@twind.io) to request activation.
 
 > **Note:** After the Access Control API product is enabled, you may need to log out and log back in for the changes to take effect.
 
@@ -76,4 +76,4 @@ A successful response indicates that your API key is valid and properly configur
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

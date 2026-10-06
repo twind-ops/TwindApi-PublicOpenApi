@@ -124,4 +124,4 @@ Response: paginated event list (`eventName`, `createdBy`, `createdByCompany`, `c
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

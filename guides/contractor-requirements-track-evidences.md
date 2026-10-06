@@ -185,4 +185,4 @@ Response: `200 OK` (no body). The selected instances now carry the same document
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

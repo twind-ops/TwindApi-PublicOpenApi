@@ -150,4 +150,4 @@ Pass one of these MIME types as `contentType` in Step 1, and echo the same strin
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*
