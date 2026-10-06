@@ -10,7 +10,7 @@ info:
     Use the `X-Api-Key` header with your public API key.
   contact:
     name: Twind Support
-    email: support@twind.com
+    email: api-support@twind.io
   version: "1.0"
 servers:
 - url: "https://{host}/api"
@@ -274,6 +274,17 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: includeDrafts
+        in: query
+        description: "Also offer contractors whose only link to the client is a pending\
+          \ contract draft. Opt-in: omit it and only contract holders are returned.\
+          \ Ignored with `contractId` or `siteId`, which a draft cannot match. A draft\
+          \ never expires, so it also satisfies `activeContractsOnly`. Has no effect\
+          \ while contract drafts are not enabled for the caller."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -986,7 +997,8 @@ paths:
         \ each assignment also lists the risks applied at that site. Activities within\
         \ a site are bundled into a single assignment entry. Use 'companyScope' to\
         \ include resources from the contractor's own subcontractors (requires the\
-        \ RESOURCE_READ_SUBCONTRACTOR permission). Max page size: 100."
+        \ RESOURCE_READ_SUBCONTRACTOR or REQUIREMENT_READ_SUBCONTRACTORS permission).\
+        \ Max page size: 100."
       operationId: findAssignedDetailedResourcesAsContractor
       parameters:
       - name: id
@@ -5256,6 +5268,7 @@ paths:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
       - name: selected
         in: query
         description: "Pre-selected requirement IDs to ensure inclusion in the result\
@@ -7984,10 +7997,13 @@ paths:
       - name: statuses
         in: query
         description: "Restrict the listing to these sources: DRAFT for pending contract\
-          \ drafts, ACTIVE for live contracts. Omit for ACTIVE only; drafts are returned\
-          \ only when DRAFT is requested explicitly. A draft carries no engagement,\
-          \ so requesting DRAFT together with siteIds, activityIds, contractId or\
-          \ any resource-assignment filter returns nothing."
+          \ drafts, ACTIVE for live contracts, ARCHIVED for contracts the client archived.\
+          \ Omit for ACTIVE only; drafts and archived contracts are returned only\
+          \ when requested explicitly. A draft carries no engagement, so requesting\
+          \ DRAFT together with siteIds, activityIds, contractId or any resource-assignment\
+          \ filter returns no drafts. An archived contract is returned whether or\
+          \ not it expired, so showExpired does not hide it. A deleted contract is\
+          \ never returned."
         required: false
         schema:
           type: array
@@ -7996,6 +8012,7 @@ paths:
             enum:
             - DRAFT
             - ACTIVE
+            - ARCHIVED
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -9115,6 +9132,11 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: target
+        in: query
+        required: false
+        schema:
+          type: string
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -10261,6 +10283,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         templateFile:
           type: string
           description: Object storage key for a template file; blank clears the template
@@ -10720,8 +10743,9 @@ components:
             part of the `ContractPropertyKey` enum.
         resourceClientValidations:
           type: array
-          description: "Optional per-resource-type client-validation settings, applied\
-            \ once the draft is coordinated."
+          description: "Optional per-resource-type client-validation settings, stored\
+            \ to prefill the coordinated contract. Carrying entries requires the RESOURCE_ASSIGNMENT_APPROVAL_WRITE\
+            \ permission."
           items:
             $ref: "#/components/schemas/ContractClientValidationDto"
         subcontracting:
@@ -11066,6 +11090,10 @@ components:
           maxConnections:
             type: integer
             format: int32
+          enforceLimits:
+            type: boolean
+      required:
+      - enforceLimits
     CompaniesContractsApiConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11240,6 +11268,9 @@ components:
       - automatic
       - custom
       - standard
+    DynamicTemplatesConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     EUCategoryConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11399,6 +11430,7 @@ components:
           external_management: "#/components/schemas/ExternalManagementConfig"
           special_works: "#/components/schemas/SpecialWorksConfig"
           pending_critical_agreements: "#/components/schemas/PendingCriticalAgreementsConfig"
+          review_billing_report: "#/components/schemas/ReviewBillingReportConfig"
           holding_management: "#/components/schemas/HoldingCompanyConfig"
           webservices_cae: "#/components/schemas/WebServicesCaeConfig"
           inspections_incidents: "#/components/schemas/InspectionsIncidentsConfig"
@@ -11411,6 +11443,7 @@ components:
           mandatory_employee_picture: "#/components/schemas/MandatoryEmployeePictureConfig"
           id_card: "#/components/schemas/IdCardConfig"
           mfa: "#/components/schemas/MfaConfig"
+          dynamic_templates: "#/components/schemas/DynamicTemplatesConfig"
       properties:
         type:
           type: string
@@ -11440,6 +11473,8 @@ components:
           type: string
         publicApiKey:
           type: string
+        managedBySupport:
+          type: boolean
       required:
       - displayName
       - internalName
@@ -11473,6 +11508,9 @@ components:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     ResourcesApiConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+    ReviewBillingReportConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
     ReviewConfig:
@@ -11539,6 +11577,7 @@ components:
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
+          - $ref: "#/components/schemas/DynamicTemplatesConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
@@ -11558,6 +11597,7 @@ components:
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ReviewBillingReportConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -11805,6 +11845,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         templateFile:
           type: string
         critical:
@@ -13243,9 +13284,15 @@ components:
           $ref: "#/components/schemas/ProjectRef"
         resourceCounts:
           $ref: "#/components/schemas/ContractTreeResourceCountsV2"
+        archived:
+          type: boolean
+          description: "True when the contract has been archived. Unlike active/scheduled/expired,\
+            \ this is not derivable from dateFrom/dateTo, so it is returned rather\
+            \ than computed by the caller."
       required:
       - allowSubcontract
       - anyPendingApproval
+      - archived
       - children
       - client
       - contractor
@@ -13725,11 +13772,14 @@ components:
           description: "DRAFT for a `contract_draft` row the client saved before the\
             \ engagement was known, with no contract row yet; PENDING for a subcontract\
             \ invitation still awaiting client approval; ACTIVE for a real, coordinated\
-            \ contract. See the id doc on the V1 shape."
+            \ contract; ARCHIVED for a contract the client archived, only ever returned\
+            \ on a client-side listing fetched with statuses=ARCHIVED. See the id\
+            \ doc on the V1 shape."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
+          - ARCHIVED
         contractorId:
           type: string
           format: uuid
@@ -13923,6 +13973,7 @@ components:
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
+          - $ref: "#/components/schemas/DynamicTemplatesConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
@@ -13942,6 +13993,7 @@ components:
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ReviewBillingReportConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -14402,6 +14454,7 @@ components:
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
+          - $ref: "#/components/schemas/DynamicTemplatesConfig"
           - $ref: "#/components/schemas/EUCategoryConfig"
           - $ref: "#/components/schemas/EmployeeTypeConfig"
           - $ref: "#/components/schemas/ErpPropertiesConfig"
@@ -14421,6 +14474,7 @@ components:
           - $ref: "#/components/schemas/PublicApiConfig"
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
+          - $ref: "#/components/schemas/ReviewBillingReportConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -15326,6 +15380,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         hasTemplate:
           type: boolean
         expirationType:
@@ -15504,6 +15559,7 @@ components:
             - AGREEMENT
             - TRAINING
             - ACCIDENT_REPORT
+            - DYNAMIC_TEMPLATE
           expirationType:
             type: string
             enum:
@@ -15659,6 +15715,7 @@ components:
             - AGREEMENT
             - TRAINING
             - ACCIDENT_REPORT
+            - DYNAMIC_TEMPLATE
           expirationType:
             type: string
             enum:
@@ -16092,6 +16149,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         isCritical:
           type: boolean
         enableDoesNotApply:
@@ -16746,6 +16804,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         critical:
           type: boolean
           description: Whether the requirement is marked critical for compliance.
@@ -17541,11 +17600,14 @@ components:
             \ flag is on, has no engagement, so sites, engagements, resources, requirements\
             \ and the validation fields are all empty or null on it, and has an `id`\
             \ that is a `contract_draft` id, not a contract id. A PENDING entry has\
-            \ an `id` that is a `subcontract_request` id, not a contract id."
+            \ an `id` that is a `subcontract_request` id, not a contract id. ARCHIVED\
+            \ for a contract the client archived; only ever returned on a client-side\
+            \ listing fetched with statuses=ARCHIVED, and `archived` is true on it."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
+          - ARCHIVED
         contractorId:
           type: string
           format: uuid
@@ -18254,6 +18316,7 @@ components:
           - AGREEMENT
           - TRAINING
           - ACCIDENT_REPORT
+          - DYNAMIC_TEMPLATE
         signatureRequired:
           type: boolean
         isAgreement:
