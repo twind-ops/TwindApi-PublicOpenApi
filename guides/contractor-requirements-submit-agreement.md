@@ -52,4 +52,4 @@ To submit on behalf of a subcontractor in your chain, add `?asSubcontractorId={s
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

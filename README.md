@@ -107,7 +107,7 @@ curl -X GET "https://api.example.com/endpoint"
 
 ---
 
-*Need help? Contact support@twind.com*
+*Need help? Contact api-support@twind.io*
 ```
 
 ### Step 2: Update the Guides Index

@@ -61,4 +61,4 @@ Import via URL directly from [api-doc.twind.io](https://api-doc.twind.io/openapi
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*

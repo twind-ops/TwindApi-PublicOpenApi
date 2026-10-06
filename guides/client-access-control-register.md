@@ -261,5 +261,5 @@ curl -X GET \
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for
 assistance.*

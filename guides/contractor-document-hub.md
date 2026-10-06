@@ -386,4 +386,4 @@ Pass one of these MIME types as `contentType` in Step 2a, and echo the same stri
 
 ---
 
-*Need help? Contact [support@twind.com](mailto:support@twind.com) for assistance.*
+*Need help? Contact [api-support@twind.io](mailto:api-support@twind.io) for assistance.*
