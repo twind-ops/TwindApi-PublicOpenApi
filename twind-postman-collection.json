@@ -4200,7 +4200,7 @@
           }, {
             "key" : "showExpired",
             "value" : "",
-            "description" : "",
+            "description" : "When true, ACTIVE also returns expired contracts, still with status ACTIVE. It never narrows EXPIRED, ARCHIVED or DRAFT.",
             "disabled" : true
           }, {
             "key" : "showOnlyInternalManagement",
@@ -4240,7 +4240,7 @@
           }, {
             "key" : "statuses",
             "value" : "",
-            "description" : "Restrict the listing to these sources: DRAFT for pending contract drafts, ACTIVE for live contracts, ARCHIVED for contracts the client archived. Omit for ACTIVE only; drafts and archived contracts are returned only when requested explicitly. A draft carries no engagement, so requesting DRAFT together with siteIds, activityIds, contractId or any resource-assignment filter returns no drafts. An archived contract is returned whether or not it expired, so showExpired does not hide it. A deleted contract is never returned.",
+            "description" : "Restrict the listing to these sources, combined with OR: DRAFT for pending contract drafts, ACTIVE for live contracts, EXPIRED for live contracts past their end date, ARCHIVED for contracts the client archived. Omit for ACTIVE only; drafts and archived contracts are returned only when requested explicitly, and a row reads status EXPIRED only when EXPIRED is requested. A draft carries no engagement, so requesting DRAFT together with siteIds, activityIds, contractId or any resource-assignment filter returns no drafts. An archived contract is returned whether or not it expired, so showExpired does not hide it. A deleted contract is never returned.",
             "disabled" : true
           }, {
             "key" : "page",

@@ -7930,6 +7930,8 @@ paths:
             format: uuid
       - name: showExpired
         in: query
+        description: "When true, ACTIVE also returns expired contracts, still with\
+          \ status ACTIVE. It never narrows EXPIRED, ARCHIVED or DRAFT."
         required: false
         schema:
           type: boolean
@@ -7996,14 +7998,16 @@ paths:
           - NONE
       - name: statuses
         in: query
-        description: "Restrict the listing to these sources: DRAFT for pending contract\
-          \ drafts, ACTIVE for live contracts, ARCHIVED for contracts the client archived.\
+        description: "Restrict the listing to these sources, combined with OR: DRAFT\
+          \ for pending contract drafts, ACTIVE for live contracts, EXPIRED for live\
+          \ contracts past their end date, ARCHIVED for contracts the client archived.\
           \ Omit for ACTIVE only; drafts and archived contracts are returned only\
-          \ when requested explicitly. A draft carries no engagement, so requesting\
-          \ DRAFT together with siteIds, activityIds, contractId or any resource-assignment\
-          \ filter returns no drafts. An archived contract is returned whether or\
-          \ not it expired, so showExpired does not hide it. A deleted contract is\
-          \ never returned."
+          \ when requested explicitly, and a row reads status EXPIRED only when EXPIRED\
+          \ is requested. A draft carries no engagement, so requesting DRAFT together\
+          \ with siteIds, activityIds, contractId or any resource-assignment filter\
+          \ returns no drafts. An archived contract is returned whether or not it\
+          \ expired, so showExpired does not hide it. A deleted contract is never\
+          \ returned."
         required: false
         schema:
           type: array
@@ -8013,6 +8017,7 @@ paths:
             - DRAFT
             - ACTIVE
             - ARCHIVED
+            - EXPIRED
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -13773,13 +13778,15 @@ components:
             \ engagement was known, with no contract row yet; PENDING for a subcontract\
             \ invitation still awaiting client approval; ACTIVE for a real, coordinated\
             \ contract; ARCHIVED for a contract the client archived, only ever returned\
-            \ on a client-side listing fetched with statuses=ARCHIVED. See the id\
-            \ doc on the V1 shape."
+            \ on a client-side listing fetched with statuses=ARCHIVED; EXPIRED for\
+            \ a contract past its end date, only ever returned on a client-side listing\
+            \ fetched with statuses=EXPIRED. See the id doc on the V1 shape."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
           - ARCHIVED
+          - EXPIRED
         contractorId:
           type: string
           format: uuid
@@ -15975,6 +15982,24 @@ components:
       - id
       - name
       - taxId
+    ContractJobPositions:
+      type: object
+      properties:
+        contractId:
+          type: string
+          format: uuid
+        contractName:
+          type: string
+        jobPositions:
+          type: array
+          description: "Distinct job positions the employee holds across the contract's\
+            \ engagements, sorted alphabetically. Never empty."
+          items:
+            type: string
+      required:
+      - contractId
+      - contractName
+      - jobPositions
     EvidenceDetails:
       type: object
       properties:
@@ -16242,11 +16267,23 @@ components:
           description: "External identifier for the subject (e.g. document id, plate)."
         employeeJobPosition:
           type: string
-          description: "The employee's job position(s) across the engagement(s) this\
-            \ requirement instance applies to. Only ever set when the subject is an\
-            \ employee and the client has the resource-assignment approval product\
-            \ active. When the employee holds different positions on different engagements,\
-            \ every distinct position is listed, comma-separated."
+          description: "The job position on the employee's own record. Only set when\
+            \ the subject is an employee and the record has a position. While the\
+            \ requirement-review-job-positions flag is off for the caller, it instead\
+            \ holds the employee's contract job positions, comma-joined, and only\
+            \ when the client has the resource-assignment approval product."
+        contractJobPositions:
+          type: array
+          description: "The employee's job positions in each contract this requirement\
+            \ instance applies to, restricted to contracts whose client validates\
+            \ employee assignments and where the employee holds at least one job position,\
+            \ sorted by contract name. Only set on the instance detail, with the requirement-review-job-positions\
+            \ flag on for the caller, when the subject is an employee and the client\
+            \ has the resource-assignment approval product active; then empty when\
+            \ no contract qualifies. Only approved assignments count: a pending change\
+            \ is not reflected."
+          items:
+            $ref: "#/components/schemas/ContractJobPositions"
       required:
       - id
       - identifier
@@ -17602,12 +17639,16 @@ components:
             \ that is a `contract_draft` id, not a contract id. A PENDING entry has\
             \ an `id` that is a `subcontract_request` id, not a contract id. ARCHIVED\
             \ for a contract the client archived; only ever returned on a client-side\
-            \ listing fetched with statuses=ARCHIVED, and `archived` is true on it."
+            \ listing fetched with statuses=ARCHIVED, and `archived` is true on it.\
+            \ EXPIRED for a contract past its end date; only ever returned on a client-side\
+            \ listing fetched with statuses=EXPIRED (through showExpired alone it\
+            \ reads ACTIVE)."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
           - ARCHIVED
+          - EXPIRED
         contractorId:
           type: string
           format: uuid
