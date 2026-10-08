@@ -3276,7 +3276,7 @@
           }, {
             "key" : "status",
             "value" : "",
-            "description" : "Include only instances whose latest evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED).",
+            "description" : "Include only instances whose last or last reviewed evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED matches instances whose latest evidence is pending review and the client has been consulted about it; PENDING_REVIEW also matches those instances.",
             "disabled" : true
           }, {
             "key" : "excludeStatus",
@@ -3429,7 +3429,7 @@
           }, {
             "key" : "status",
             "value" : "",
-            "description" : "Include only instances whose latest evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED).",
+            "description" : "Include only instances whose last or last reviewed evidence status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED matches instances whose latest evidence is pending review and the client has been consulted about it; PENDING_REVIEW also matches those instances.",
             "disabled" : true
           }, {
             "key" : "excludeStatus",

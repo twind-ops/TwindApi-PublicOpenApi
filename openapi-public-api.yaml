@@ -6148,21 +6148,32 @@ paths:
             description: Filter by one or more activity ids.
       - name: status
         in: query
-        description: "Include only instances whose latest evidence status is one of\
-          \ these values (e.g. PENDING_REVIEW, APPROVED)."
+        description: "Include only instances whose last or last reviewed evidence\
+          \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+          \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+          \ matches instances whose latest evidence is pending review and the client\
+          \ has been consulted about it; PENDING_REVIEW also matches those instances."
         required: false
         schema:
           type: array
-          description: "Include only instances whose latest evidence status is one\
-            \ of these values (e.g. PENDING_REVIEW, APPROVED)."
+          description: "Include only instances whose last or last reviewed evidence\
+            \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+            \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+            \ matches instances whose latest evidence is pending review and the client\
+            \ has been consulted about it; PENDING_REVIEW also matches those instances."
           items:
             type: string
-            description: "Include only instances whose latest evidence status is one\
-              \ of these values (e.g. PENDING_REVIEW, APPROVED)."
+            description: "Include only instances whose last or last reviewed evidence\
+              \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+              \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+              \ matches instances whose latest evidence is pending review and the\
+              \ client has been consulted about it; PENDING_REVIEW also matches those\
+              \ instances."
             enum:
             - APPROVED
             - REJECTED
             - PENDING_REVIEW
+            - PENDING_REVIEW_CONSULTED
             - PENDING_UPLOAD
             - UNDER_GRACE_PERIOD
             - EXPIRED
@@ -6499,21 +6510,32 @@ paths:
             description: Filter by one or more activity ids.
       - name: status
         in: query
-        description: "Include only instances whose latest evidence status is one of\
-          \ these values (e.g. PENDING_REVIEW, APPROVED)."
+        description: "Include only instances whose last or last reviewed evidence\
+          \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+          \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+          \ matches instances whose latest evidence is pending review and the client\
+          \ has been consulted about it; PENDING_REVIEW also matches those instances."
         required: false
         schema:
           type: array
-          description: "Include only instances whose latest evidence status is one\
-            \ of these values (e.g. PENDING_REVIEW, APPROVED)."
+          description: "Include only instances whose last or last reviewed evidence\
+            \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+            \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+            \ matches instances whose latest evidence is pending review and the client\
+            \ has been consulted about it; PENDING_REVIEW also matches those instances."
           items:
             type: string
-            description: "Include only instances whose latest evidence status is one\
-              \ of these values (e.g. PENDING_REVIEW, APPROVED)."
+            description: "Include only instances whose last or last reviewed evidence\
+              \ status is one of these values (e.g. PENDING_REVIEW, APPROVED). PENDING_UPLOAD\
+              \ also matches instances with no evidence yet. PENDING_REVIEW_CONSULTED\
+              \ matches instances whose latest evidence is pending review and the\
+              \ client has been consulted about it; PENDING_REVIEW also matches those\
+              \ instances."
             enum:
             - APPROVED
             - REJECTED
             - PENDING_REVIEW
+            - PENDING_REVIEW_CONSULTED
             - PENDING_UPLOAD
             - UNDER_GRACE_PERIOD
             - EXPIRED
@@ -16036,6 +16058,20 @@ components:
         consultedAt:
           type: string
           format: date-time
+        displayStatus:
+          type: string
+          description: "Status to display for this evidence: PENDING_REVIEW_CONSULTED\
+            \ while it is pending review and the client has been consulted about it\
+            \ (see consultedAt), otherwise the same value as status."
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_REVIEW_CONSULTED
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
       required:
       - createdAt
       - files
@@ -16907,6 +16943,20 @@ components:
           type: string
           description: Reviewer note for the most recent rejection. Only populated
             for evidences in REJECTED status; otherwise null.
+        displayStatus:
+          type: string
+          description: "Status to display for this evidence: PENDING_REVIEW_CONSULTED\
+            \ while it is pending review and the client has been consulted about it\
+            \ (see consultedAt), otherwise the same value as status."
+          enum:
+          - APPROVED
+          - REJECTED
+          - PENDING_REVIEW
+          - PENDING_REVIEW_CONSULTED
+          - PENDING_UPLOAD
+          - UNDER_GRACE_PERIOD
+          - EXPIRED
+          - PENDING_VALIDITY
       required:
       - status
     RequirementInstanceAsContractor:
@@ -18273,6 +18323,22 @@ components:
             - APPROVED
             - REJECTED
             - PENDING_REVIEW
+            - PENDING_UPLOAD
+            - UNDER_GRACE_PERIOD
+            - EXPIRED
+            - PENDING_VALIDITY
+        evidenceDisplayStatuses:
+          type: array
+          description: "Display statuses of this requirement's evidences, deduplicated:\
+            \ the evidenceStatuses values, with PENDING_REVIEW_CONSULTED for an evidence\
+            \ the client has been consulted about. Not index-aligned with evidenceStatuses."
+          items:
+            type: string
+            enum:
+            - APPROVED
+            - REJECTED
+            - PENDING_REVIEW
+            - PENDING_REVIEW_CONSULTED
             - PENDING_UPLOAD
             - UNDER_GRACE_PERIOD
             - EXPIRED
