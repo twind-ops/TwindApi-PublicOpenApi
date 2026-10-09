@@ -11995,6 +11995,12 @@ components:
           - REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB
           - DOCUMENT_HUB
           - DOCUMENT_HUB_BULK
+        flow:
+          type: string
+          description: "Optional. UI flow that initiated the submission, recorded\
+            \ as the entry point of the trial feature-usage event."
+          enum:
+          - EXPIRY_MANAGEMENT
       required:
       - requirementInstanceIds
     CreateUploadEvidenceDto:
@@ -12058,6 +12064,12 @@ components:
           format: uuid
           description: "Optional. When this upload re-submits a Document Hub document,\
             \ the id of that source company_document, recorded as provenance."
+        flow:
+          type: string
+          description: "Optional. UI flow that initiated the submission, used for\
+            \ trial feature-usage metering."
+          enum:
+          - EXPIRY_MANAGEMENT
       required:
       - filePaths
       - issueDate
@@ -12104,6 +12116,12 @@ components:
             \ as it is (for example, that the source system records no signature).\
             \ Shown as the approval comment in the requirement history. Ignored outside\
             \ a migration. At most 1000 characters."
+        flow:
+          type: string
+          description: "Optional. UI flow that initiated the submission, used for\
+            \ trial feature-usage metering."
+          enum:
+          - EXPIRY_MANAGEMENT
       required:
       - requirementInstanceId
     CreateEquipmentDto:
@@ -12822,16 +12840,65 @@ components:
       - status
     AssignedResourceDetailedV2:
       type: object
+      description: "A resource assigned to at least one active contract. Which attributes\
+        \ are present depends on 'discriminator': a field that does not apply to the\
+        \ resource type, or that has no value, is omitted from the payload."
       properties:
         resourceId:
           type: string
           format: uuid
+          description: Resource ID.
         name:
           type: string
+          description: "Display name. EMPLOYEE: first and last name. VEHICLE / EQUIPMENT:\
+            \ the resource name. PRODUCT: the product name, or its code when it has\
+            \ no name."
         discriminator:
           type: string
+          description: Resource type. Decides which per-type attributes are present.
+          enum:
+          - EMPLOYEE
+          - VEHICLE
+          - EQUIPMENT
+          - PRODUCT
+        firstName:
+          type: string
+          description: Employee first name. Only for EMPLOYEE.
+        lastName:
+          type: string
+          description: Employee last name. Only for EMPLOYEE.
+        identity:
+          type: string
+          description: "Employee identification number, of the kind given by 'identityType'.\
+            \ Only for EMPLOYEE."
+        identityType:
+          type: string
+          description: Kind of document 'identity' refers to. Only for EMPLOYEE.
+          enum:
+          - PASSPORT
+          - IDENTITY_NUMBER
+          - SOCIAL_SECURITY_NUMBER
+          - OTHER
+        registrationPlate:
+          type: string
+          description: Vehicle registration plate. Only for VEHICLE.
+        serialNumber:
+          type: string
+          description: Serial number. Only for EQUIPMENT and PRODUCT.
+        code:
+          type: string
+          description: Product code. Only for PRODUCT.
+        manufacturer:
+          type: string
+          description: "Manufacturer. Only for VEHICLE, EQUIPMENT and PRODUCT."
+        model:
+          type: string
+          description: Model. Only for VEHICLE and EQUIPMENT.
         assignments:
           type: array
+          description: "Every (contract, site) pair where the resource is currently\
+            \ deployed. Activities at the same site under the same contract are bundled\
+            \ into one entry."
           items:
             $ref: "#/components/schemas/ResourceAssignmentV2"
       required:
@@ -12876,17 +12943,24 @@ components:
           $ref: "#/components/schemas/PageMetadata"
     ResourceAssignmentV2:
       type: object
+      description: "A (contract, site) pair where the resource is currently deployed."
       properties:
         contract:
           $ref: "#/components/schemas/IdAndNameV2"
+          description: Contract the resource is assigned to.
         site:
           $ref: "#/components/schemas/IdAndNameV2"
+          description: Client site of the assignment.
         activities:
           type: array
+          description: "Activities the resource performs at this site under this contract,\
+            \ oldest first."
           items:
             $ref: "#/components/schemas/IdAndNameV2"
         risks:
           type: array
+          description: Risks applied to the resource at this site. Only EMPLOYEE resources
+            carry risks; empty for every other type.
           items:
             $ref: "#/components/schemas/IdAndNameV2"
       required:
@@ -14328,6 +14402,7 @@ components:
             - MIGRATED_CAE_AS_CONTRACTOR
             - MIGRATED_EC_AS_CONTRACTOR
             - MIGRATED_TWIND1_CLIENT
+            - REAL_CLIENT_ACCESS_FOR_TESTING
         currentQuotas:
           type: array
           items:
