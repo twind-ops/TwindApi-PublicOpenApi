@@ -2584,6 +2584,29 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: q
+        in: query
+        description: "Optional: search text. Matches the risk name or description,\
+          \ ignoring case and accents."
+        required: false
+        schema:
+          type: string
+      - name: projectMandatory
+        in: query
+        description: "Optional: return only the risks the contract's project marks\
+          \ as mandatory when true."
+        required: false
+        schema:
+          type: boolean
+      - name: riskIds
+        in: query
+        description: "Optional: return only the risks with these ids."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -12226,6 +12249,10 @@ components:
           items:
             $ref: "#/components/schemas/CreateDocumentDto"
           minItems: 1
+        flow:
+          type: string
+          enum:
+          - EXPIRY_MANAGEMENT
       required:
       - documents
     CreateDocumentDto:

@@ -1471,6 +1471,21 @@
             "description" : "Contract ID. UUID of the contract whose risks are listed."
           } ],
           "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Optional: search text. Matches the risk name or description, ignoring case and accents.",
+            "disabled" : true
+          }, {
+            "key" : "projectMandatory",
+            "value" : "",
+            "description" : "Optional: return only the risks the contract's project marks as mandatory when true.",
+            "disabled" : true
+          }, {
+            "key" : "riskIds",
+            "value" : "",
+            "description" : "Optional: return only the risks with these ids.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
