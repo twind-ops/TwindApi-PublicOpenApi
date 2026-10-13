@@ -3659,9 +3659,12 @@ paths:
       - Access register
       summary: List access register records
       description: "Returns paginated access register records for the company. Supports\
-        \ filters (site, resource, contractor, type, date range, entry-only, latest\
-        \ entrance), text search (q), and pageable sort; default sort is entry_at\
-        \ descending. Allowed sort fields are documented on the pageable parameter."
+        \ filters (site, resource, contractor, type, entry date range (from/to), exit\
+        \ date range (exitFrom/exitTo), entry-only, latest entrance), text search\
+        \ (q), and pageable sort; default sort is entry_at descending. Entry and exit\
+        \ date ranges are independent and combine with AND; any exit bound excludes\
+        \ entries that have no exit yet. Allowed sort fields are documented on the\
+        \ pageable parameter."
       operationId: getAccessRegisterRecords
       parameters:
       - name: companyId
@@ -3772,6 +3775,22 @@ paths:
       - name: to
         in: query
         description: Filter entries with entry_at on or before this instant (inclusive)
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: exitFrom
+        in: query
+        description: Filter entries with exit_at on or after this instant (inclusive).
+          Entries without an exit are excluded.
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - name: exitTo
+        in: query
+        description: Filter entries with exit_at on or before this instant (inclusive).
+          Entries without an exit are excluded.
         required: false
         schema:
           type: string
@@ -11150,6 +11169,9 @@ components:
     ComplianceStatisticsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    ContractorNotesConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     ContractorPlanConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11494,6 +11516,7 @@ components:
           id_card: "#/components/schemas/IdCardConfig"
           mfa: "#/components/schemas/MfaConfig"
           dynamic_templates: "#/components/schemas/DynamicTemplatesConfig"
+          contractor_notes: "#/components/schemas/ContractorNotesConfig"
       properties:
         type:
           type: string
@@ -11622,6 +11645,7 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
+          - $ref: "#/components/schemas/ContractorNotesConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
@@ -14098,6 +14122,7 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
+          - $ref: "#/components/schemas/ContractorNotesConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
@@ -14430,6 +14455,21 @@ components:
             - MIGRATED_EC_AS_CONTRACTOR
             - MIGRATED_TWIND1_CLIENT
             - REAL_CLIENT_ACCESS_FOR_TESTING
+            - PARTNER_GESEME
+            - PARTNER_PREVENGES
+            - PARTNER_ADEMA
+            - PARTNER_CADERSEM
+            - PARTNER_SECURITAS
+            - PARTNER_CALIDALIA
+            - PARTNER_GRUPO_IFA
+            - PARTNER_NJ_SEGURTASUNA
+            - PARTNER_PREVINT
+            - PARTNER_IBERSIS
+            - PARTNER_SEPRELA
+            - PARTNER_GES_ALLIANCE
+            - PARTNER_APPLUS_LABORATORIES
+            - PARTNER_AECIM
+            - PARTNER_AVANTA
         currentQuotas:
           type: array
           items:
@@ -14580,6 +14620,7 @@ components:
           - $ref: "#/components/schemas/ClientPlanConfig"
           - $ref: "#/components/schemas/CompaniesContractsApiConfig"
           - $ref: "#/components/schemas/ComplianceStatisticsConfig"
+          - $ref: "#/components/schemas/ContractorNotesConfig"
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"

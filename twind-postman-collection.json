@@ -2067,6 +2067,16 @@
             "description" : "Filter entries with entry_at on or before this instant (inclusive)",
             "disabled" : true
           }, {
+            "key" : "exitFrom",
+            "value" : "",
+            "description" : "Filter entries with exit_at on or after this instant (inclusive). Entries without an exit are excluded.",
+            "disabled" : true
+          }, {
+            "key" : "exitTo",
+            "value" : "",
+            "description" : "Filter entries with exit_at on or before this instant (inclusive). Entries without an exit are excluded.",
+            "disabled" : true
+          }, {
             "key" : "entryOnly",
             "value" : "",
             "description" : "When true, only entries without an exit are returned",
@@ -2103,7 +2113,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated access register records for the company. Supports filters (site, resource, contractor, type, date range, entry-only, latest entrance), text search (q), and pageable sort; default sort is entry_at descending. Allowed sort fields are documented on the pageable parameter."
+        "description" : "Returns paginated access register records for the company. Supports filters (site, resource, contractor, type, entry date range (from/to), exit date range (exitFrom/exitTo), entry-only, latest entrance), text search (q), and pageable sort; default sort is entry_at descending. Entry and exit date ranges are independent and combine with AND; any exit bound excludes entries that have no exit yet. Allowed sort fields are documented on the pageable parameter."
       }
     }, {
       "name" : "Create access register entry",
