@@ -3876,6 +3876,123 @@
       }
     } ]
   }, {
+    "name" : "Contractor properties",
+    "description" : "A private note the client keeps about each of its contractors, and the history of its changes. Notes belong to the client and are never visible to the contractor.",
+    "item" : [ {
+      "name" : "List client-defined properties for a contractor",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/contractors/:contractorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "contractors", ":contractorId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company id"
+          } ]
+        },
+        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+      }
+    }, {
+      "name" : "Set a client-defined property on a contractor",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/contractors/:contractorId",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "contractors", ":contractorId" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company id"
+          } ]
+        },
+        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{\"NOTE\":\"Call before 9am\"}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
+      "name" : "Delete a client-defined property from a contractor",
+      "request" : {
+        "method" : "DELETE",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/contractors/:contractorId/properties/:key",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "contractors", ":contractorId", "properties", ":key" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company id"
+          }, {
+            "key" : "key",
+            "value" : "{{key}}",
+            "description" : "Property key"
+          } ]
+        },
+        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+      }
+    }, {
+      "name" : "List the change history of a contractor's private note",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:clientId/contractors/:contractorId/properties/NOTE/logs",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":clientId", "contractors", ":contractorId", "properties", "NOTE", "logs" ],
+          "variable" : [ {
+            "key" : "clientId",
+            "value" : "{{clientId}}",
+            "description" : "Client company id"
+          }, {
+            "key" : "contractorId",
+            "value" : "{{contractorId}}",
+            "description" : "Contractor company id"
+          } ],
+          "query" : [ {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+      }
+    } ]
+  }, {
     "name" : "Sites",
     "description" : "Site management: create, read, update, and contractor views including hierarchy.",
     "item" : [ {
@@ -4100,7 +4217,7 @@
             "description" : "Contract ID to delete"
           } ]
         },
-        "description" : "Soft-deletes the contract and all its subcontracts."
+        "description" : "Deletes the contract and all its subcontracts. A contract that is missing, belongs to another company or was already deleted answers 404."
       }
     }, {
       "name" : "Set contract resources (batch)",

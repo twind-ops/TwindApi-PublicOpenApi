@@ -79,6 +79,10 @@ tags:
 - name: Company
   description: "Company profile: update details, create contractors, and subcontractor\
     \ hierarchy."
+- name: Contractor properties
+  description: "A private note the client keeps about each of its contractors, and\
+    \ the history of its changes. Notes belong to the client and are never visible\
+    \ to the contractor."
 - name: Sites
   description: "Site management: create, read, update, and contractor views including\
     \ hierarchy."
@@ -7215,6 +7219,235 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+  /v1/companies/{clientId}/contractors/{contractorId}:
+    get:
+      tags:
+      - Contractor properties
+      summary: List client-defined properties for a contractor
+      description: "Returns the properties the client keeps about a contractor they\
+        \ work with, such as its private note (`NOTE`). Only properties enabled for\
+        \ the client and readable by the caller are returned; the list is empty when\
+        \ none is set. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
+        \ listing."
+      operationId: listContractorProperties
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: Properties visible to the caller
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ClientContractorPropertyEntryDto"
+        "401":
+          description: "Unauthorized: authentication required"
+        "403":
+          description: "Access denied: insufficient permissions"
+        "404":
+          description: Contractor not found
+    patch:
+      tags:
+      - Contractor properties
+      summary: Set a client-defined property on a contractor
+      description: "Creates or replaces a single property the client keeps about a\
+        \ contractor they work with, such as its private note (`{\"NOTE\":\"Call before\
+        \ 9am\"}`). Exactly one property per call, at most 255 characters. Saving\
+        \ the value already stored changes nothing. The property must be enabled for\
+        \ the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
+        \ listing."
+      operationId: setContractorProperty
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: "Exactly one property: its key and new value (at most 255 characters)."
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+            examples:
+              note:
+                summary: Private note
+                description: note
+                value:
+                  NOTE: Call before 9am
+        required: true
+      responses:
+        "204":
+          description: Property saved
+          content: {}
+        "400":
+          description: "Invalid body (not exactly one known key, blank or over-long\
+            \ value) or the property is not enabled for the client"
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content: {}
+        "403":
+          description: "Access denied: insufficient permissions"
+          content: {}
+        "404":
+          description: Contractor not found
+          content: {}
+        "409":
+          description: The property kept changing concurrently and was not saved;
+            retry the request
+  /v1/companies/{clientId}/contractors/{contractorId}/properties/{key}:
+    delete:
+      tags:
+      - Contractor properties
+      summary: Delete a client-defined property from a contractor
+      description: "Removes one property the client keeps about a contractor, such\
+        \ as its private note (`NOTE`). Deleting a property that is not set succeeds\
+        \ and changes nothing. The property must be enabled for the client. The contractor\
+        \ must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+      operationId: deleteContractorProperty
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: key
+        in: path
+        description: Property key
+        required: true
+        schema:
+          type: string
+          enum:
+          - SAP_NUMBER
+          - NOTE
+      responses:
+        "204":
+          description: Property deleted or not set
+          content: {}
+        "400":
+          description: Unknown property key or the property is not enabled for the
+            client
+          content: {}
+        "401":
+          description: "Unauthorized: authentication required"
+          content: {}
+        "403":
+          description: "Access denied: insufficient permissions"
+          content: {}
+        "404":
+          description: Contractor not found
+          content: {}
+  /v1/companies/{clientId}/contractors/{contractorId}/properties/NOTE/logs:
+    get:
+      tags:
+      - Contractor properties
+      summary: List the change history of a contractor's private note
+      description: "Returns every creation, edit and deletion of the private note\
+        \ the client keeps about a contractor, newest first, with who made it, when,\
+        \ and the previous and new text. Returns an empty list when the caller may\
+        \ not read the note. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
+        \ listing."
+      operationId: listContractorNoteHistory
+      parameters:
+      - name: clientId
+        in: path
+        description: Client company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractorId
+        in: path
+        description: Contractor company id
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 20
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: "A page of note changes, newest first"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractorNoteHistoryEntryDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractorNoteHistoryEntryDto"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractorNoteHistoryEntryDto"
+        "404":
+          description: Contractor not found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageResponseContractorNoteHistoryEntryDto"
   /v1/companies/{companyId}/sites:
     get:
       tags:
@@ -7678,7 +7911,8 @@ paths:
       tags:
       - Contracts
       summary: Delete contract
-      description: Soft-deletes the contract and all its subcontracts.
+      description: "Deletes the contract and all its subcontracts. A contract that\
+        \ is missing, belongs to another company or was already deleted answers 404."
       operationId: deleteContract
       parameters:
       - name: companyId
@@ -19527,6 +19761,65 @@ components:
       - contracts
       - paymentStatus
       - totalContractsCount
+    ClientContractorPropertyEntryDto:
+      type: object
+      properties:
+        key:
+          type: string
+          enum:
+          - SAP_NUMBER
+          - NOTE
+        value:
+          type: string
+      required:
+      - key
+      - value
+    ContractorNoteHistoryEntryDto:
+      type: object
+      properties:
+        change:
+          type: string
+          enum:
+          - CREATED
+          - UPDATED
+          - DELETED
+        previousValue:
+          type: string
+        value:
+          type: string
+        changedBy:
+          $ref: "#/components/schemas/IdNameEmail"
+        changedAt:
+          type: string
+          format: date-time
+      required:
+      - change
+      - changedAt
+      - changedBy
+    IdNameEmail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+      required:
+      - id
+      - name
+    PageResponseContractorNoteHistoryEntryDto:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractorNoteHistoryEntryDto"
+        page:
+          $ref: "#/components/schemas/PageData"
+      required:
+      - content
+      - page
     PagedModelSystemStandardVehicleType:
       type: object
       properties:
@@ -19730,6 +20023,7 @@ x-tagGroups:
 - name: Companies and contracts
   tags:
   - Company
+  - Contractor properties
   - Sites
   - Contracts
   - Subcontracts
