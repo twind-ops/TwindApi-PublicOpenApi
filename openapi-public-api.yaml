@@ -4670,11 +4670,13 @@ paths:
       description: "Retrieves paginated access control statuses for resources when\
         \ the company acts as a contractor. Results are filtered based on the user's\
         \ client company and site visibility. Subcontractor filtering (`companyScope`\
-        \ and `contractorIds`). Results are always reported at site level: when a\
-        \ client uses site hierarchy, assignments at deeper levels (zone, area) are\
-        \ grouped into their site ancestor and the reported status is the rollup for\
-        \ that branch. `activeEntry` follows the same rule — an entry registered at\
-        \ a deeper level is attributed to the site, so its `siteId` names the reported\
+        \ and `contractorIds`). `onlyPresentAtSite` keeps only resources currently\
+        \ present at the site (an open access-register entry with no exit recorded\
+        \ anywhere in the site branch). Results are always reported at site level:\
+        \ when a client uses site hierarchy, assignments at deeper levels (zone, area)\
+        \ are grouped into their site ancestor and the reported status is the rollup\
+        \ for that branch. `activeEntry` follows the same rule — an entry registered\
+        \ at a deeper level is attributed to the site, so its `siteId` names the reported\
         \ site rather than identifying where the entry was registered. **Allowed sort\
         \ fields:** `client_name` (client company name); `contractor_name` (contractor\
         \ company name); `resource_name` (resource name: employee, vehicle, or equipment);\
@@ -4814,6 +4816,14 @@ paths:
         required: false
         schema:
           type: boolean
+      - name: onlyPresentAtSite
+        in: query
+        description: "When true, only show rows whose resource currently has an open\
+          \ access-register entry (no exit recorded) at the row's site or within its\
+          \ site branch"
+        required: false
+        schema:
+          type: boolean
       - name: identity
         in: query
         description: "Filter by the subject's identifier (exact, case-insensitive),\
@@ -4891,10 +4901,12 @@ paths:
       description: "Retrieves paginated access control statuses for resources when\
         \ the company acts as a client. Results are filtered based on the user's site\
         \ visibility and can be further filtered by contractor, site, resource type,\
-        \ status, and resource ID. **Allowed sort fields:** `site_name` (site name,\
-        \ default); `contractor_name` (contractor company name); `resource_name` (resource\
-        \ name: employee, vehicle, or equipment); `end_of_access` (end of access date).\
-        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        \ status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`)\
+        \ and resources currently present at the site (`onlyPresentAtSite`). **Allowed\
+        \ sort fields:** `site_name` (site name, default); `contractor_name` (contractor\
+        \ company name); `resource_name` (resource name: employee, vehicle, or equipment);\
+        \ `end_of_access` (end of access date). **Sort format:** `?sort=field,direction`\
+        \ (e.g. `?sort=site_name,asc`)."
       operationId: getAccessControlStatusByClient
       parameters:
       - name: companyId
@@ -5006,6 +5018,14 @@ paths:
         in: query
         description: "When true, only show resources with access ending within the\
           \ next 15 days"
+        required: false
+        schema:
+          type: boolean
+      - name: onlyPresentAtSite
+        in: query
+        description: "When true, only show rows whose resource currently has an open\
+          \ access-register entry (no exit recorded) at the row's site or within its\
+          \ site branch"
         required: false
         schema:
           type: boolean
@@ -11395,7 +11415,16 @@ components:
             format: int32
           enforceLimits:
             type: boolean
+          billingModel:
+            type: string
+            enum:
+            - TWIND
+            - ECOORDINA
+          maxElements:
+            type: integer
+            format: int32
       required:
+      - billingModel
       - enforceLimits
     CompaniesContractsApiConfig:
       allOf:
@@ -12067,12 +12096,30 @@ components:
             format: uuid
         photo:
           type: string
+        notificationPreferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotificationPreferenceDto"
       required:
       - email
       - firstName
       - languageId
       - lastName
       - roles
+    NotificationEvent:
+      type: string
+      enum:
+      - CONTRACT_RECEIVED
+    NotificationPreferenceDto:
+      type: object
+      properties:
+        event:
+          $ref: "#/components/schemas/NotificationEvent"
+        enabled:
+          type: boolean
+      required:
+      - enabled
+      - event
     IdValueString:
       type: object
       properties:
@@ -15597,6 +15644,10 @@ components:
           type: string
           enum:
           - EMAIL
+        notificationPreferences:
+          type: array
+          items:
+            $ref: "#/components/schemas/NotificationPreferenceDto"
       required:
       - canReview
       - email

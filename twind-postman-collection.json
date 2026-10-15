@@ -2608,6 +2608,11 @@
             "description" : "When true, only show resources with access ending within the next 15 days",
             "disabled" : true
           }, {
+            "key" : "onlyPresentAtSite",
+            "value" : "",
+            "description" : "When true, only show rows whose resource currently has an open access-register entry (no exit recorded) at the row's site or within its site branch",
+            "disabled" : true
+          }, {
             "key" : "identity",
             "value" : "",
             "description" : "Filter by the subject's identifier (exact, case-insensitive), matched against whichever column carries it for the resource type: employee NIF, vehicle registration plate, equipment serial number, or product serial number.",
@@ -2629,7 +2634,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). `onlyPresentAtSite` keeps only resources currently present at the site (an open access-register entry with no exit recorded anywhere in the site branch). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
       }
     }, {
       "name" : "Get access control status by client",
@@ -2701,6 +2706,11 @@
             "description" : "When true, only show resources with access ending within the next 15 days",
             "disabled" : true
           }, {
+            "key" : "onlyPresentAtSite",
+            "value" : "",
+            "description" : "When true, only show rows whose resource currently has an open access-register entry (no exit recorded) at the row's site or within its site branch",
+            "disabled" : true
+          }, {
             "key" : "siteLevel",
             "value" : "",
             "description" : "Filter by site hierarchy level",
@@ -2727,7 +2737,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, and resource ID. **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`) and resources currently present at the site (`onlyPresentAtSite`). **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
       }
     } ]
   }, {
