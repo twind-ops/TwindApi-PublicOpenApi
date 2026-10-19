@@ -3907,7 +3907,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
       }
     }, {
       "name" : "Set a client-defined property on a contractor",
@@ -3928,7 +3928,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing.",
+        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404.",
         "body" : {
           "mode" : "raw",
           "raw" : "{\"NOTE\":\"Call before 9am\"}",
@@ -3962,7 +3962,7 @@
             "description" : "Property key"
           } ]
         },
-        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
       }
     }, {
       "name" : "List the change history of a contractor's private note",
@@ -3999,7 +3999,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
       }
     } ]
   }, {
@@ -4107,6 +4107,11 @@
             "description" : "Optional: site ids that must stay in the result even when they do not match `q`. Combined with `q` as a union. Without `q` it narrows the result to these ids.",
             "disabled" : true
           }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "Also offer sites reached only through expired contracts. Defaults to false: only non-expired contracts count.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -4143,6 +4148,11 @@
             "key" : "q",
             "value" : "",
             "description" : "Optional search on site name",
+            "disabled" : true
+          }, {
+            "key" : "showExpired",
+            "value" : "",
+            "description" : "Also offer sites reached only through expired contracts. Defaults to false: only non-expired contracts count.",
             "disabled" : true
           } ]
         },
@@ -5187,6 +5197,11 @@
             "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
             "disabled" : true
           }, {
+            "key" : "contractorTaxId",
+            "value" : "",
+            "description" : "Filter by contractor tax ID. Exact match, ignoring case, whitespace, dots, commas and dashes (e.g. `B-12.345.678` matches `b12345678`).",
+            "disabled" : true
+          }, {
             "key" : "contractIds",
             "value" : "",
             "description" : "Filter contractors to those with at least one matching contract. Obtain contract IDs from the `by-contract` list response (field `contract.id`). Root ids are expanded to all active subcontracts below them.",
@@ -5288,6 +5303,11 @@
             "key" : "contractorIds",
             "value" : "",
             "description" : "Filter by contractor company IDs. Obtain them from the `by-company` list response (field `contractor.id`) or from `GET /v1/companies/{companyId}/contracts/my-contractors` (field `id`).",
+            "disabled" : true
+          }, {
+            "key" : "contractorTaxId",
+            "value" : "",
+            "description" : "Filter by contractor tax ID. Exact match, ignoring case, whitespace, dots, commas and dashes (e.g. `B-12.345.678` matches `b12345678`).",
             "disabled" : true
           }, {
             "key" : "contractIds",

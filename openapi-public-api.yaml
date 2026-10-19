@@ -7247,8 +7247,9 @@ paths:
       description: "Returns the properties the client keeps about a contractor they\
         \ work with, such as its private note (`NOTE`). Only properties enabled for\
         \ the client and readable by the caller are returned; the list is empty when\
-        \ none is set. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
-        \ listing."
+        \ none is set. The contractor must be linked to the client through a contract\
+        \ (directly or down a subcontracting chain) or an invitation the client sent;\
+        \ otherwise the request returns 404."
       operationId: listContractorProperties
       parameters:
       - name: clientId
@@ -7288,8 +7289,9 @@ paths:
         \ contractor they work with, such as its private note (`{\"NOTE\":\"Call before\
         \ 9am\"}`). Exactly one property per call, at most 255 characters. Saving\
         \ the value already stored changes nothing. The property must be enabled for\
-        \ the client. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
-        \ listing."
+        \ the client. The contractor must be linked to the client through a contract\
+        \ (directly or down a subcontracting chain) or an invitation the client sent;\
+        \ otherwise the request returns 404."
       operationId: setContractorProperty
       parameters:
       - name: clientId
@@ -7349,7 +7351,8 @@ paths:
       description: "Removes one property the client keeps about a contractor, such\
         \ as its private note (`NOTE`). Deleting a property that is not set succeeds\
         \ and changes nothing. The property must be enabled for the client. The contractor\
-        \ must be visible in the client's `/v1/companies/{id}/my-companies` listing."
+        \ must be linked to the client through a contract (directly or down a subcontracting\
+        \ chain) or an invitation the client sent; otherwise the request returns 404."
       operationId: deleteContractorProperty
       parameters:
       - name: clientId
@@ -7400,8 +7403,9 @@ paths:
       description: "Returns every creation, edit and deletion of the private note\
         \ the client keeps about a contractor, newest first, with who made it, when,\
         \ and the previous and new text. Returns an empty list when the caller may\
-        \ not read the note. The contractor must be visible in the client's `/v1/companies/{id}/my-companies`\
-        \ listing."
+        \ not read the note. The contractor must be linked to the client through a\
+        \ contract (directly or down a subcontracting chain) or an invitation the\
+        \ client sent; otherwise the request returns 404."
       operationId: listContractorNoteHistory
       parameters:
       - name: clientId
@@ -7735,6 +7739,14 @@ paths:
           items:
             type: string
             format: uuid
+      - name: showExpired
+        in: query
+        description: "Also offer sites reached only through expired contracts. Defaults\
+          \ to false: only non-expired contracts count."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -7804,6 +7816,14 @@ paths:
         required: false
         schema:
           type: string
+      - name: showExpired
+        in: query
+        description: "Also offer sites reached only through expired contracts. Defaults\
+          \ to false: only non-expired contracts count."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: companyId
         in: path
         description: Contractor company id
@@ -9659,6 +9679,13 @@ paths:
           items:
             type: string
             format: uuid
+      - name: contractorTaxId
+        in: query
+        description: "Filter by contractor tax ID. Exact match, ignoring case, whitespace,\
+          \ dots, commas and dashes (e.g. `B-12.345.678` matches `b12345678`)."
+        required: false
+        schema:
+          type: string
       - name: contractIds
         in: query
         description: Filter contractors to those with at least one matching contract.
@@ -9875,6 +9902,13 @@ paths:
           items:
             type: string
             format: uuid
+      - name: contractorTaxId
+        in: query
+        description: "Filter by contractor tax ID. Exact match, ignoring case, whitespace,\
+          \ dots, commas and dashes (e.g. `B-12.345.678` matches `b12345678`)."
+        required: false
+        schema:
+          type: string
       - name: contractIds
         in: query
         description: Filter by specific contract IDs. Obtain them from the `by-contract`
