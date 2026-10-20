@@ -4681,7 +4681,10 @@ paths:
         \ fields:** `client_name` (client company name); `contractor_name` (contractor\
         \ company name); `resource_name` (resource name: employee, vehicle, or equipment);\
         \ `site_name` (site name, default); `end_of_access` (end of access date).\
-        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        \ **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each\
+        \ row also carries `contracts` and `risks` so that clients can show them as\
+        \ optional table columns; both are read from the precomputed access-control\
+        \ row and add no query cost."
       operationId: getAccessControlStatusByContractor
       parameters:
       - name: companyId
@@ -4906,7 +4909,9 @@ paths:
         \ sort fields:** `site_name` (site name, default); `contractor_name` (contractor\
         \ company name); `resource_name` (resource name: employee, vehicle, or equipment);\
         \ `end_of_access` (end of access date). **Sort format:** `?sort=field,direction`\
-        \ (e.g. `?sort=site_name,asc`)."
+        \ (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks`\
+        \ so that clients can show them as optional table columns; both are read from\
+        \ the precomputed access-control row and add no query cost."
       operationId: getAccessControlStatusByClient
       parameters:
       - name: companyId
@@ -7249,7 +7254,11 @@ paths:
         \ the client and readable by the caller are returned; the list is empty when\
         \ none is set. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404."
+        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
+        \ kept about any other company in the client's companies tabs, including the\
+        \ clients it works for and the external companies it created. About those\
+        \ companies, setting or deleting any other property returns 404 and listing\
+        \ leaves it out."
       operationId: listContractorProperties
       parameters:
       - name: clientId
@@ -7291,7 +7300,11 @@ paths:
         \ the value already stored changes nothing. The property must be enabled for\
         \ the client. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404."
+        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
+        \ kept about any other company in the client's companies tabs, including the\
+        \ clients it works for and the external companies it created. About those\
+        \ companies, setting or deleting any other property returns 404 and listing\
+        \ leaves it out."
       operationId: setContractorProperty
       parameters:
       - name: clientId
@@ -7352,7 +7365,11 @@ paths:
         \ as its private note (`NOTE`). Deleting a property that is not set succeeds\
         \ and changes nothing. The property must be enabled for the client. The contractor\
         \ must be linked to the client through a contract (directly or down a subcontracting\
-        \ chain) or an invitation the client sent; otherwise the request returns 404."
+        \ chain) or an invitation the client sent; otherwise the request returns 404.\
+        \ The private note (`NOTE`) can also be kept about any other company in the\
+        \ client's companies tabs, including the clients it works for and the external\
+        \ companies it created. About those companies, setting or deleting any other\
+        \ property returns 404 and listing leaves it out."
       operationId: deleteContractorProperty
       parameters:
       - name: clientId
@@ -7405,7 +7422,11 @@ paths:
         \ and the previous and new text. Returns an empty list when the caller may\
         \ not read the note. The contractor must be linked to the client through a\
         \ contract (directly or down a subcontracting chain) or an invitation the\
-        \ client sent; otherwise the request returns 404."
+        \ client sent; otherwise the request returns 404. The private note (`NOTE`)\
+        \ can also be kept about any other company in the client's companies tabs,\
+        \ including the clients it works for and the external companies it created.\
+        \ About those companies, setting or deleting any other property returns 404\
+        \ and listing leaves it out."
       operationId: listContractorNoteHistory
       parameters:
       - name: clientId
@@ -19261,6 +19282,8 @@ components:
             $ref: "#/components/schemas/Activity"
         risks:
           type: array
+          description: "Risks attached to the resource's assignments at this site,\
+            \ deduplicated. Empty when no assignment carries a risk."
           items:
             $ref: "#/components/schemas/Risk"
         status:
@@ -19286,6 +19309,9 @@ components:
             $ref: "#/components/schemas/BlockingContractor"
         contracts:
           type: array
+          description: "Contracts through which the resource is engaged at this site\
+            \ (every engagement in the reported site branch), deduplicated by id.\
+            \ Empty only when the row has no engagement."
           items:
             $ref: "#/components/schemas/Contract"
         temporaryAuthorization:

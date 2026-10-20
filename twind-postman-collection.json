@@ -2634,7 +2634,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). `onlyPresentAtSite` keeps only resources currently present at the site (an open access-register entry with no exit recorded anywhere in the site branch). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). `onlyPresentAtSite` keeps only resources currently present at the site (an open access-register entry with no exit recorded anywhere in the site branch). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost."
       }
     }, {
       "name" : "Get access control status by client",
@@ -2737,7 +2737,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`) and resources currently present at the site (`onlyPresentAtSite`). **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`)."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`) and resources currently present at the site (`onlyPresentAtSite`). **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost."
       }
     } ]
   }, {
@@ -3907,7 +3907,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
+        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     }, {
       "name" : "Set a client-defined property on a contractor",
@@ -3928,7 +3928,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404.",
+        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out.",
         "body" : {
           "mode" : "raw",
           "raw" : "{\"NOTE\":\"Call before 9am\"}",
@@ -3962,7 +3962,7 @@
             "description" : "Property key"
           } ]
         },
-        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
+        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     }, {
       "name" : "List the change history of a contractor's private note",
@@ -3999,7 +3999,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404."
+        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     } ]
   }, {
