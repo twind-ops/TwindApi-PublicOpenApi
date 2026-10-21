@@ -11840,6 +11840,7 @@ components:
           mfa: "#/components/schemas/MfaConfig"
           dynamic_templates: "#/components/schemas/DynamicTemplatesConfig"
           contractor_notes: "#/components/schemas/ContractorNotesConfig"
+          rnt_ita_redaction: "#/components/schemas/RntItaRedactionConfig"
       properties:
         type:
           type: string
@@ -11930,6 +11931,15 @@ components:
       - rejectionCurrencyId
       - rejectionPrice
       - useSamePrice
+    RntItaRedactionConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          hideAmounts:
+            type: boolean
+      required:
+      - hideAmounts
     ScheduledLinksConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11995,6 +12005,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ReviewBillingReportConfig"
+          - $ref: "#/components/schemas/RntItaRedactionConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -14493,6 +14504,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ReviewBillingReportConfig"
+          - $ref: "#/components/schemas/RntItaRedactionConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -15018,6 +15030,7 @@ components:
           - $ref: "#/components/schemas/RequirementsApiConfig"
           - $ref: "#/components/schemas/ResourcesApiConfig"
           - $ref: "#/components/schemas/ReviewBillingReportConfig"
+          - $ref: "#/components/schemas/RntItaRedactionConfig"
           - $ref: "#/components/schemas/ScheduledLinksConfig"
           - $ref: "#/components/schemas/SignableAgreementsConfig"
           - $ref: "#/components/schemas/SiteHierarchyConfig"
@@ -16576,6 +16589,12 @@ components:
         consultedAt:
           type: string
           format: date-time
+        redaction:
+          $ref: "#/components/schemas/EvidenceRedaction"
+          description: "For an RNT or ITA report, how each of its files is shown,\
+            \ one entry per file in the order of files: redacted, being redacted,\
+            \ or as uploaded with a notice. Null when the files are served as today,\
+            \ or this viewer gets the original."
         displayStatus:
           type: string
           description: "Status to display for this evidence: PENDING_REVIEW_CONSULTED\
@@ -16595,6 +16614,39 @@ components:
       - files
       - id
       - status
+    EvidenceRedaction:
+      type: object
+      description: "How the files of an RNT or ITA evidence are shown. Each file is\
+        \ handled on its own: redacted, still being redacted, or shown as uploaded."
+      properties:
+        files:
+          type: array
+          description: "One entry per file of the evidence, in the same order as its\
+            \ files: entry i describes file i."
+          items:
+            $ref: "#/components/schemas/FileRedaction"
+      required:
+      - files
+    FileRedaction:
+      type: object
+      properties:
+        state:
+          type: string
+          description: "REDACTED: the file's URL is the redacted copy. PENDING: the\
+            \ file is being redacted and has no usable URL yet. AS_UPLOADED: the file's\
+            \ URL is the original; reason says why. Client users see a notice unless\
+            \ the reason is NOT_A_REPORT."
+          enum:
+          - PENDING
+          - REDACTED
+          - AS_UPLOADED
+        reason:
+          type: string
+          description: "Why the file is shown as uploaded: a refusal code of the redaction\
+            \ engine, or FAILED when redacting it failed for good. Set only when state\
+            \ is AS_UPLOADED."
+      required:
+      - state
     GetRequirementInstanceDetails:
       type: object
       properties:
@@ -16629,6 +16681,12 @@ components:
           format: date-time
         isGDEnabled:
           type: boolean
+        redactionActive:
+          type: boolean
+          description: "Whether files uploaded to this instance are redacted for its\
+            \ client: the requirement is an RNT or ITA report, the client has RNT/ITA\
+            \ redaction turned on, and client and contractor are different companies.\
+            \ When true, ask the uploader for the original PDF."
         euCategory:
           type: string
           enum:
@@ -16657,6 +16715,7 @@ components:
       - isGDEnabled
       - isSelfContract
       - permissions
+      - redactionActive
       - requirement
     IdNameInfo:
       type: object
@@ -17025,6 +17084,11 @@ components:
           type: string
         event:
           $ref: "#/components/schemas/JsonNode"
+          description: "Event payload. When it lists files, it may also carry a redaction\
+            \ key shaped like EvidenceRedaction: for an RNT or ITA report, how each\
+            \ of those files is shown, one entry per file in the same order. Absent\
+            \ or null when the files are served as today, or this viewer gets the\
+            \ original."
         createdBy:
           $ref: "#/components/schemas/IdAndName"
         createdAt:
@@ -17461,6 +17525,13 @@ components:
           type: string
           description: Reviewer note for the most recent rejection. Only populated
             for evidences in REJECTED status; otherwise null.
+        redaction:
+          $ref: "#/components/schemas/EvidenceRedaction"
+          description: "For an RNT or ITA report, how each of its files is shown,\
+            \ one entry per file in the order of the evidence's files (as listed by\
+            \ the evidence details): redacted, being redacted, or as uploaded with\
+            \ a notice. Null when the files are served as today, or this viewer gets\
+            \ the original."
         displayStatus:
           type: string
           description: "Status to display for this evidence: PENDING_REVIEW_CONSULTED\
@@ -17687,6 +17758,12 @@ components:
           type: array
           items:
             type: string
+        redaction:
+          $ref: "#/components/schemas/EvidenceRedaction"
+          description: "For an RNT or ITA report, how each of its files is shown,\
+            \ one entry per file in the order of files: redacted, being redacted,\
+            \ or as uploaded with a notice. Null when the files are served as today,\
+            \ or this viewer gets the original."
       required:
       - createdAt
       - createdById
