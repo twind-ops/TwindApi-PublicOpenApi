@@ -3907,7 +3907,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
+        "description" : "Returns the properties the client keeps about a contractor they work with, such as its private note (`NOTE`). Only properties enabled for the client and readable by the caller are returned; the list is empty when none is set. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. It also returns 404 when the caller's team does not see the company in the client's companies tabs. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     }, {
       "name" : "Set a client-defined property on a contractor",
@@ -3928,7 +3928,7 @@
             "description" : "Contractor company id"
           } ]
         },
-        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out.",
+        "description" : "Creates or replaces a single property the client keeps about a contractor they work with, such as its private note (`{\"NOTE\":\"Call before 9am\"}`). Exactly one property per call, at most 255 characters. Saving the value already stored changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. It also returns 404 when the caller's team does not see the company in the client's companies tabs. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out.",
         "body" : {
           "mode" : "raw",
           "raw" : "{\"NOTE\":\"Call before 9am\"}",
@@ -3962,7 +3962,7 @@
             "description" : "Property key"
           } ]
         },
-        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
+        "description" : "Removes one property the client keeps about a contractor, such as its private note (`NOTE`). Deleting a property that is not set succeeds and changes nothing. The property must be enabled for the client. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. It also returns 404 when the caller's team does not see the company in the client's companies tabs. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     }, {
       "name" : "List the change history of a contractor's private note",
@@ -3999,7 +3999,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
+        "description" : "Returns every creation, edit and deletion of the private note the client keeps about a contractor, newest first, with who made it, when, and the previous and new text. Returns an empty list when the caller may not read the note. The contractor must be linked to the client through a contract (directly or down a subcontracting chain) or an invitation the client sent; otherwise the request returns 404. It also returns 404 when the caller's team does not see the company in the client's companies tabs. The private note (`NOTE`) can also be kept about any other company in the client's companies tabs, including the clients it works for and the external companies it created. About those companies, setting or deleting any other property returns 404 and listing leaves it out."
       }
     } ]
   }, {

@@ -7254,11 +7254,12 @@ paths:
         \ the client and readable by the caller are returned; the list is empty when\
         \ none is set. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
-        \ kept about any other company in the client's companies tabs, including the\
-        \ clients it works for and the external companies it created. About those\
-        \ companies, setting or deleting any other property returns 404 and listing\
-        \ leaves it out."
+        \ otherwise the request returns 404. It also returns 404 when the caller's\
+        \ team does not see the company in the client's companies tabs. The private\
+        \ note (`NOTE`) can also be kept about any other company in the client's companies\
+        \ tabs, including the clients it works for and the external companies it created.\
+        \ About those companies, setting or deleting any other property returns 404\
+        \ and listing leaves it out."
       operationId: listContractorProperties
       parameters:
       - name: clientId
@@ -7300,11 +7301,12 @@ paths:
         \ the value already stored changes nothing. The property must be enabled for\
         \ the client. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
-        \ kept about any other company in the client's companies tabs, including the\
-        \ clients it works for and the external companies it created. About those\
-        \ companies, setting or deleting any other property returns 404 and listing\
-        \ leaves it out."
+        \ otherwise the request returns 404. It also returns 404 when the caller's\
+        \ team does not see the company in the client's companies tabs. The private\
+        \ note (`NOTE`) can also be kept about any other company in the client's companies\
+        \ tabs, including the clients it works for and the external companies it created.\
+        \ About those companies, setting or deleting any other property returns 404\
+        \ and listing leaves it out."
       operationId: setContractorProperty
       parameters:
       - name: clientId
@@ -7366,10 +7368,12 @@ paths:
         \ and changes nothing. The property must be enabled for the client. The contractor\
         \ must be linked to the client through a contract (directly or down a subcontracting\
         \ chain) or an invitation the client sent; otherwise the request returns 404.\
-        \ The private note (`NOTE`) can also be kept about any other company in the\
-        \ client's companies tabs, including the clients it works for and the external\
-        \ companies it created. About those companies, setting or deleting any other\
-        \ property returns 404 and listing leaves it out."
+        \ It also returns 404 when the caller's team does not see the company in the\
+        \ client's companies tabs. The private note (`NOTE`) can also be kept about\
+        \ any other company in the client's companies tabs, including the clients\
+        \ it works for and the external companies it created. About those companies,\
+        \ setting or deleting any other property returns 404 and listing leaves it\
+        \ out."
       operationId: deleteContractorProperty
       parameters:
       - name: clientId
@@ -7422,11 +7426,12 @@ paths:
         \ and the previous and new text. Returns an empty list when the caller may\
         \ not read the note. The contractor must be linked to the client through a\
         \ contract (directly or down a subcontracting chain) or an invitation the\
-        \ client sent; otherwise the request returns 404. The private note (`NOTE`)\
-        \ can also be kept about any other company in the client's companies tabs,\
-        \ including the clients it works for and the external companies it created.\
-        \ About those companies, setting or deleting any other property returns 404\
-        \ and listing leaves it out."
+        \ client sent; otherwise the request returns 404. It also returns 404 when\
+        \ the caller's team does not see the company in the client's companies tabs.\
+        \ The private note (`NOTE`) can also be kept about any other company in the\
+        \ client's companies tabs, including the clients it works for and the external\
+        \ companies it created. About those companies, setting or deleting any other\
+        \ property returns 404 and listing leaves it out."
       operationId: listContractorNoteHistory
       parameters:
       - name: clientId
@@ -12165,6 +12170,9 @@ components:
       type: string
       enum:
       - CONTRACT_RECEIVED
+      - CONTRACT_CREATED_MANAGER
+      - CONTRACT_UPDATED_MANAGER
+      - CONTRACT_REMOVED_MANAGER
     NotificationPreferenceDto:
       type: object
       properties:
@@ -14858,6 +14866,30 @@ components:
       - products
       - subcontractingChainMode
       - taxId
+    ElementCounts:
+      type: object
+      properties:
+        contractors:
+          type: integer
+          format: int32
+        employees:
+          type: integer
+          format: int32
+        vehicles:
+          type: integer
+          format: int32
+        equipment:
+          type: integer
+          format: int32
+        products:
+          type: integer
+          format: int32
+      required:
+      - contractors
+      - employees
+      - equipment
+      - products
+      - vehicles
     MatchingClientCompanyDto:
       type: object
       properties:
@@ -14880,12 +14912,15 @@ components:
           enum:
           - CLIENT_SITES
           - CLIENT_CONTRACTORS
+          - CLIENT_ELEMENTS
         maxValue:
           type: integer
           format: int32
         currentValue:
           type: integer
           format: int32
+        elementCounts:
+          $ref: "#/components/schemas/ElementCounts"
       required:
       - currentValue
       - maxValue
