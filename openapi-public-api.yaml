@@ -11284,10 +11284,10 @@ components:
         heightMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11320,10 +11320,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11346,10 +11346,10 @@ components:
         sizeMm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11394,10 +11394,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11448,10 +11448,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        ymm:
+        xmm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
       required:
@@ -11716,6 +11716,8 @@ components:
       - type: object
         properties:
           autoApproveEvidence:
+            type: boolean
+          allowSubcontracting:
             type: boolean
       required:
       - autoApproveEvidence
