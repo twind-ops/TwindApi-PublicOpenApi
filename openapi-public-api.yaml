@@ -11284,10 +11284,10 @@ components:
         heightMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11320,10 +11320,10 @@ components:
           format: double
         noPhotoText:
           type: string
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11346,10 +11346,10 @@ components:
         sizeMm:
           type: number
           format: double
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11394,10 +11394,10 @@ components:
           - BOLD
           - ITALIC
           - UNDERLINE
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11448,10 +11448,10 @@ components:
           - UNDERLINE
         centered:
           type: boolean
-        xmm:
+        ymm:
           type: number
           format: double
-        ymm:
+        xmm:
           type: number
           format: double
       required:
@@ -11666,6 +11666,12 @@ components:
     DynamicTemplatesConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          smsEnabled:
+            type: boolean
+      required:
+      - smsEnabled
     EUCategoryConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -12359,6 +12365,11 @@ components:
         trainingCourseId:
           type: string
           format: uuid
+        dynamicTemplateId:
+          type: string
+          format: uuid
+          description: "Dynamic template the requirement uses. Required when evidenceType\
+            \ is DYNAMIC_TEMPLATE, rejected otherwise."
         holdingShareScope:
           type: string
           enum:
@@ -16173,6 +16184,8 @@ components:
           trainingCourseId:
             type: string
             format: uuid
+          dynamicTemplate:
+            $ref: "#/components/schemas/RequirementDynamicTemplate"
           holdingShared:
             type: boolean
           holdingShareScope:
@@ -16329,6 +16342,8 @@ components:
           trainingCourseId:
             type: string
             format: uuid
+          dynamicTemplate:
+            $ref: "#/components/schemas/RequirementDynamicTemplate"
           holdingShared:
             type: boolean
           holdingShareScope:
@@ -16443,6 +16458,17 @@ components:
       - id
       - name
     RequirementDetailResponse: {}
+    RequirementDynamicTemplate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     ResolvedRulesCondition:
       type: object
       properties:
