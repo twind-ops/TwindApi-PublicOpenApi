@@ -2618,6 +2618,11 @@
             "description" : "Filter by the subject's identifier (exact, case-insensitive), matched against whichever column carries it for the resource type: employee NIF, vehicle registration plate, equipment serial number, or product serial number.",
             "disabled" : true
           }, {
+            "key" : "cursor",
+            "value" : "",
+            "description" : "Cursor walk for a full sync. Send `start` to begin, then the previous page's `nextCursor` until it is null. Keep every filter unchanged during the walk; `page` is ignored and `sort` is rejected. A cursor is valid for 24 hours.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2634,7 +2639,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). `onlyPresentAtSite` keeps only resources currently present at the site (an open access-register entry with no exit recorded anywhere in the site branch). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a contractor. Results are filtered based on the user's client company and site visibility. Subcontractor filtering (`companyScope` and `contractorIds`). `onlyPresentAtSite` keeps only resources currently present at the site (an open access-register entry with no exit recorded anywhere in the site branch). Results are always reported at site level: when a client uses site hierarchy, assignments at deeper levels (zone, area) are grouped into their site ancestor and the reported status is the rollup for that branch. `activeEntry` follows the same rule — an entry registered at a deeper level is attributed to the site, so its `siteId` names the reported site rather than identifying where the entry was registered. **Allowed sort fields:** `client_name` (client company name); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `site_name` (site name, default); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost. **Cursor walk (full sync):** pass `cursor=start`, then each response's `nextCursor`, until `nextCursor` is null. Every row that exists and matches the filters for the whole walk is returned exactly once; rows created or revoked during the walk may or may not appear. Time-dependent status (end of access, temporary authorizations, `onlyExpiringInFifteenDays`) is evaluated at the instant the walk started; changes made by access recalculation during the walk are reflected. Rows are ordered by `(resource.id, site.id)`, so `sort` is rejected and `page` is ignored. In cursor mode `page.number`, `page.totalElements` and `page.totalPages` are `-1`; a real count on the first page means the request was not in cursor mode. Keep the filters unchanged during the walk: a continuation with different filters is not rejected and returns rows of the new filter set. Resume within 24 hours, otherwise the request fails with 400 and the walk must start again with `cursor=start`. Outside cursor mode `nextCursor` is always null."
       }
     }, {
       "name" : "Get access control status by client",
@@ -2721,6 +2726,11 @@
             "description" : "Filter by the subject's identifier (exact, case-insensitive), matched against whichever column carries it for the resource type: employee NIF, vehicle registration plate, equipment serial number, or product serial number.",
             "disabled" : true
           }, {
+            "key" : "cursor",
+            "value" : "",
+            "description" : "Cursor walk for a full sync. Send `start` to begin, then the previous page's `nextCursor` until it is null. Keep every filter unchanged during the walk; `page` is ignored and `sort` is rejected. A cursor is valid for 24 hours.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -2737,7 +2747,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`) and resources currently present at the site (`onlyPresentAtSite`). **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost."
+        "description" : "Retrieves paginated access control statuses for resources when the company acts as a client. Results are filtered based on the user's site visibility and can be further filtered by contractor, site, resource type, status, resource ID, resources expiring in 15 days (`onlyExpiringInFifteenDays`) and resources currently present at the site (`onlyPresentAtSite`). **Allowed sort fields:** `site_name` (site name, default); `contractor_name` (contractor company name); `resource_name` (resource name: employee, vehicle, or equipment); `end_of_access` (end of access date). **Sort format:** `?sort=field,direction` (e.g. `?sort=site_name,asc`). Each row also carries `contracts` and `risks` so that clients can show them as optional table columns; both are read from the precomputed access-control row and add no query cost. **Cursor walk (full sync):** pass `cursor=start`, then each response's `nextCursor`, until `nextCursor` is null. Every row that exists and matches the filters for the whole walk is returned exactly once; rows created or revoked during the walk may or may not appear. Time-dependent status (end of access, temporary authorizations, `onlyExpiringInFifteenDays`) is evaluated at the instant the walk started; changes made by access recalculation during the walk are reflected. Rows are ordered by `(resource.id, site.id)`, so `sort` is rejected and `page` is ignored. In cursor mode `page.number`, `page.totalElements` and `page.totalPages` are `-1`; a real count on the first page means the request was not in cursor mode. Keep the filters unchanged during the walk: a continuation with different filters is not rejected and returns rows of the new filter set. Resume within 24 hours, otherwise the request fails with 400 and the walk must start again with `cursor=start`. Outside cursor mode `nextCursor` is always null."
       }
     } ]
   }, {
