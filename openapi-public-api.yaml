@@ -12506,11 +12506,15 @@ components:
           example: 2026-03-25
         filePaths:
           type: array
-          description: Object storage keys for uploaded files (same keys returned
-            from the presigned upload flow).
+          description: "Object storage keys for uploaded files (same keys returned\
+            \ from the presigned upload flow). May be empty or omitted. When sourceEvidenceId\
+            \ is set with a retroactive origin, an entry that is a source file's key,\
+            \ or the key of its redacted copy, keeps that source file (unless sourceFileIndexes\
+            \ is set, which then decides alone); every other entry is a new upload\
+            \ added after the kept source files, except blank entries and keys under\
+            \ redacted/, which are ignored."
           items:
             type: string
-          minItems: 1
         requirementDoesNotApply:
           type: boolean
           description: "When true, marks the requirement as not applicable; comments\
@@ -12541,7 +12545,19 @@ components:
           format: uuid
           description: "Optional. When this upload retroactively re-submits an evidence\
             \ that already exists (origin = REQUIREMENT_RETROACTIVE / REQUIREMENT_RETROACTIVE_FROM_DOCUMENT_HUB),\
-            \ the id of that source evidence, recorded as provenance."
+            \ the id of that source evidence, recorded as provenance. The new evidence\
+            \ gets the kept source files, in the source's order (see sourceFileIndexes\
+            \ and filePaths), followed by the new uploads in filePaths."
+        sourceFileIndexes:
+          type: array
+          description: "Optional, only with sourceEvidenceId and a retroactive origin\
+            \ (400 otherwise). The 0-based indexes, in the source evidence's file\
+            \ order, of the source files to keep; each must be distinct and in range\
+            \ (400 otherwise), and an empty list keeps none. When omitted, the source\
+            \ files kept are those whose keys, or whose copies' keys, are in filePaths."
+          items:
+            type: integer
+            format: int32
         sourceDocumentId:
           type: string
           format: uuid
@@ -17094,6 +17110,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/MatchFile"
+        redaction:
+          $ref: "#/components/schemas/EvidenceRedaction"
+          description: "For an RNT or ITA report, how each of its files is shown,\
+            \ one entry per file in the order of downloadUrls: redacted, being redacted,\
+            \ or as uploaded with a notice. Null when the files are served as today,\
+            \ or this viewer gets the original."
       required:
       - client
       - contracts
