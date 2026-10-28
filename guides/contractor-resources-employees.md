@@ -20,7 +20,7 @@ Some clients mandate an **employee classification** (their own categorization of
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/classification/employee-types" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`) — one entry per active client:
@@ -50,7 +50,7 @@ Required fields: `firstName`, `lastName`, `identityType` (`PASSPORT`, `IDENTITY_
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "firstName": "John",
@@ -87,7 +87,7 @@ List your employees with the public [`GET /v1/companies/{companyId}/employees`](
 
 ```bash
 curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "j.smith@acme-maintenance.example",
@@ -104,7 +104,7 @@ When an employee leaves the company, soft-delete the record using [`DELETE /v1/c
 
 ```bash
 curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees/00000000-0000-0000-0000-000000000030" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: `204 No Content`. (`GET .../employees/total` returns your current headcount as a plain number.)

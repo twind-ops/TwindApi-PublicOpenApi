@@ -21,7 +21,7 @@ Fetch the parent contract detail to confirm the subcontracting rules and pick th
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -54,7 +54,7 @@ Submit one request per subcontractor: the body takes the subcontractor company i
 
 ```bash
 curl -X POST "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/subcontracts/requests" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "contractorIds": ["00000000-0000-0000-0000-000000000003"],
@@ -85,7 +85,7 @@ List the requests your company has submitted. While the client decides, the requ
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/subcontracts/requests/as-contractor?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):

@@ -46,14 +46,20 @@ From this page, you can:
 To authenticate your requests, include the API key in the `X-Api-Key` HTTP header:
 
 ```
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 ### Example: Basic Request with cURL
 
+The cURL examples in these guides read the key from the `TWIND_API_KEY` environment variable, so export it once in your shell:
+
+```bash
+export TWIND_API_KEY="<paste your API key>"
+```
+
 ```bash
 curl -X GET "https://app.twind.io/api/v1/endpoint" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 ## Verifying Your API Key
@@ -64,7 +70,7 @@ To verify that your API key is correctly configured, you can make a request to t
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/users/me" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 A successful response indicates that your API key is valid and properly configured. You can now use this key to access all available endpoints in the Access Control API.

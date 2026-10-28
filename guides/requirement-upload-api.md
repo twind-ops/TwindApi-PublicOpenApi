@@ -28,7 +28,7 @@ Include credentials on every request using **`X-Api-Key`** as described in the
 Example header:
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
@@ -66,7 +66,7 @@ upload routes).
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements/temporary-upload-url?contentType=application/pdf&fileName=requirement-template.pdf" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -149,7 +149,7 @@ shows where **`templateFile`** fits.
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Example requirement",
@@ -196,7 +196,7 @@ create).
 ```bash
 curl -X PUT \
   "https://app.twind.io/api/v1/companies/{companyId}/requirements/{requirementId}" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Example requirement",

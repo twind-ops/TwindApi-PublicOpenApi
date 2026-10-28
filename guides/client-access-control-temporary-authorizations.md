@@ -34,7 +34,7 @@ Include credentials on every request using **`X-Api-Key`** as described in the
 Example header:
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
@@ -74,7 +74,7 @@ Possible **validity status** values (computed from dates):
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Summer Project Access",
@@ -116,7 +116,7 @@ Returns paginated authorizations (one row per resource-site pair).
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations?contractorIds=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&validityStatuses=ACTIVE" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -169,7 +169,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations/ffffffff-ffff-ffff-ffff-ffffffffffff" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -189,7 +189,7 @@ every `resourceId` is applied to every `siteId`.
 ```bash
 curl -X PATCH \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations/ffffffff-ffff-ffff-ffff-ffffffffffff" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Summer Project Access",
@@ -224,7 +224,7 @@ Soft-deletes the authorization group. The authorization moves to
 ```bash
 curl -X DELETE \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations/ffffffff-ffff-ffff-ffff-ffffffffffff" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 **Response** (`204 No Content`) — no body returned.
@@ -242,7 +242,7 @@ autocomplete filters.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations/names?q=Summer" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -259,7 +259,7 @@ TemporaryAuthorizationManager role). Useful for populating an approver selector.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/temporary-authorizations/authorizers?q=Alice" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 

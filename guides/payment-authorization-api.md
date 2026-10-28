@@ -24,7 +24,7 @@ Contact support if an endpoint returns **403 Forbidden** unexpectedly.
 ## Authentication
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 See [API Authentication Guide](get-api-token.md) for full setup.
@@ -100,7 +100,7 @@ their **aggregated** payment authorization status. Paginated.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/by-company?paymentStatus=NOT_AUTHORIZED&page=0&size=20" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -146,7 +146,7 @@ product).
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/contractors/11111111-0000-0000-0000-000000000001" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -225,7 +225,7 @@ Returns one row per contract. Accepts the same filters as `by-company` (except
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/by-contract?paymentStatus=NOT_AUTHORIZED&showExpired=false&page=0&size=20" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -279,7 +279,7 @@ with its own `contractor` and `paymentStatus`.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/by-contract/aaaaaaaa-0000-0000-0000-000000000001" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -410,7 +410,7 @@ against the **Requirements API**:
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/11111111-0000-0000-0000-000000000001/requirement-instances/dddddddd-0000-0000-0000-000000000001" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -438,7 +438,7 @@ Returns the client's current [calculation mode](#calculation-modes). Defaults to
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/config" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -461,7 +461,7 @@ permission.
 ```bash
 curl -X PUT \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/config" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "calculationMode": "SUBCONTRACTING_CHAIN" }'
 ```
@@ -479,7 +479,7 @@ Returns product activation, deactivation and calculation-mode changes, most rece
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{clientId}/payment-authorization/history?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 

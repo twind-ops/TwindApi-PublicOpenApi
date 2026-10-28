@@ -26,7 +26,7 @@ Include credentials on every request using **`X-Api-Key`** as described in the
 Example header:
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
@@ -62,7 +62,7 @@ array.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/visitor/temporary-upload-url?contentType=application/pdf&fileName=visitor-id.pdf" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -142,7 +142,7 @@ Repeat for each documentation file you need. Collect each object **`key`** (from
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/visitor" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "visitorName": "Jane",

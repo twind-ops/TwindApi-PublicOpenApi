@@ -15,7 +15,7 @@ Some requirements ask your company to accept a set of terms or policies rather t
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/agreement" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "requirementInstanceId": "00000000-0000-0000-0000-000000000072"

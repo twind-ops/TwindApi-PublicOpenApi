@@ -20,7 +20,7 @@ The body defines what you demand (`name`, `subject`, `evidenceType`), from whom 
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Work-at-height training certificate",
@@ -69,7 +69,7 @@ List your requirements (filters include `name`, `subject`, `evidenceType`, `disa
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -92,7 +92,7 @@ The update is a **full replace** of the configuration (same body shape as the cr
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/disable" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: `204 No Content` (both `disable` and `enable`).

@@ -19,7 +19,7 @@ Creating equipment requires a **standard equipment type** from the platform cata
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/standard-equipment-types?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -46,7 +46,7 @@ Required fields: `name`, `serialNumber`, `equipmentType` (a standard type id fro
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Excavator B",
@@ -76,7 +76,7 @@ List your equipment with the public [`GET /v1/companies/{companyId}/equipment`](
 
 ```bash
 curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "320 GC"
@@ -91,7 +91,7 @@ When a piece of equipment is retired, soft-delete the record using [`DELETE /v1/
 
 ```bash
 curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/equipment/00000000-0000-0000-0000-000000000050" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: `204 No Content`.

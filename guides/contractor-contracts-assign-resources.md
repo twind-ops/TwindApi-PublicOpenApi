@@ -21,7 +21,7 @@ Get the contract detail to see its sites. Each `siteId` is a possible assignment
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -55,7 +55,7 @@ List your resources to obtain their ids. Only resources with `isAssignable: true
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/employees?q=John&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -85,7 +85,7 @@ For **employees** you also choose the risks of the assignment. **Risks** are haz
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/risks?page=0&size=1000" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -116,7 +116,7 @@ This endpoint replaces the **complete assignment** for the (contract, site) pair
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '[
     {
@@ -140,7 +140,7 @@ To adjust the risks of one resource that is already assigned — without resendi
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/resources/00000000-0000-0000-0000-000000000030/risks" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "riskIds": ["00000000-0000-0000-0000-000000000080", "00000000-0000-0000-0000-000000000081"] }'
 ```

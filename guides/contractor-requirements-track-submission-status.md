@@ -20,7 +20,7 @@ Fetch the submission detail to see its current `status`. When the submission is 
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -59,7 +59,7 @@ If your client has document management enabled, you can flag a `PENDING_REVIEW` 
 
 ```bash
 curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "expressValidation": true }'
 ```

@@ -19,7 +19,7 @@ Returns the client companies your contractor company works with. Use it to obtai
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/clients?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -47,7 +47,7 @@ Returns the contracts where your company acts as contractor, with the client, da
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/contracts/with-clients?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -86,7 +86,7 @@ The contract detail returns the full scope: each site with its activities, the s
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/contracts/00000000-0000-0000-0000-000000000010" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -126,7 +126,7 @@ Supports filtering by `q`, `resourceTypes`, and `companyScope` (`MY_COMPANY`, `M
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000002/assigned-resources-detailed/as-contractor?resourceTypes=EMPLOYEE&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):

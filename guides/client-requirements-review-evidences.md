@@ -20,7 +20,7 @@ List your requirement instances and pick those whose `evidences` array carries a
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?requirementIds=00000000-0000-0000-0000-000000000060&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -65,7 +65,7 @@ Fetch the evidence details: the uploaded `files` (URLs), the contractor's declar
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -91,7 +91,7 @@ Both decisions require the **`issueDate`** — the date the document was actuall
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/approve" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "issueDate": "2026-06-01",
@@ -105,7 +105,7 @@ Response: `200 OK` (no body).
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/evidences/00000000-0000-0000-0000-000000000071/reject" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "issueDate": "2026-06-01",

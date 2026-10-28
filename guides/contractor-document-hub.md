@@ -18,7 +18,7 @@ Before uploading a document you need the ids of the subject (the resource the do
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?size=50" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -46,7 +46,7 @@ Response (`200 OK`):
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/document-types?size=50" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -66,7 +66,7 @@ Response (`200 OK`):
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/document-names?size=50" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -91,7 +91,7 @@ The API never receives the file binary directly. You request a presigned URL, up
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/temporary-upload-url?contentType=application%2Fpdf&fileName=insurance-certificate.pdf" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -151,7 +151,7 @@ Once every file is in storage, register the document in one call. The body accep
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "documents": [
@@ -188,7 +188,7 @@ Supports pagination via `page` (zero-based) and `size` query parameters.
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -217,12 +217,12 @@ To filter the document list by subject type, apply `subjectTypes` to the subject
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/subjects?subjectTypes=EMPLOYEE&size=50" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/document-types?documentTargetTypes=EMPLOYEE&size=50" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Supported `subjectTypes` values (subjects endpoint): `CONTRACTOR`, `EMPLOYEE`, `EQUIPMENT`.
@@ -235,7 +235,7 @@ Supported `documentTargetTypes` values (document types endpoint): `CONTRACTOR`, 
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -265,7 +265,7 @@ The body uses the same shape as a single document in Step 2c (no array wrapper).
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Insurance Certificate (renewed)",
@@ -288,7 +288,7 @@ Returns `204 No Content`.
 
 ```bash
 curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 ## Draft lifecycle (optional)
@@ -303,7 +303,7 @@ The request body is identical to Step 2c. Returns `201 Created` with the same `{
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/draft" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "documents": [
@@ -330,7 +330,7 @@ Send the same body shape as an edit (no array wrapper). Returns `204 No Content`
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/documents/00000000-0000-0000-0000-000000000030/finalize" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Insurance Certificate",
