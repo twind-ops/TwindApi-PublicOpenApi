@@ -25,7 +25,7 @@ Include credentials on every request using **`X-Api-Key`** as described in the
 Example header:
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
@@ -60,7 +60,7 @@ for the full walkthrough.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/assigned-resources?resourceTypes=EMPLOYEE&page=0&size=100" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -115,7 +115,7 @@ with contractor, site, and requirement details.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -124,7 +124,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?contractorId=aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee&status=NOT_ALLOWED" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -133,7 +133,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?onlyExpiringInFifteenDays=true&sort=end_of_access,asc" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -234,7 +234,7 @@ with `resourceTypes` when the same identifier could exist across resource types.
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?identity=09547483E&siteIds={siteId}" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -257,7 +257,7 @@ The `{id}` path parameter is a **composite identifier** in the format
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee-cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -313,7 +313,7 @@ Request the next page by incrementing `page`:
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?page=1&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 ## Validation and errors (overview)

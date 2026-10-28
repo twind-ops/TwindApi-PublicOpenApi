@@ -33,7 +33,7 @@ The URL is company-scoped, but the submission is always tied to a specific requi
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "requirementInstanceId": "00000000-0000-0000-0000-000000000050",
@@ -76,7 +76,7 @@ Use the same `{instanceId}` from your Prerequisites (the same id you passed as `
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000050/matches" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -154,7 +154,7 @@ Apply the submission from Step 1 to the instances you selected from the matches 
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000071/matching-requirement-instances" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "requirementInstanceIds": [

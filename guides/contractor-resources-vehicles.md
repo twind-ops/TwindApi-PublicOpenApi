@@ -19,7 +19,7 @@ Creating a vehicle requires a **standard vehicle type** from the platform catalo
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/standard-vehicle-types?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -46,7 +46,7 @@ Required fields: `name`, `registrationPlate`, `vehicleType` (a standard type id 
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Truck A",
@@ -77,7 +77,7 @@ List your vehicles with the public [`GET /v1/companies/{companyId}/vehicles`](#t
 
 ```bash
 curl -X PATCH "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "registrationPlate": "5678-DEF"
@@ -92,7 +92,7 @@ When a vehicle leaves the fleet, soft-delete the record using [`DELETE /v1/compa
 
 ```bash
 curl -X DELETE "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/vehicles/00000000-0000-0000-0000-000000000040" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: `204 No Content`.

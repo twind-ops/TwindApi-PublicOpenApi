@@ -20,7 +20,7 @@ List the subcontract requests waiting for your decision. Narrow the list with th
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -57,7 +57,7 @@ Approving creates a child contract for the subcontractor under the parent contra
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/approve" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`) — the id(s) of the child contract(s) created:
@@ -74,7 +74,7 @@ Response (`200 OK`) — the id(s) of the child contract(s) created:
 
 ```bash
 curl -X PUT "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/subcontracts/requests/00000000-0000-0000-0000-000000000100/reject" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: `204 No Content` — the pending request is removed.
@@ -91,7 +91,7 @@ At any time you can list the subcontracts hanging from one site of a contract, w
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020/subcontracts" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):

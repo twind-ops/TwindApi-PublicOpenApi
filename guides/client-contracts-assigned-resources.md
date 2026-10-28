@@ -23,7 +23,7 @@ Both support filtering by `q` (name search), `resourceTypes` (`EMPLOYEE`, `VEHIC
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/assigned-resources-detailed/as-client?resourceTypes=EMPLOYEE&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -65,7 +65,7 @@ The contract detail shows each site with its activities and a `resourceCount`; t
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/resources" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -102,7 +102,7 @@ To focus on a single site — its activities, scope and the resources deployed t
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010/sites/00000000-0000-0000-0000-000000000020" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):

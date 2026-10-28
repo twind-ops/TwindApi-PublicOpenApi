@@ -19,7 +19,7 @@ Filter by `status` (`PENDING_UPLOAD`, `REJECTED`, `EXPIRED`, `UNDER_GRACE_PERIOD
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/as-contractor?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -55,7 +55,7 @@ The detail returns the requirement's full configuration — the `acceptanceCrite
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -101,7 +101,7 @@ The audit log lists every event on the instance — submissions, approvals, reje
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response: paginated event list (`eventName`, `createdBy`, `createdByCompany`, `createdAt`).

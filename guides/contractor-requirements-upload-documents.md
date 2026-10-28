@@ -19,7 +19,7 @@ Request a presigned POST URL for your file. `contentType` and `fileName` are req
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000002/evidences/00000000-0000-0000-0000-000000000070/temporary-upload-url?contentType=application%2Fpdf&fileName=insurance-policy.pdf" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
@@ -87,7 +87,7 @@ Once every file is in storage, register the submission against the requirement i
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/cm/companies/00000000-0000-0000-0000-000000000002/evidences/upload" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "requirementInstanceId": "00000000-0000-0000-0000-000000000070",

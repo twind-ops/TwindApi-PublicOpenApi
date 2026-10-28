@@ -34,7 +34,7 @@ Include credentials on every request using **`X-Api-Key`** as described in the
 Example header:
 
 ```text
-X-Api-Key: your-api-key-here
+X-Api-Key: YOUR_API_KEY
 ```
 
 > **Security tip:** Do not log full tokens or keys. Store secrets outside your
@@ -61,7 +61,7 @@ X-Api-Key: your-api-key-here
 ```bash
 curl -X POST \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "companyId": "{companyId}",
@@ -97,7 +97,7 @@ Returns paginated access register records. Default sort is `entry_at` descending
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register?from=2026-06-22T00:00:00%2B00:00&to=2026-06-22T23:59:59%2B00:00" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -106,7 +106,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register?entryOnly=true" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -115,7 +115,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register?q=John&resourceType=EMPLOYEE" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -176,7 +176,7 @@ curl -X GET \
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register/ffffffff-ffff-ffff-ffff-ffffffffffff" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Accept: application/json"
 ```
 
@@ -194,7 +194,7 @@ Sets the exit time and optional notes on an open access register record.
 ```bash
 curl -X PATCH \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register/ffffffff-ffff-ffff-ffff-ffffffffffff" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "id": "ffffffff-ffff-ffff-ffff-ffffffffffff",
@@ -231,7 +231,7 @@ Request the next page by incrementing `page`:
 ```bash
 curl -X GET \
   "https://app.twind.io/api/v1/companies/{companyId}/access-register?page=1&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 ## Validation and errors (overview)

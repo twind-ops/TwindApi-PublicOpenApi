@@ -21,7 +21,7 @@ If the contractor already works with you, skip this step and find its id with [`
 
 ```bash
 curl -X POST "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/contractors" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Acme Maintenance S.L.",
@@ -54,7 +54,7 @@ Create the contract between your client company (path `companyId`) and the contr
 
 ```bash
 curl -X POST "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts" \
-  -H "X-Api-Key: your-api-key-here" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "name": "Plant maintenance 2026",
@@ -104,7 +104,7 @@ Fetch the contract detail to confirm its sites, activities and subcontracting se
 
 ```bash
 curl -X GET "https://app.twind.io/api/v2/companies/00000000-0000-0000-0000-000000000001/contracts/00000000-0000-0000-0000-000000000010" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):

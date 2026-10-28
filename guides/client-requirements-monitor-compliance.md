@@ -19,7 +19,7 @@ Filter the instance list by `status` (one of `APPROVED`, `REJECTED`, `PENDING_RE
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/as-client?excludeStatus=APPROVED&sort=evidence_expiration,asc&page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -55,7 +55,7 @@ The instance detail returns the full requirement configuration (acceptance crite
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirement-instances/00000000-0000-0000-0000-000000000070/logs?page=0&size=10" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`, trimmed):
@@ -92,7 +92,7 @@ For a per-requirement view — e.g. before tightening a critical requirement —
 
 ```bash
 curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/requirements/00000000-0000-0000-0000-000000000060/stats" \
-  -H "X-Api-Key: your-api-key-here"
+  -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
 Response (`200 OK`):
