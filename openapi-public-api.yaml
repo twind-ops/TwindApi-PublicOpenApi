@@ -11706,6 +11706,9 @@ components:
     CustomCompanyTypesConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+    DocuflowConfig:
+      allOf:
+      - $ref: "#/components/schemas/ProductTypeConfig"
     DocumentaConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
@@ -11903,6 +11906,7 @@ components:
           visitor_scheduling: "#/components/schemas/VisitorSchedulingConfig"
           compliance_statistics: "#/components/schemas/ComplianceStatisticsConfig"
           documenta: "#/components/schemas/DocumentaConfig"
+          docuflow: "#/components/schemas/DocuflowConfig"
           custom_company_types: "#/components/schemas/CustomCompanyTypesConfig"
           mandatory_employee_picture: "#/components/schemas/MandatoryEmployeePictureConfig"
           id_card: "#/components/schemas/IdCardConfig"
@@ -12051,6 +12055,7 @@ components:
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
+          - $ref: "#/components/schemas/DocuflowConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/DynamicTemplatesConfig"
@@ -12250,6 +12255,9 @@ components:
       type: string
       enum:
       - CONTRACT_RECEIVED
+      - CONTRACT_REMOVED
+      - CONTRACT_ACCEPTED
+      - CONTRACT_REJECTED
       - CONTRACT_CREATED_MANAGER
       - CONTRACT_UPDATED_MANAGER
       - CONTRACT_REMOVED_MANAGER
@@ -12260,6 +12268,8 @@ components:
       - ASSIGNMENT_PENDING_VALIDATION
       - ASSIGNMENT_PENDING_REMINDER
       - INCIDENT_CORRECTED
+      - EVIDENCE_REJECTED
+      - CONTRACTOR_WEEKLY_RECAP
     NotificationPreferenceDto:
       type: object
       properties:
@@ -14578,6 +14588,7 @@ components:
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
+          - $ref: "#/components/schemas/DocuflowConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/DynamicTemplatesConfig"
@@ -15104,6 +15115,7 @@ components:
           - $ref: "#/components/schemas/ContractorPlanConfig"
           - $ref: "#/components/schemas/CustomAccessCardsConfig"
           - $ref: "#/components/schemas/CustomCompanyTypesConfig"
+          - $ref: "#/components/schemas/DocuflowConfig"
           - $ref: "#/components/schemas/DocumentaConfig"
           - $ref: "#/components/schemas/DocumentalManagementConfig"
           - $ref: "#/components/schemas/DynamicTemplatesConfig"
