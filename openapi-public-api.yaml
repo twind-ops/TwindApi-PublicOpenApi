@@ -10578,6 +10578,8 @@ components:
           type: string
         photo:
           type: string
+          description: Storage key of the site photo. Omit or send null to keep the
+            current photo; send an empty string to remove it.
         address:
           $ref: "#/components/schemas/SiteAddressDto"
         parentId:
@@ -16777,6 +16779,16 @@ components:
           description: "Why the file is shown as uploaded: a refusal code of the redaction\
             \ engine, TOO_LARGE when the file is over 20 MB, or FAILED when redacting\
             \ it failed for good. Set only when state is AS_UPLOADED."
+        clientCopyName:
+          type: string
+          description: "The name the client's copy is stored and downloads under.\
+            \ Set only when state is REDACTED, and not for files redacted before copies\
+            \ were named."
+        contractorCopyName:
+          type: string
+          description: "The name the contractor's copy is stored and downloads under.\
+            \ Set only when state is REDACTED, and not for files redacted before copies\
+            \ were named."
       required:
       - state
     GetRequirementInstanceDetails:
