@@ -8356,7 +8356,7 @@ paths:
       - name: showExpired
         in: query
         description: "When true, ACTIVE also returns expired contracts, still with\
-          \ status ACTIVE. It never narrows EXPIRED, ARCHIVED or DRAFT."
+          \ status ACTIVE. It never narrows EXPIRED, INACTIVE or DRAFT."
         required: false
         schema:
           type: boolean
@@ -8425,14 +8425,14 @@ paths:
         in: query
         description: "Restrict the listing to these sources, combined with OR: DRAFT\
           \ for pending contract drafts, ACTIVE for live contracts, EXPIRED for live\
-          \ contracts past their end date, ARCHIVED for contracts the client archived.\
-          \ Omit for ACTIVE only; drafts and archived contracts are returned only\
-          \ when requested explicitly, and a row reads status EXPIRED only when EXPIRED\
-          \ is requested. A draft carries no engagement, so requesting DRAFT together\
-          \ with siteIds, activityIds, contractId or any resource-assignment filter\
-          \ returns no drafts. An archived contract is returned whether or not it\
-          \ expired, so showExpired does not hide it. A deleted contract is never\
-          \ returned."
+          \ contracts past their end date, INACTIVE for contracts the client deactivated\
+          \ (ARCHIVED is a deprecated alias). Omit for ACTIVE only; drafts and inactive\
+          \ contracts are returned only when requested explicitly, and a row reads\
+          \ status EXPIRED only when EXPIRED is requested. A draft carries no engagement,\
+          \ so requesting DRAFT together with siteIds, activityIds, contractId or\
+          \ any resource-assignment filter returns no drafts. An inactive contract\
+          \ is returned whether or not it expired, so showExpired does not hide it.\
+          \ A deleted contract is never returned."
         required: false
         schema:
           type: array
@@ -8442,6 +8442,7 @@ paths:
             - DRAFT
             - ACTIVE
             - ARCHIVED
+            - INACTIVE
             - EXPIRED
       - name: page
         in: query
@@ -13910,7 +13911,11 @@ components:
           $ref: "#/components/schemas/ContractTreeResourceCountsV2"
         archived:
           type: boolean
-          description: "True when the contract has been archived. Unlike active/scheduled/expired,\
+          deprecated: true
+          description: Deprecated alias of inactive.
+        inactive:
+          type: boolean
+          description: "True when the client deactivated the contract. Unlike active/scheduled/expired,\
             \ this is not derivable from dateFrom/dateTo, so it is returned rather\
             \ than computed by the caller."
       required:
@@ -13923,6 +13928,7 @@ components:
       - dateFrom
       - dateTo
       - id
+      - inactive
       - isExpired
       - level
       - name
@@ -14396,15 +14402,18 @@ components:
           description: "DRAFT for a `contract_draft` row the client saved before the\
             \ engagement was known, with no contract row yet; PENDING for a subcontract\
             \ invitation still awaiting client approval; ACTIVE for a real, coordinated\
-            \ contract; ARCHIVED for a contract the client archived, only ever returned\
-            \ on a client-side listing fetched with statuses=ARCHIVED; EXPIRED for\
-            \ a contract past its end date, only ever returned on a client-side listing\
-            \ fetched with statuses=EXPIRED. See the id doc on the V1 shape."
+            \ contract; INACTIVE (or ARCHIVED, its deprecated alias, when the listing\
+            \ was filtered by ARCHIVED) for a contract the client deactivated; only\
+            \ ever returned on a client-side listing fetched with statuses=INACTIVE\
+            \ or ARCHIVED; EXPIRED for a contract past its end date, only ever returned\
+            \ on a client-side listing fetched with statuses=EXPIRED. See the id doc\
+            \ on the V1 shape."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
           - ARCHIVED
+          - INACTIVE
           - EXPIRED
         contractorId:
           type: string
@@ -17251,7 +17260,16 @@ components:
           format: date-time
         createdByCompany:
           $ref: "#/components/schemas/IdAndName"
+        evidenceId:
+          type: string
+          format: uuid
+          description: The evidence the entry is about; null for an entry of none.
+        canDownloadOriginals:
+          type: boolean
+          description: Whether this viewer may download the originals of the entry's
+            files whose redaction state is REDACTED; false when none is.
       required:
+      - canDownloadOriginals
       - createdAt
       - event
       - eventName
@@ -18419,7 +18437,11 @@ components:
             $ref: "#/components/schemas/IdAndNameV2"
         archived:
           type: boolean
-          description: "True when the contract has been archived. Unlike active/scheduled/expired,\
+          deprecated: true
+          description: Deprecated alias of inactive.
+        inactive:
+          type: boolean
+          description: "True when the client deactivated the contract. Unlike active/scheduled/expired,\
             \ this is not derivable from dateFrom/dateTo, so it is returned rather\
             \ than computed by the caller."
         pendingApproval:
@@ -18442,17 +18464,19 @@ components:
             \ flag is on, has no engagement, so sites, engagements, resources, requirements\
             \ and the validation fields are all empty or null on it, and has an `id`\
             \ that is a `contract_draft` id, not a contract id. A PENDING entry has\
-            \ an `id` that is a `subcontract_request` id, not a contract id. ARCHIVED\
-            \ for a contract the client archived; only ever returned on a client-side\
-            \ listing fetched with statuses=ARCHIVED, and `archived` is true on it.\
-            \ EXPIRED for a contract past its end date; only ever returned on a client-side\
-            \ listing fetched with statuses=EXPIRED (through showExpired alone it\
-            \ reads ACTIVE)."
+            \ an `id` that is a `subcontract_request` id, not a contract id. INACTIVE\
+            \ (or ARCHIVED, its deprecated alias, when the listing was filtered by\
+            \ ARCHIVED) for a contract the client deactivated; only ever returned\
+            \ on a client-side listing fetched with statuses=INACTIVE or ARCHIVED,\
+            \ and `inactive` is true on it. EXPIRED for a contract past its end date;\
+            \ only ever returned on a client-side listing fetched with statuses=EXPIRED\
+            \ (through showExpired alone it reads ACTIVE)."
           enum:
           - DRAFT
           - ACTIVE
           - PENDING
           - ARCHIVED
+          - INACTIVE
           - EXPIRED
         contractorId:
           type: string
@@ -18476,6 +18500,7 @@ components:
       - hasSubcontracts
       - hasUnresolvedMandatoryRiskConflicts
       - id
+      - inactive
       - level
       - mainContractor
       - name
