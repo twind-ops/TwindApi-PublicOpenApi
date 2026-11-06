@@ -55,7 +55,7 @@ Response (`200 OK`, trimmed):
 }
 ```
 
-Keep the **resource id** (`content[].id`). No row means the employee is not assigned to any of your contracts.
+Keep the **resource id** (`content[].id`) of the row whose `identity` equals the national ID. If no row on this page matches, request the remaining pages (`page.totalPages`) before concluding that the employee is not assigned to any of your contracts.
 
 ## Step 2: Find the requirement instance for that employee
 
@@ -109,7 +109,7 @@ Keep two values for the next steps:
 - **Requirement instance id** — `content[].id`.
 - **Contractor id** — `content[].contractor.id`. You upload *on behalf of* this company, so it goes into `asSubcontractorId` in Steps 3 and 5.
 
-Check that `permissions` contains `REVIEW`; without it the approval in Step 6 is refused. If the employee works for more than one of your contractors you get one instance per contractor — pick the one whose `contractor.id` is the company you are loading the document for.
+Check that `permissions` contains `REVIEW`; without it the approval in Step 6 is refused. Pick an instance whose `contractor.id` is the company you are loading the document for. Requirements scoped `SITE_SPECIFIC`, `CONTRACT_SPECIFIC` or `PROJECT_SPECIFIC` can return several instances for the same employee and contractor: use each row's `contracts` and `applicableEngagements` to choose the one for the intended site, contract or project (or narrow the query with `contractIds` / `siteIds`).
 
 ## Step 3: Get a presigned upload URL
 
@@ -228,11 +228,11 @@ curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
   }'
 ```
 
-Response: `204 No Content`. No `asSubcontractorId` here — approving is a client action on your own requirement.
+Response: `200 OK` (no body). No `asSubcontractorId` here — approving is a client action on your own requirement.
 
 To confirm, repeat the Step 2 instance query: the evidence with the id from Step 5 now has `status: "APPROVED"`.
 
-> **Note:** If the requirement is reviewed by CTAIMA, the evidence may have been queued for CTAIMA review when you registered it in Step 5. Your approval in Step 6 still applies and closes that review.
+> **Note:** Having evidence review delegated to CTAIMA (document management) does not prevent you from approving: what gates Step 6 is `REVIEW` in the instance's `permissions` (Step 2).
 
 ## Common errors
 
