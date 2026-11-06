@@ -239,7 +239,8 @@ curl -X GET \
 ```
 
 The response uses the same paginated
-[`PageResponseGetAccessControlResponse`](#tag/access-status/GET/v1/companies/{companyId}/access-control/as-client)
+<!-- markdownlint-disable-next-line MD051 -->
+[`CursorPageResponseGetAccessControlResponse`](#tag/access-status/GET/v1/companies/{companyId}/access-control/as-client)
 shape as the list endpoint above. An identifier with no matching resource returns
 `200 OK` with an empty `content` array — not a `404`.
 
@@ -297,7 +298,18 @@ curl -X GET \
 
 ## Pagination
 
-All list endpoints return a `page` object alongside the `content` array:
+The list endpoint supports two pagination modes:
+
+- **Page mode** (default) — `page` / `size` / `sort`. Use it for UIs and
+  ad-hoc queries.
+- **Cursor mode** — `cursor` / `size`. Use it for a **full sync** (export every
+  row into your own system). Page offsets shift when rows are created or
+  revoked between requests, so walking pages can skip or duplicate rows; the
+  cursor walk does not.
+
+### Page mode
+
+Every response returns a `page` object alongside the `content` array:
 
 | Field | Description |
 | --- | --- |
@@ -308,7 +320,7 @@ All list endpoints return a `page` object alongside the `content` array:
 
 Request the next page by incrementing `page`:
 
-### Example: cURL — request page 2
+#### Example: cURL — request page 2
 
 ```bash
 curl -X GET \
@@ -316,8 +328,95 @@ curl -X GET \
   -H "X-Api-Key: $TWIND_API_KEY"
 ```
 
+### Cursor mode (full sync)
+
+1. Send the first request with `cursor=start` plus your filters and `size`.
+2. Read `nextCursor` from the response.
+3. Repeat the **same request** replacing `cursor` with that `nextCursor`.
+4. Stop when `nextCursor` is `null`.
+
+#### Example: cURL — start a cursor walk
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?cursor=start&size=100&status=NOT_ALLOWED" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
+  -H "Accept: application/json"
+```
+
+**Response** (`200 OK`, trimmed)
+
+```json
+{
+  "content": [
+    {
+      "resource": {
+        "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "type": "EMPLOYEE"
+      },
+      "site": {
+        "id": "cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "name": "Main Warehouse"
+      },
+      "status": "NOT_ALLOWED"
+    }
+  ],
+  "page": {
+    "size": 100,
+    "number": -1,
+    "totalElements": -1,
+    "totalPages": -1
+  },
+  "nextCursor": "<opaque-cursor>"
+}
+```
+
+#### Example: cURL — continue the walk
+
+Pass `nextCursor` URL-encoded and keep every other parameter unchanged:
+
+```bash
+curl -G \
+  "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client" \
+  --data-urlencode "cursor=$NEXT_CURSOR" \
+  --data-urlencode "size=100" \
+  --data-urlencode "status=NOT_ALLOWED" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
+  -H "Accept: application/json"
+```
+
+#### Cursor mode rules
+
+- **Treat the cursor as opaque.** Do not parse or build it; only send `start`
+  or a `nextCursor` you received.
+- **Fixed order.** Rows come ordered by `(resource.id, site.id)`. `sort` is
+  rejected with `400`, and `page` is ignored.
+- **No totals.** `page.number`, `page.totalElements` and `page.totalPages` are
+  `-1`. If the first response carries real counts, the request was not in cursor
+  mode (check that `cursor` was sent). Outside cursor mode `nextCursor` is
+  always `null`.
+- **Keep filters unchanged.** A continuation with different filters is **not**
+  rejected: it silently returns rows of the new filter set, so your sync would
+  mix two result sets. To change filters, start a new walk with `cursor=start`.
+- **Consistency.** Every row that exists and matches the filters for the whole
+  walk is returned exactly once. Rows created or revoked during the walk may or
+  may not appear. Time-dependent status (end of access, temporary
+  authorizations, `onlyExpiringInFifteenDays`) is evaluated at the instant the
+  walk started; changes made by access recalculation during the walk are
+  reflected.
+- **24-hour lifetime.** A cursor older than 24 hours fails with `400`; restart
+  the walk with `cursor=start`.
+
+The same cursor mode is available on the contractor-side endpoint
+<!-- markdownlint-disable-next-line MD051 -->
+[`GET /v1/companies/{companyId}/access-control/as-contractor`](#tag/access-status/GET/v1/companies/{companyId}/access-control/as-contractor).
+
 ## Validation and errors (overview)
 
+- **400** — A deprecated singular filter was combined with its plural
+  counterpart (e.g. `siteId` and `siteIds`); or, in cursor mode, the cursor is
+  empty, malformed, older than 24 hours, started under a different site
+  hierarchy grouping, or combined with `sort`.
 - **401** — Missing or invalid API key.
 - **403** — Your integration does not have client access to this company.
 - **404** — Resource not found; the composite `{resourceId}-{siteId}` identifier does not match any access control record (single-resource endpoint only).
