@@ -228,7 +228,7 @@ curl -X PUT "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-00000
   }'
 ```
 
-Response: `200 OK` (no body). No `asSubcontractorId` here — approving is a client action on your own requirement.
+Response: `204 No Content`. No `asSubcontractorId` here — approving is a client action on your own requirement.
 
 To confirm, repeat the Step 2 instance query: the evidence with the id from Step 5 now has `status: "APPROVED"`.
 
