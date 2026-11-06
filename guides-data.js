@@ -56,6 +56,13 @@ const GUIDES_DATA = [
             icon: "assets/icon-requirements.svg",
           },
           {
+            id: "client-requirements-upload-and-approve-for-employee",
+            file: "client-requirements-upload-and-approve-for-employee.md",
+            title: "Upload and Approve an Evidence for a Contractor's Employee",
+            description: "Find a contractor's employee by national ID, upload a document to one of their requirements on the contractor's behalf, and approve it.",
+            icon: "assets/icon-requirements.svg",
+          },
+          {
             id: "client-requirements-monitor-compliance",
             file: "client-requirements-monitor-compliance.md",
             title: "Monitor Contractor Compliance",
