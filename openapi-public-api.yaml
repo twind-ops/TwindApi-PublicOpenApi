@@ -4937,20 +4937,26 @@ paths:
         \ so that clients can show them as optional table columns; both are read from\
         \ the precomputed access-control row and add no query cost. With `includeFutureContracts=true`\
         \ the list also contains resources whose contracts have not started yet, as\
-        \ `NOT_ALLOWED` rows marked by `accessStartsOn`. **Cursor walk (full sync):**\
-        \ pass `cursor=start`, then each response's `nextCursor`, until `nextCursor`\
-        \ is null. Every row that exists and matches the filters for the whole walk\
-        \ is returned exactly once; rows created or revoked during the walk may or\
-        \ may not appear. Time-dependent status (end of access, temporary authorizations,\
-        \ `onlyExpiringInFifteenDays`) is evaluated at the instant the walk started;\
-        \ changes made by access recalculation during the walk are reflected. Rows\
-        \ are ordered by `(resource.id, site.id)`, so `sort` is rejected and `page`\
-        \ is ignored. In cursor mode `page.number`, `page.totalElements` and `page.totalPages`\
-        \ are `-1`; a real count on the first page means the request was not in cursor\
-        \ mode. Keep the filters unchanged during the walk: a continuation with different\
-        \ filters is not rejected and returns rows of the new filter set. Resume within\
-        \ 24 hours, otherwise the request fails with 400 and the walk must start again\
-        \ with `cursor=start`. Outside cursor mode `nextCursor` is always null."
+        \ `NOT_ALLOWED` rows marked by `accessStartsOn`. With `includeRevoked=true`\
+        \ it also contains resources that lost access to a site (unassigned, contract\
+        \ expired, deactivated or deleted, resource deleted), for at least 7 days\
+        \ after it happened, as `NOT_ALLOWED` rows marked by `revokedAt` whose `endOfAccess`\
+        \ is the last day they had access; an integration that revokes access in its\
+        \ own system from them must sync more often than every 7 days. **Cursor walk\
+        \ (full sync):** pass `cursor=start`, then each response's `nextCursor`, until\
+        \ `nextCursor` is null. Every row that exists and matches the filters for\
+        \ the whole walk is returned exactly once; rows created or revoked during\
+        \ the walk may or may not appear. Time-dependent status (end of access, temporary\
+        \ authorizations, `onlyExpiringInFifteenDays`) is evaluated at the instant\
+        \ the walk started; changes made by access recalculation during the walk are\
+        \ reflected. Rows are ordered by `(resource.id, site.id)`, so `sort` is rejected\
+        \ and `page` is ignored. In cursor mode `page.number`, `page.totalElements`\
+        \ and `page.totalPages` are `-1`; a real count on the first page means the\
+        \ request was not in cursor mode. Keep the filters unchanged during the walk:\
+        \ a continuation with different filters is not rejected and returns rows of\
+        \ the new filter set. Resume within 24 hours, otherwise the request fails\
+        \ with 400 and the walk must start again with `cursor=start`. Outside cursor\
+        \ mode `nextCursor` is always null."
       operationId: getAccessControlStatusByClient
       parameters:
       - name: companyId
@@ -5102,6 +5108,19 @@ paths:
           \ are the earliest start date of those contracts, and it is replaced by\
           \ the normal row once a contract starts. Only `accessStartsOn` tells such\
           \ a row apart: it is null on every other row."
+        required: false
+        schema:
+          type: boolean
+      - name: includeRevoked
+        in: query
+        description: "When true, also returns resources that lost access to a site\
+          \ (unassigned, contract expired, deactivated or deleted, resource deleted)\
+          \ for at least 7 days after it happened, one row per resource and site.\
+          \ Such a row is `NOT_ALLOWED`, its `endOfAccess` is the last day it had\
+          \ access and `revokedAt` is set. A future-contract row (with `includeFutureContracts`)\
+          \ revoked before it started has no `endOfAccess`. A resource assigned to\
+          \ the site again comes back as a normal row. Without it the response is\
+          \ unchanged."
         required: false
         schema:
           type: boolean
@@ -5993,7 +6012,9 @@ paths:
       summary: Get eligible resources for child requirements
       description: "Returns paginated resources (employees, vehicles, equipment) eligible\
         \ for child requirement instances. Can be filtered by a search query on resource\
-        \ name."
+        \ name. For a holding-shared requirement and a caller who can review evidence,\
+        \ lists the workers of every company of the holding group once, each with\
+        \ the companies they appear in."
       operationId: getEligibleResourcesForChildRequirements
       parameters:
       - name: companyId
@@ -11093,6 +11114,13 @@ components:
           type: string
           description: Internal manager user ID for the contract.
           minLength: 1
+        additionalManagerIds:
+          type: array
+          description: The Contract Managers besides the main one in managerId.
+          items:
+            type: string
+          maxItems: 19
+          minItems: 0
         sites:
           type: array
           description: Sites this contract covers; must not be empty. Each site entry
@@ -11170,6 +11198,13 @@ components:
           type: string
           description: Internal manager user id for the contract.
           minLength: 1
+        additionalManagerIds:
+          type: array
+          description: The Contract Managers besides the main one in managerId.
+          items:
+            type: string
+          maxItems: 19
+          minItems: 0
         dateFrom:
           type: string
           format: date
@@ -12984,6 +13019,13 @@ components:
         managerId:
           type: string
           description: Internal manager user ID. Ignored or rejected for subcontracts.
+        additionalManagerIds:
+          type: array
+          description: The Contract Managers besides the main one in managerId.
+          items:
+            type: string
+          maxItems: 19
+          minItems: 0
         subcontracting:
           $ref: "#/components/schemas/SubcontractingDto"
           description: Subcontracting policy. Omit to leave unchanged; rejected for
@@ -13762,6 +13804,13 @@ components:
           format: date
         manager:
           $ref: "#/components/schemas/ManagerRefV2"
+          description: The main Contract Manager.
+        additionalManagers:
+          type: array
+          description: The Contract Managers besides the main one in manager. Left
+            out when none.
+          items:
+            $ref: "#/components/schemas/ManagerRefV2"
         client:
           $ref: "#/components/schemas/IdAndNameV2"
         contractor:
@@ -14361,6 +14410,13 @@ components:
           $ref: "#/components/schemas/Requirements"
         manager:
           $ref: "#/components/schemas/ManagerRefV2"
+          description: The main Contract Manager.
+        additionalManagers:
+          type: array
+          description: The Contract Managers besides the main one in manager. Left
+            out when none.
+          items:
+            $ref: "#/components/schemas/ManagerRefV2"
         project:
           $ref: "#/components/schemas/ProjectRef"
         hasUnresolvedMandatoryRiskConflicts:
@@ -16787,8 +16843,8 @@ components:
         reason:
           type: string
           description: "Why the file is shown as uploaded: a refusal code of the redaction\
-            \ engine, TOO_LARGE when the file is over 20 MB, or FAILED when redacting\
-            \ it failed for good. Set only when state is AS_UPLOADED."
+            \ engine, TOO_LARGE when the file is over 20 MB or 1,500 pages, or FAILED\
+            \ when redacting it failed for good. Set only when state is AS_UPLOADED."
         clientCopyName:
           type: string
           description: "The name the client's copy is stored and downloads under.\
@@ -16860,6 +16916,11 @@ components:
         notDueUntil:
           type: string
           format: date
+        holdingGroup:
+          $ref: "#/components/schemas/HoldingGroupInfo"
+          description: "Set when this requirement is shared across a holding with\
+            \ group review on: the holding and the other companies the review also\
+            \ applies to."
       required:
       - applicability
       - client
@@ -16871,6 +16932,18 @@ components:
       - permissions
       - redactionActive
       - requirement
+    HoldingGroupInfo:
+      type: object
+      properties:
+        holding:
+          $ref: "#/components/schemas/IdNameInfo"
+        companies:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdNameInfo"
+      required:
+      - companies
+      - holding
     IdNameInfo:
       type: object
       properties:
@@ -16882,6 +16955,22 @@ components:
       required:
       - id
       - name
+    Manager:
+      type: object
+      properties:
+        id:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+      required:
+      - email
+      - firstName
+      - id
+      - lastName
     RequirementContractInfo:
       type: object
       properties:
@@ -16896,6 +16985,12 @@ components:
           type: string
         managerEmail:
           type: string
+        additionalManagers:
+          type: array
+          description: The Contract Managers besides the main one in manager. Left
+            out when none.
+          items:
+            $ref: "#/components/schemas/Manager"
       required:
       - id
       - managerEmail
@@ -17034,21 +17129,17 @@ components:
           description: "External identifier for the subject (e.g. document id, plate)."
         employeeJobPosition:
           type: string
-          description: "The job position on the employee's own record. Only set when\
-            \ the subject is an employee and the record has a position. While the\
-            \ requirement-review-job-positions flag is off for the caller, it instead\
-            \ holds the employee's contract job positions, comma-joined, and only\
-            \ when the client has the resource-assignment approval product."
+          description: The job position on the employee's own record. Only set when
+            the subject is an employee and the record has a position.
         contractJobPositions:
           type: array
           description: "The employee's job positions in each contract this requirement\
             \ instance applies to, restricted to contracts whose client validates\
             \ employee assignments and where the employee holds at least one job position,\
-            \ sorted by contract name. Only set on the instance detail, with the requirement-review-job-positions\
-            \ flag on for the caller, when the subject is an employee and the client\
-            \ has the resource-assignment approval product active; then empty when\
-            \ no contract qualifies. Only approved assignments count: a pending change\
-            \ is not reflected."
+            \ sorted by contract name. Only set on the instance detail, when the subject\
+            \ is an employee and the client has the resource-assignment approval product\
+            \ active; then empty when no contract qualifies. Only approved assignments\
+            \ count: a pending change is not reflected."
           items:
             $ref: "#/components/schemas/ContractJobPositions"
       required:
@@ -17269,6 +17360,11 @@ components:
           type: boolean
           description: Whether this viewer may download the originals of the entry's
             files whose redaction state is REDACTED; false when none is.
+        holdingName:
+          type: string
+          description: "For a holding-shared requirement, the name of the holding\
+            \ on a verdict row the holding propagated: a copy of another company's\
+            \ action, or a row of another group company. Absent otherwise."
       required:
       - canDownloadOriginals
       - createdAt
@@ -17407,6 +17503,10 @@ components:
           - $ref: "#/components/schemas/Equipment"
           - $ref: "#/components/schemas/Product"
           - $ref: "#/components/schemas/Vehicle"
+        companies:
+          type: array
+          items:
+            $ref: "#/components/schemas/IdNameInfo"
       required:
       - requirementInstanceId
       - resource
@@ -17591,8 +17691,14 @@ components:
           description: Contract start date.
         managerName:
           type: string
-          description: Contract manager display name when assigned; omitted or null
-            when not available.
+          description: Main Contract Manager display name when assigned; omitted or
+            null when not available.
+        additionalManagerNames:
+          type: array
+          description: The other Contract Managers' display names. Left out when there
+            are none.
+          items:
+            type: string
       required:
       - dateFrom
       - id
@@ -18392,6 +18498,13 @@ components:
           $ref: "#/components/schemas/Requirements"
         manager:
           $ref: "#/components/schemas/Manager"
+          description: The main Contract Manager.
+        additionalManagers:
+          type: array
+          description: The Contract Managers besides the main one in manager. Left
+            out when none.
+          items:
+            $ref: "#/components/schemas/Manager"
         project:
           $ref: "#/components/schemas/ProjectRef"
         approvalState:
@@ -18541,22 +18654,6 @@ components:
       - id
       - scopeSites
       - site
-    Manager:
-      type: object
-      properties:
-        id:
-          type: string
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-      required:
-      - email
-      - firstName
-      - id
-      - lastName
     PageResponseContractData:
       type: object
       properties:
@@ -19650,6 +19747,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/GetAccessControlActiveEntry"
+        revokedAt:
+          type: string
+          format: date-time
+          description: "Set only with `includeRevoked=true`, on a resource that lost\
+            \ access to this site: when the access was revoked. Such a row is `NOT_ALLOWED`\
+            \ and its `endOfAccess` is the last day it had access, or null on a future-contract\
+            \ row (`accessStartsOn` set) that was revoked before it started. Revoked\
+            \ rows are returned for at least 7 days after revocation."
       required:
       - activities
       - blockingAncestorContractors
