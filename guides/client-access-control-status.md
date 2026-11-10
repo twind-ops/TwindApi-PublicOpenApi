@@ -224,6 +224,10 @@ Send **`includeRevoked=true`** to also get these **revoked resources**, one row
 per resource and site. Without the parameter, or with `false`, the response is
 unchanged.
 
+For a full sync, add `includeRevoked=true` to a cursor walk
+(`cursor=start&includeRevoked=true`; see **Cursor mode (full sync)** below) and
+keep it on every continuation.
+
 ### Example: cURL — include revoked resources
 
 ```bash
