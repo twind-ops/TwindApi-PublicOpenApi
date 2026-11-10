@@ -208,6 +208,87 @@ curl -X GET \
   `PARTIALLY_ALLOWED` status.
 - **`statusPerContractActivity`** — Per-activity breakdown. Use this to identify
   exactly which activities are blocked and why.
+- **`revokedAt`** — Set only with `includeRevoked=true`, on a resource that
+  lost access to the site: the moment access was revoked. See
+  **Revoked resources** below.
+
+## Revoked resources
+
+When a resource loses access to one of your sites, it drops out of the list.
+This happens when the resource is unassigned from the site, when its contract
+expires, is deactivated or is deleted, or when the resource itself is deleted.
+If your integration copies this list into its own access system, it also needs
+to know whom to remove there.
+
+Send **`includeRevoked=true`** to also get these **revoked resources**, one row
+per resource and site. Without the parameter, or with `false`, the response is
+unchanged.
+
+For a full sync, add `includeRevoked=true` to a cursor walk
+(`cursor=start&includeRevoked=true`; see **Cursor mode (full sync)** below) and
+keep it on every continuation.
+
+### Example: cURL — include revoked resources
+
+```bash
+curl -X GET \
+  "https://app.twind.io/api/v1/companies/{companyId}/access-control/as-client?includeRevoked=true&page=0&size=100" \
+  -H "X-Api-Key: $TWIND_API_KEY" \
+  -H "Accept: application/json"
+```
+
+**Response** (`200 OK`, trimmed to one revoked row)
+
+```json
+{
+  "content": [
+    {
+      "resource": {
+        "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "type": "EMPLOYEE",
+        "name": "Jane",
+        "surname": "Doe"
+      },
+      "site": {
+        "id": "cccccccc-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "name": "Main Warehouse"
+      },
+      "status": "NOT_ALLOWED",
+      "accessControlType": "RESTRICTIVE",
+      "endOfAccess": "2026-11-11",
+      "revokedAt": "2026-11-12T09:15:00Z"
+    }
+  ],
+  "page": { "size": 100, "number": 0, "totalElements": 1, "totalPages": 1 }
+}
+```
+
+### What a revoked row looks like
+
+- **`status`** is always `NOT_ALLOWED`.
+- **`revokedAt`** is the moment access was revoked. Only revoked rows carry it,
+  so it tells a revoked resource apart from one that is still assigned but
+  blocked (also `NOT_ALLOWED`, without `revokedAt`).
+- **`endOfAccess`** is the last day the resource had access: the day before
+  `revokedAt` in your company's timezone, or the end date it already had if
+  that came first. For example, a contract that ended on 2026-11-10 is revoked
+  on 2026-11-11 and reports `"endOfAccess": "2026-11-10"`.
+
+### How long revoked rows are returned
+
+A revoked row is returned for **at least 7 days** after `revokedAt`. After
+that it disappears from the list for good, so an integration that relies on it
+must sync more often than every 7 days. **We advise a daily sync.**
+
+If the resource is assigned to the site again, it comes back as a normal row,
+with its current status and without `revokedAt`.
+
+### Resources whose contracts haven't started
+
+`includeRevoked` does not return resources whose contracts haven't started
+yet. Those still need `includeFutureContracts=true`, and they are marked by
+`accessStartsOn`. When you send both, a future-contract row that was revoked
+before it started has no `endOfAccess`, because it never had access.
 
 ## Search access status by identifier (NIF, serial number, plate)
 
