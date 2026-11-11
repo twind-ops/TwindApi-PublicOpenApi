@@ -5155,6 +5155,11 @@
             "description" : "Optional search query for accent-insensitive partial match on name",
             "disabled" : true
           }, {
+            "key" : "allCountries",
+            "value" : "",
+            "description" : "When true, returns document types of every country instead of only the company's country",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
@@ -5171,7 +5176,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns the document type catalog for the company's country (same source as requirements admin). Each entry includes target (EMPLOYEE, EQUIPMENT, VEHICLE, CONTRACTOR, PRODUCT). Optional documentTargetTypes pre-filters server-side (multi-select). Optional q performs an accent-insensitive partial match on name."
+        "description" : "Returns the document type catalog for the company's country (same source as requirements admin). Each entry includes target (EMPLOYEE, EQUIPMENT, VEHICLE, CONTRACTOR, PRODUCT). Optional documentTargetTypes pre-filters server-side (multi-select). Optional q performs an accent-insensitive partial match on name. Optional allCountries=true returns the catalog of every country instead."
       }
     } ]
   }, {

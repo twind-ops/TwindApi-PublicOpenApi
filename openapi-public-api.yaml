@@ -9644,7 +9644,8 @@ paths:
         \ source as requirements admin). Each entry includes target (EMPLOYEE, EQUIPMENT,\
         \ VEHICLE, CONTRACTOR, PRODUCT). Optional documentTargetTypes pre-filters\
         \ server-side (multi-select). Optional q performs an accent-insensitive partial\
-        \ match on name."
+        \ match on name. Optional allCountries=true returns the catalog of every country\
+        \ instead."
       operationId: getDocumentTypes
       parameters:
       - name: id
@@ -9677,6 +9678,13 @@ paths:
         required: false
         schema:
           type: string
+      - name: allCountries
+        in: query
+        description: "When true, returns document types of every country instead of\
+          \ only the company's country"
+        required: false
+        schema:
+          type: boolean
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -15281,6 +15289,20 @@ components:
       - id
       - name
       - taxId
+    GetDocumentTypesCountry:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        code:
+          type: string
+      required:
+      - code
+      - id
+      - name
     GetDocumentTypesResponse:
       type: object
       properties:
@@ -15300,8 +15322,11 @@ components:
           - VEHICLE
           - PRODUCT
           - VISITOR
+        country:
+          $ref: "#/components/schemas/GetDocumentTypesCountry"
       required:
       - code
+      - country
       - id
       - name
       - target
