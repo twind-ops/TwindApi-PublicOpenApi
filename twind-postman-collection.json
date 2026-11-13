@@ -1564,6 +1564,40 @@
         }
       }
     }, {
+      "name" : "Update site resources",
+      "request" : {
+        "method" : "PATCH",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v2/companies/:companyId/contracts/:contractId/sites/:siteId/resources",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v2", "companies", ":companyId", "contracts", ":contractId", "sites", ":siteId", "resources" ],
+          "variable" : [ {
+            "key" : "companyId",
+            "value" : "{{companyId}}",
+            "description" : "Contractor company ID that owns the resources."
+          }, {
+            "key" : "contractId",
+            "value" : "{{contractId}}",
+            "description" : "Contract ID the site belongs to."
+          }, {
+            "key" : "siteId",
+            "value" : "{{siteId}}",
+            "description" : "Site ID whose resources to update."
+          } ]
+        },
+        "description" : "Assigns, updates or unassigns individual resources at a (contract, site) pair without resending the rest. Resources in **upsert** are assigned to every activity at the site, or updated if already assigned: **riskIds** and **employeeJobPosition** replace the current value when present and keep it when omitted; an empty **riskIds** clears the risks. Resources in **remove** are unassigned from every activity at the site; removing one of the contractor's resources that is not assigned has no effect; an unknown resource or one of another company is rejected. Resources not listed are left unchanged. The request is applied entirely or not at all. When the client validates resource assignments or removals, the changes are submitted for the client's validation instead of being applied, and the response is still 204. Upserting a resource whose removal awaits the client's validation withdraws that removal: nothing stays pending if the upsert matches the current assignment, and a change is submitted or applied like any other. `GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}` shows only applied assignments.",
+        "body" : {
+          "mode" : "raw",
+          "raw" : "{}",
+          "options" : {
+            "raw" : {
+              "language" : "json"
+            }
+          }
+        }
+      }
+    }, {
       "name" : "Update risks for a resource at a site",
       "request" : {
         "method" : "PUT",
@@ -3548,7 +3582,7 @@
             "disabled" : true
           } ]
         },
-        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, equipment, or product); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+        "description" : "Returns paginated requirement instances for a client company. **Allowed sort fields:** `contractor_name` (contractor company name); `subject_name` (resource name: employee full name, vehicle, equipment, or product); `requirement_name` (requirement name); `evidence_expiration` (minimum tolerance date: expiration + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date` (evidence upload date); `evidence_expiry` (evidence expiration date, grace period not added; no expiration last when ascending); `status` (in order: pending review, pending upload, rejected, under grace period, expired, approved); `created_at` (instance creation date, default). **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       }
     } ]
   }, {

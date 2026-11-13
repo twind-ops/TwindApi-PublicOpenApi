@@ -2786,6 +2786,94 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
+    patch:
+      tags:
+      - Assignments
+      summary: Update site resources
+      description: "Assigns, updates or unassigns individual resources at a (contract,\
+        \ site) pair without resending the rest. Resources in **upsert** are assigned\
+        \ to every activity at the site, or updated if already assigned: **riskIds**\
+        \ and **employeeJobPosition** replace the current value when present and keep\
+        \ it when omitted; an empty **riskIds** clears the risks. Resources in **remove**\
+        \ are unassigned from every activity at the site; removing one of the contractor's\
+        \ resources that is not assigned has no effect; an unknown resource or one\
+        \ of another company is rejected. Resources not listed are left unchanged.\
+        \ The request is applied entirely or not at all. When the client validates\
+        \ resource assignments or removals, the changes are submitted for the client's\
+        \ validation instead of being applied, and the response is still 204. Upserting\
+        \ a resource whose removal awaits the client's validation withdraws that removal:\
+        \ nothing stays pending if the upsert matches the current assignment, and\
+        \ a change is submitted or applied like any other. `GET /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}`\
+        \ shows only applied assignments."
+      operationId: patchSiteResources
+      parameters:
+      - name: companyId
+        in: path
+        description: Contractor company ID that owns the resources.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: contractId
+        in: path
+        description: Contract ID the site belongs to.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: siteId
+        in: path
+        description: Site ID whose resources to update.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchSiteResourcesDto"
+        required: true
+      responses:
+        "204":
+          description: Resources updated
+          content: {}
+        "400":
+          description: "`RESOURCES_DELETED`: one or more of the resources being assigned\
+            \ have been deleted. `RESOURCES_WITHOUT_CLASSIFICATION`: the client has\
+            \ the Employee Type add-on and one or more resources have no classification\
+            \ for it. `RESOURCES_WITHOUT_PHOTO`: the client has the Mandatory Employee\
+            \ Picture add-on and one or more of the employees being assigned has no\
+            \ picture. Each lists the offending resources in `resources`, with `id`,\
+            \ `name` and `type`. `PROJECT_MANDATORY_RISK_NOT_SELECTED`: an employee\
+            \ lacks a risk the project makes mandatory; `resourceIds` lists them.\
+            \ It is checked on every resource assigned at the site once the change\
+            \ is applied, so it can name resources the request does not mention. A\
+            \ 400 without either list is also returned for an invalid body (empty,\
+            \ null items, duplicate or overlapping ids, more than 200 items), unknown\
+            \ resources or risks, and resources of another company."
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: Contract or site not found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
   /v2/companies/{companyId}/contracts/{contractId}/sites/{siteId}/resources/{resourceId}/risks:
     put:
       tags:
@@ -6528,8 +6616,11 @@ paths:
         \ (resource name: employee full name, vehicle, equipment, or product); `requirement_name`\
         \ (requirement name); `evidence_expiration` (minimum tolerance date: expiration\
         \ + grace period); `date_of_issue` (evidence date of issue); `evidence_upload_date`\
-        \ (evidence upload date); `created_at` (instance creation date, default).\
-        \ **Sort format:** use query parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
+        \ (evidence upload date); `evidence_expiry` (evidence expiration date, grace\
+        \ period not added; no expiration last when ascending); `status` (in order:\
+        \ pending review, pending upload, rejected, under grace period, expired, approved);\
+        \ `created_at` (instance creation date, default). **Sort format:** use query\
+        \ parameter `sort=field,direction` (e.g. `?sort=contractor_name,asc`)."
       operationId: getPendingRequirementsAsCustomer
       parameters:
       - name: companyId
@@ -13063,6 +13154,47 @@ components:
             \ note, max 4000 chars, never shown to contractors)."
       required:
       - removeAssignedResourcesConfirmed
+    PatchSiteResourceDto:
+      type: object
+      description: "A resource to assign or update at a (contract, site) pair."
+      properties:
+        resourceId:
+          type: string
+          format: uuid
+          description: "Contractor resource id to assign or update. Obtain the UUID\
+            \ from `GET /v1/companies/{companyId}/employees`, `.../vehicles`, or `.../equipment`."
+        riskIds:
+          type: array
+          description: Risk ids for this resource (employees only). Omit to keep the
+            current risks; pass an empty list to clear them.
+          items:
+            type: string
+            format: uuid
+        employeeJobPosition:
+          type: string
+          description: Job position for an employee resource. Omit to keep the current
+            position (or the employee's stored default for a new assignment).
+      required:
+      - resourceId
+    PatchSiteResourcesDto:
+      type: object
+      description: "Incremental change to the resources assigned at a (contract, site)\
+        \ pair. Resources not listed are left unchanged."
+      properties:
+        upsert:
+          type: array
+          description: "Resources to assign at the site, or to update if already assigned."
+          items:
+            $ref: "#/components/schemas/PatchSiteResourceDto"
+        remove:
+          type: array
+          description: Ids of resources to unassign from every activity at the site.
+          items:
+            type: string
+            format: uuid
+      required:
+      - remove
+      - upsert
     UpdateUserDto:
       type: object
       properties:
