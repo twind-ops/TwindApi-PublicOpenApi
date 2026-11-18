@@ -6893,6 +6893,40 @@ paths:
           description: "When true, restricts results to requirement instances the\
             \ current user has permission to review. Has no effect when requirement\
             \ permissions are not enforced or the user is not scoped to specific teams."
+      - name: groupScope
+        in: query
+        description: "Compact list and export only. When true and the caller is a\
+          \ Holding Manager of this holding parent, lists the requirements of every\
+          \ company of the group where the caller is a member, each row carrying its\
+          \ `company`; the compact response then carries `groupScope: true`. Ignored\
+          \ otherwise, and on the non-compact list: the list stays this company's\
+          \ alone."
+        required: false
+        schema:
+          type: boolean
+          description: "Compact list and export only. When true and the caller is\
+            \ a Holding Manager of this holding parent, lists the requirements of\
+            \ every company of the group where the caller is a member, each row carrying\
+            \ its `company`; the compact response then carries `groupScope: true`.\
+            \ Ignored otherwise, and on the non-compact list: the list stays this\
+            \ company's alone."
+      - name: companyIds
+        in: query
+        description: "With `groupScope`, restricts the group list to these companies\
+          \ of the group. Ids outside the group match nothing. Ignored without the\
+          \ group scope."
+        required: false
+        schema:
+          type: array
+          description: "With `groupScope`, restricts the group list to these companies\
+            \ of the group. Ids outside the group match nothing. Ignored without the\
+            \ group scope."
+          items:
+            type: string
+            format: uuid
+            description: "With `groupScope`, restricts the group list to these companies\
+              \ of the group. Ids outside the group match nothing. Ignored without\
+              \ the group scope."
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -12406,6 +12440,7 @@ components:
       - SUBCONTRACT_REJECTED_MANAGER
       - ASSIGNMENT_PENDING_VALIDATION
       - ASSIGNMENT_PENDING_REMINDER
+      - RESOURCES_ASSIGNED_MANAGER
       - INCIDENT_CORRECTED
       - EVIDENCE_REJECTED
       - CONTRACTOR_WEEKLY_RECAP
@@ -18142,6 +18177,11 @@ components:
             \ that day is still ahead. Filing is open before it - show the date, do\
             \ not withhold the action. Null for every other requirement, and once\
             \ the day has passed."
+        company:
+          $ref: "#/components/schemas/IdNameInfo"
+          description: The company of the holding group the requirement is requested
+            in. Present only on a holding manager's group list (`groupScope=true`
+            applied).
       required:
       - applicableEngagements
       - contractor

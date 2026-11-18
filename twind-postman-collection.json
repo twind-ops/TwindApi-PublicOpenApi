@@ -3566,6 +3566,16 @@
             "description" : "When true, restricts results to requirement instances the current user has permission to review. Has no effect when requirement permissions are not enforced or the user is not scoped to specific teams.",
             "disabled" : true
           }, {
+            "key" : "groupScope",
+            "value" : "",
+            "description" : "Compact list and export only. When true and the caller is a Holding Manager of this holding parent, lists the requirements of every company of the group where the caller is a member, each row carrying its `company`; the compact response then carries `groupScope: true`. Ignored otherwise, and on the non-compact list: the list stays this company's alone.",
+            "disabled" : true
+          }, {
+            "key" : "companyIds",
+            "value" : "",
+            "description" : "With `groupScope`, restricts the group list to these companies of the group. Ids outside the group match nothing. Ignored without the group scope.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
