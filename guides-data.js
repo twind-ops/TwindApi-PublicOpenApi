@@ -79,7 +79,7 @@ const GUIDES_DATA = [
             id: "client-contracts-create",
             file: "client-contracts-create.md",
             title: "Create a Contract with a Contractor",
-            description: "Register a contractor company and create a contract defining its sites and activities.",
+            description: "Find or register a contractor company and create a contract defining its sites and activities.",
             icon: "assets/icon-contract.svg",
           },
           {

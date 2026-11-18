@@ -11,9 +11,45 @@ Before you start, ensure you have the following:
 - **Site and activity ids** — each site in the contract carries its own list of activities. List them with [`GET /v1/companies/{companyId}/sites`](#tag/lookups/GET/v1/companies/{companyId}/sites) and [`GET /v1/companies/{companyId}/activities`](#tag/lookups/GET/v1/companies/{companyId}/activities).
 - **A contract manager** — the create call requires a `managerId`: the id of a user of your company, from [`GET /v1/companies/{companyId}/users`](#tag/companies/GET/v1/companies/{companyId}/users). API-key users may get **403 Forbidden** on that endpoint; in that case use your own user id from [`GET /v1/users/me`](#tag/user/GET/v1/users/me) as `managerId`.
 
-## Step 1: Register the contractor company
+## Step 1: Find or register the contractor company
 
-If the contractor already works with you, skip this step and find its id with [`GET /v1/companies/{companyId}/contracts/my-contractors`](#tag/companies/GET/v1/companies/{companyId}/contracts/my-contractors). Otherwise, create the contractor company and link it to your client company. The contact person receives an invitation to manage the new company.
+Many companies are already registered in Twind, including ones that have never worked with you. Search for the contractor by its tax ID first, and invite it only when it is not found.
+
+### 1a. Search the Twind company directory
+
+[`GET /v1/companies/{id}/contractors`](#tag/company/GET/v1/companies/{id}/contractors) lists every company registered in Twind that can be assigned to a contract, searchable by name or tax ID with `q`.
+
+- Always send `includeWithoutContractorPlan=true`: client companies can take contracts too and need no invitation. Without it they are left out of the results.
+- `q` is a partial match, so keep the row whose `taxId` is exactly the one you searched for.
+
+### Example: Search by tax ID
+
+```bash
+curl -X GET "https://app.twind.io/api/v1/companies/00000000-0000-0000-0000-000000000001/contractors?q=B12345678&includeWithoutContractorPlan=true" \
+  -H "X-Api-Key: $TWIND_API_KEY"
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "content": [
+    {
+      "id": "00000000-0000-0000-0000-000000000002",
+      "name": "Acme Maintenance S.L.",
+      "taxId": "B12345678",
+      "classifications": [{ "id": "00000000-0000-0000-0000-000000000050", "name": "Maintenance" }]
+    }
+  ],
+  "page": { "size": 10, "number": 0, "totalElements": 1, "totalPages": 1 }
+}
+```
+
+If a row matches, its `id` is the **contractor company id**: skip to Step 2. `classifications` lists the company types you have assigned to it.
+
+### 1b. Not found: register the contractor company
+
+Create the contractor company and link it to your client company. The contact person receives an invitation to manage the new company.
 
 [`POST /v1/companies/{id}/contractors`](#tag/company/POST/v1/companies/{id}/contractors)
 
@@ -43,6 +79,10 @@ Response (`201 Created`):
 ```
 
 The returned `id` is the **contractor company id** — you will use it as `contractorId` in the next step. Country ids come from [`GET /v1/countries`](#tag/lookups/GET/v1/countries) and language ids (the invited contact's platform language) from [`GET /v1/languages`](#tag/lookups/GET/v1/languages) — both filterable by partial name (`?name=Spain`, `?name=Spanish`).
+
+If the call returns `409 Conflict`, the tax ID is already registered in Twind. The response carries no id: repeat the search in 1a.
+
+The contractor company id never changes, so your integration can store it against the tax ID and skip Step 1 the next time it contracts the same company.
 
 ## Step 2: Create the contract with its sites and activities
 
@@ -144,6 +184,7 @@ To change the scope later, use [`PATCH /v2/companies/{companyId}/contracts/{cont
 | 403 | Insufficient permissions, or `companyId` is not a company your user belongs to. | Ensure your user has the necessary permissions for this action. |
 | 400 | Validation error — e.g. empty `sites`, a site with no `activities`, duplicate `siteId` entries, missing `managerId`, `subcontracting.allowed: true` without `onlyClientAllowed`, or `dateTo` earlier than `dateFrom`. | Check the body against the rules in Step 2. |
 | 404 | Unknown `contractorId`, `siteId`, `activityId` or `contractId`. | Re-fetch ids from the lookup endpoints listed in Prerequisites. |
+| 409 | `POST /v1/companies/{id}/contractors`: a company with this tax ID is already registered in Twind. | Find its id with the search in Step 1a; do not retry the `POST`. |
 
 ## Next Steps
 
