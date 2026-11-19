@@ -8,7 +8,7 @@ Before you start, ensure you have the following:
 
 - **API key** — see the [API Authentication Guide](get-api-token.md) for the `X-Api-Key` header.
 - **Your contractor company id** — from [`GET /v1/users/me/companies`](#tag/user/GET/v1/users/me/companies).
-- **The subcontractor registered** — the company you subcontract to must exist on the platform. If it does not, create it with `POST /v1/companies/{id}/contractors`.
+- **The subcontractor registered** — the company you subcontract to must exist on the platform. Find it by tax ID with [`GET /v1/companies/{id}/contractors?q={taxId}&includeWithoutContractorPlan=true`](#tag/company/GET/v1/companies/{id}/contractors), keeping the row whose `taxId` matches exactly. Only if it is not found, invite it with [`POST /v1/companies/{id}/contractors`](#tag/company/POST/v1/companies/{id}/contractors).
 - **Subcontracting allowed** — the parent contract's `subcontracting` configuration must allow it (`allowed: true` and the chain below `maxLevel`). Check it in the contract detail (Step 1).
 
 ## Step 1: Identify the scope to delegate
