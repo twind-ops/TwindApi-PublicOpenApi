@@ -77,8 +77,8 @@ tags:
   description: "Submission and review: file upload URL, agreement submission, approve,\
     \ reject, and requirement instance matching."
 - name: Company
-  description: "Company profile: update details, create contractors, and subcontractor\
-    \ hierarchy."
+  description: "Company profile: update details, search the Twind company directory,\
+    \ create contractors, and subcontractor hierarchy."
 - name: Contractor properties
   description: "A private note the client keeps about each of its contractors, and\
     \ the history of its changes. Notes belong to the client and are never visible\
@@ -7297,6 +7297,264 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetail"
   /v1/companies/{id}/contractors:
+    get:
+      tags:
+      - Company
+      summary: Search the Twind company directory
+      description: "Lists the companies registered in Twind that can be assigned to\
+        \ a contract, searchable by name or tax ID with `q` (partial match: compare\
+        \ `taxId` to find the exact company). Always send `includeWithoutContractorPlan=true`:\
+        \ client companies can take contracts too and need no invitation. A company\
+        \ not in this list must be invited first with `POST /v1/companies/{id}/contractors`.\
+        \ Use the `id` as `contractorId` when creating the contract."
+      operationId: findContractors
+      parameters:
+      - name: id
+        in: path
+        description: Id of the calling company
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        description: "Text search term, matched against company name and tax ID. The\
+          \ /all-contractors and /my-companies endpoints also match it against the\
+          \ company email, and — when the Custom Company Types product is enabled\
+          \ for the caller — against the names of the company types the caller has\
+          \ assigned to each company. Ignored when filterById is set."
+        required: false
+        schema:
+          type: string
+          description: "Text search term, matched against company name and tax ID.\
+            \ The /all-contractors and /my-companies endpoints also match it against\
+            \ the company email, and — when the Custom Company Types product is enabled\
+            \ for the caller — against the names of the company types the caller has\
+            \ assigned to each company. Ignored when filterById is set."
+      - name: filterById
+        in: query
+        description: "When set, performs a point-lookup by ID and ignores the 'q'\
+          \ search parameter."
+        required: false
+        schema:
+          type: string
+          format: uuid
+          description: "When set, performs a point-lookup by ID and ignores the 'q'\
+            \ search parameter."
+      - name: filterByIds
+        in: query
+        description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+          \ is ignored. If combined with filterById, filterById is ignored."
+        required: false
+        schema:
+          type: array
+          description: "When set, performs a batch lookup by IDs. The 'q' search parameter\
+            \ is ignored. If combined with filterById, filterById is ignored."
+          items:
+            type: string
+            format: uuid
+            description: "When set, performs a batch lookup by IDs. The 'q' search\
+              \ parameter is ignored. If combined with filterById, filterById is ignored."
+      - name: brand
+        in: query
+        description: "When set, filters companies by partner brand (e.g. 'avanta')."
+        required: false
+        schema:
+          type: string
+          description: "When set, filters companies by partner brand (e.g. 'avanta')."
+      - name: externalOnly
+        in: query
+        description: "Only honoured by the /all-contractors and /my-companies endpoints.\
+          \ When true, returns only external companies (managed via the External Management\
+          \ add-on)."
+        required: false
+        schema:
+          type: boolean
+          description: "Only honoured by the /all-contractors and /my-companies endpoints.\
+            \ When true, returns only external companies (managed via the External\
+            \ Management add-on)."
+      - name: unclassifiedOnly
+        in: query
+        description: "Only honoured by the /all-contractors and /my-companies endpoints.\
+          \ When true, restricts the result to companies that have no company type\
+          \ assigned by the caller. Ignored when the Custom Company Types product\
+          \ is not enabled for the caller."
+        required: false
+        schema:
+          type: boolean
+          description: "Only honoured by the /all-contractors and /my-companies endpoints.\
+            \ When true, restricts the result to companies that have no company type\
+            \ assigned by the caller. Ignored when the Custom Company Types product\
+            \ is not enabled for the caller."
+      - name: connected
+        in: query
+        description: "Only honoured by the /contractors endpoint. When true, restricts\
+          \ the result to companies related to the caller (via contract or contractor\
+          \ chain); when false, excludes them. Ignored by /all-contractors and /my-companies,\
+          \ and ignored when filterById or filterByIds is set."
+        required: false
+        schema:
+          type: boolean
+          description: "Only honoured by the /contractors endpoint. When true, restricts\
+            \ the result to companies related to the caller (via contract or contractor\
+            \ chain); when false, excludes them. Ignored by /all-contractors and /my-companies,\
+            \ and ignored when filterById or filterByIds is set."
+      - name: includeWithoutContractorPlan
+        in: query
+        description: "Only honoured by the /contractors endpoint, and only for callers\
+          \ holding COMPANY_READ on the company. When true, widens the result to every\
+          \ real, non-external company regardless of whether it holds the Contractor\
+          \ Plan — intended for the contract create/edit form, where contract creation\
+          \ auto-activates the plan on the chosen company. When false (default), or\
+          \ for callers without COMPANY_READ, only companies holding the Contractor\
+          \ Plan or Internal Management product are returned."
+        required: false
+        schema:
+          type: boolean
+          description: "Only honoured by the /contractors endpoint, and only for callers\
+            \ holding COMPANY_READ on the company. When true, widens the result to\
+            \ every real, non-external company regardless of whether it holds the\
+            \ Contractor Plan — intended for the contract create/edit form, where\
+            \ contract creation auto-activates the plan on the chosen company. When\
+            \ false (default), or for callers without COMPANY_READ, only companies\
+            \ holding the Contractor Plan or Internal Management product are returned."
+      - name: contractId
+        in: query
+        description: "Only honoured by the /contractors endpoint. The contract this\
+          \ company is subcontracting under (any level). When set, the company type\
+          \ shown for each candidate is scoped to that contract's head client rather\
+          \ than to the caller. The caller (the path company id) must be that contract's\
+          \ client, direct contractor, or main contractor — or, when the contract\
+          \ restricts subcontracting to the client only, the client itself — and the\
+          \ contract must still be open to subcontracting (not deactivated, not expired,\
+          \ and under its max subcontracting level)."
+        required: false
+        schema:
+          type: string
+          format: uuid
+          description: "Only honoured by the /contractors endpoint. The contract this\
+            \ company is subcontracting under (any level). When set, the company type\
+            \ shown for each candidate is scoped to that contract's head client rather\
+            \ than to the caller. The caller (the path company id) must be that contract's\
+            \ client, direct contractor, or main contractor — or, when the contract\
+            \ restricts subcontracting to the client only, the client itself — and\
+            \ the contract must still be open to subcontracting (not deactivated,\
+            \ not expired, and under its max subcontracting level)."
+      - name: relationship
+        in: query
+        description: "Only honoured by the /my-companies endpoint. CONTRACTORS returns\
+          \ the companies that work for the caller; CLIENTS returns the companies\
+          \ the caller works for. When omitted, both are returned."
+        required: false
+        schema:
+          type: string
+          description: "Only honoured by the /my-companies endpoint. CONTRACTORS returns\
+            \ the companies that work for the caller; CLIENTS returns the companies\
+            \ the caller works for. When omitted, both are returned."
+          enum:
+          - CONTRACTORS
+          - CLIENTS
+      - name: includeInactive
+        in: query
+        description: "Only honoured by the /my-companies endpoint. Deprecated, replaced\
+          \ by statuses=ACTIVE&statuses=INACTIVE. When true, also returns companies\
+          \ with no live contract with the caller: their contracts are all inactive,\
+          \ or they are related only by an open invitation or a draft; each row's\
+          \ 'active' flag tells them apart. Without a relationship, a company the\
+          \ caller invited is returned, as inactive, even when it has no live contract."
+        required: false
+        deprecated: true
+        schema:
+          type: boolean
+          deprecated: true
+          description: "Only honoured by the /my-companies endpoint. Deprecated, replaced\
+            \ by statuses=ACTIVE&statuses=INACTIVE. When true, also returns companies\
+            \ with no live contract with the caller: their contracts are all inactive,\
+            \ or they are related only by an open invitation or a draft; each row's\
+            \ 'active' flag tells them apart. Without a relationship, a company the\
+            \ caller invited is returned, as inactive, even when it has no live contract."
+      - name: statuses
+        in: query
+        description: "Only honoured by /my-companies. Filters by relationship status;\
+          \ supersedes includeInactive. ACTIVE = live contract (or external ownership);\
+          \ INACTIVE = no live contract (deactivated contract, open invitation, or\
+          \ draft). At least one value expected. Honoured only together with a relationship;\
+          \ ignored otherwise. Ignored when filterById or filterByIds is set."
+        required: false
+        schema:
+          type: array
+          description: "Only honoured by /my-companies. Filters by relationship status;\
+            \ supersedes includeInactive. ACTIVE = live contract (or external ownership);\
+            \ INACTIVE = no live contract (deactivated contract, open invitation,\
+            \ or draft). At least one value expected. Honoured only together with\
+            \ a relationship; ignored otherwise. Ignored when filterById or filterByIds\
+            \ is set."
+          items:
+            type: string
+            description: "Only honoured by /my-companies. Filters by relationship\
+              \ status; supersedes includeInactive. ACTIVE = live contract (or external\
+              \ ownership); INACTIVE = no live contract (deactivated contract, open\
+              \ invitation, or draft). At least one value expected. Honoured only\
+              \ together with a relationship; ignored otherwise. Ignored when filterById\
+              \ or filterByIds is set."
+            enum:
+            - ACTIVE
+            - INACTIVE
+          uniqueItems: true
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          default: 0
+          minimum: 0
+      - name: size
+        in: query
+        description: The size of the page to be returned
+        required: false
+        schema:
+          type: integer
+          default: 10
+          minimum: 1
+      - name: sort
+        in: query
+        description: "Sorting criteria in the format: property,(asc|desc). Default\
+          \ sort order is ascending. Multiple sort criteria are supported."
+        required: false
+        schema:
+          type: array
+          default:
+          - "name,ASC"
+          items:
+            type: string
+      responses:
+        "200":
+          description: "Page of companies, ordered by name. `classifications` lists\
+            \ the company types the client assigned to each one."
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PagedModelCompanyBasicDataDto"
+        "401":
+          description: "Unauthorized: authentication required"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "403":
+          description: "Access denied: insufficient permissions"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "404":
+          description: "The contract named by `contractId` does not exist, or the\
+            \ caller cannot subcontract under it"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
     post:
       tags:
       - Company
@@ -7304,7 +7562,9 @@ paths:
       description: "Creates a new **contractor** company and links it to the client\
         \ company. When the client has the `Custom Company Types` add-on active and\
         \ at least one company type defined, `companyTypeIds` classifies the invited\
-        \ company with every listed type and at least one is required."
+        \ company with every listed type and at least one is required. Search `GET\
+        \ /v1/companies/{id}/contractors?q={taxId}&includeWithoutContractorPlan=true`\
+        \ first: invite the company only when it is not found."
       operationId: createContractor
       parameters:
       - name: id
@@ -7343,6 +7603,15 @@ paths:
           description: "Validation error, a missing or empty `companyTypeIds` the\
             \ client's add-on requires, or a company type that the client does not\
             \ own or cannot use"
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetail"
+        "409":
+          description: "A company with this tax ID is already registered in Twind.\
+            \ The response carries no id: find the company with `GET /v1/companies/{id}/contractors`.\
+            \ If the search does not return it, the company exists but cannot be assigned\
+            \ to a contract (for example, it was deleted): contact api-support@twind.io."
           content:
             application/problem+json:
               schema:
@@ -8590,6 +8859,27 @@ paths:
             - ARCHIVED
             - INACTIVE
             - EXPIRED
+      - name: groupScope
+        in: query
+        description: "When true, lists the contracts of every company of this holding\
+          \ parent's group where the caller is a member with a contract read permission,\
+          \ each row's `client` being its company. 403 when the caller is not a Holding\
+          \ Manager of this company; 400 when the holding group lists are not available\
+          \ for it."
+        required: false
+        schema:
+          type: boolean
+      - name: companyIds
+        in: query
+        description: "With `groupScope=true`, restricts the group list to these companies\
+          \ of the group. Ids outside the caller's group scope match nothing. 400\
+          \ without `groupScope=true`."
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -17112,8 +17402,10 @@ components:
         holdingGroup:
           $ref: "#/components/schemas/HoldingGroupInfo"
           description: "Set when this requirement is shared across a holding with\
-            \ group review on: the holding and the other companies the review also\
-            \ applies to."
+            \ group review on. For the instance's client: the holding and the other\
+            \ companies the review also applies to. For the instance's contractor:\
+            \ the holding and every company the evidence applies to, the instance's\
+            \ client included."
       required:
       - applicability
       - client
@@ -17578,6 +17870,9 @@ components:
           type: boolean
         string:
           type: boolean
+        textual:
+          type: boolean
+          deprecated: true
         nodeType:
           type: string
           enum:
@@ -17614,9 +17909,6 @@ components:
           type: boolean
         floatingPointNumber:
           type: boolean
-        textual:
-          type: boolean
-          deprecated: true
         boolean:
           type: boolean
         binary:

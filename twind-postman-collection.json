@@ -3837,7 +3837,7 @@
     } ]
   }, {
     "name" : "Company",
-    "description" : "Company profile: update details, create contractors, and subcontractor hierarchy.",
+    "description" : "Company profile: update details, search the Twind company directory, create contractors, and subcontractor hierarchy.",
     "item" : [ {
       "name" : "Update company details",
       "request" : {
@@ -3865,6 +3865,99 @@
         }
       }
     }, {
+      "name" : "Search the Twind company directory",
+      "request" : {
+        "method" : "GET",
+        "header" : [ ],
+        "url" : {
+          "raw" : "{{baseUrl}}/v1/companies/:id/contractors",
+          "host" : [ "{{baseUrl}}" ],
+          "path" : [ "v1", "companies", ":id", "contractors" ],
+          "variable" : [ {
+            "key" : "id",
+            "value" : "{{id}}",
+            "description" : "Id of the calling company"
+          } ],
+          "query" : [ {
+            "key" : "q",
+            "value" : "",
+            "description" : "Text search term, matched against company name and tax ID. The /all-contractors and /my-companies endpoints also match it against the company email, and — when the Custom Company Types product is enabled for the caller — against the names of the company types the caller has assigned to each company. Ignored when filterById is set.",
+            "disabled" : true
+          }, {
+            "key" : "filterById",
+            "value" : "",
+            "description" : "When set, performs a point-lookup by ID and ignores the 'q' search parameter.",
+            "disabled" : true
+          }, {
+            "key" : "filterByIds",
+            "value" : "",
+            "description" : "When set, performs a batch lookup by IDs. The 'q' search parameter is ignored. If combined with filterById, filterById is ignored.",
+            "disabled" : true
+          }, {
+            "key" : "brand",
+            "value" : "",
+            "description" : "When set, filters companies by partner brand (e.g. 'avanta').",
+            "disabled" : true
+          }, {
+            "key" : "externalOnly",
+            "value" : "",
+            "description" : "Only honoured by the /all-contractors and /my-companies endpoints. When true, returns only external companies (managed via the External Management add-on).",
+            "disabled" : true
+          }, {
+            "key" : "unclassifiedOnly",
+            "value" : "",
+            "description" : "Only honoured by the /all-contractors and /my-companies endpoints. When true, restricts the result to companies that have no company type assigned by the caller. Ignored when the Custom Company Types product is not enabled for the caller.",
+            "disabled" : true
+          }, {
+            "key" : "connected",
+            "value" : "",
+            "description" : "Only honoured by the /contractors endpoint. When true, restricts the result to companies related to the caller (via contract or contractor chain); when false, excludes them. Ignored by /all-contractors and /my-companies, and ignored when filterById or filterByIds is set.",
+            "disabled" : true
+          }, {
+            "key" : "includeWithoutContractorPlan",
+            "value" : "",
+            "description" : "Only honoured by the /contractors endpoint, and only for callers holding COMPANY_READ on the company. When true, widens the result to every real, non-external company regardless of whether it holds the Contractor Plan — intended for the contract create/edit form, where contract creation auto-activates the plan on the chosen company. When false (default), or for callers without COMPANY_READ, only companies holding the Contractor Plan or Internal Management product are returned.",
+            "disabled" : true
+          }, {
+            "key" : "contractId",
+            "value" : "",
+            "description" : "Only honoured by the /contractors endpoint. The contract this company is subcontracting under (any level). When set, the company type shown for each candidate is scoped to that contract's head client rather than to the caller. The caller (the path company id) must be that contract's client, direct contractor, or main contractor — or, when the contract restricts subcontracting to the client only, the client itself — and the contract must still be open to subcontracting (not deactivated, not expired, and under its max subcontracting level).",
+            "disabled" : true
+          }, {
+            "key" : "relationship",
+            "value" : "",
+            "description" : "Only honoured by the /my-companies endpoint. CONTRACTORS returns the companies that work for the caller; CLIENTS returns the companies the caller works for. When omitted, both are returned.",
+            "disabled" : true
+          }, {
+            "key" : "includeInactive",
+            "value" : "",
+            "description" : "Only honoured by the /my-companies endpoint. Deprecated, replaced by statuses=ACTIVE&statuses=INACTIVE. When true, also returns companies with no live contract with the caller: their contracts are all inactive, or they are related only by an open invitation or a draft; each row's 'active' flag tells them apart. Without a relationship, a company the caller invited is returned, as inactive, even when it has no live contract.",
+            "disabled" : true
+          }, {
+            "key" : "statuses",
+            "value" : "",
+            "description" : "Only honoured by /my-companies. Filters by relationship status; supersedes includeInactive. ACTIVE = live contract (or external ownership); INACTIVE = no live contract (deactivated contract, open invitation, or draft). At least one value expected. Honoured only together with a relationship; ignored otherwise. Ignored when filterById or filterByIds is set.",
+            "disabled" : true
+          }, {
+            "key" : "page",
+            "value" : "",
+            "description" : "Zero-based page index (0..N)",
+            "disabled" : true
+          }, {
+            "key" : "size",
+            "value" : "",
+            "description" : "The size of the page to be returned",
+            "disabled" : true
+          }, {
+            "key" : "sort",
+            "value" : "",
+            "description" : "Sorting criteria in the format: property,(asc|desc). Default sort order is ascending. Multiple sort criteria are supported.",
+            "disabled" : true
+          } ]
+        },
+        "description" : "Lists the companies registered in Twind that can be assigned to a contract, searchable by name or tax ID with `q` (partial match: compare `taxId` to find the exact company). Always send `includeWithoutContractorPlan=true`: client companies can take contracts too and need no invitation. A company not in this list must be invited first with `POST /v1/companies/{id}/contractors`. Use the `id` as `contractorId` when creating the contract."
+      }
+    }, {
       "name" : "Create contractor company for a client",
       "request" : {
         "method" : "POST",
@@ -3879,7 +3972,7 @@
             "description" : "Client company id that will own the relationship to the new contractor"
           } ]
         },
-        "description" : "Creates a new **contractor** company and links it to the client company. When the client has the `Custom Company Types` add-on active and at least one company type defined, `companyTypeIds` classifies the invited company with every listed type and at least one is required.",
+        "description" : "Creates a new **contractor** company and links it to the client company. When the client has the `Custom Company Types` add-on active and at least one company type defined, `companyTypeIds` classifies the invited company with every listed type and at least one is required. Search `GET /v1/companies/{id}/contractors?q={taxId}&includeWithoutContractorPlan=true` first: invite the company only when it is not found.",
         "body" : {
           "mode" : "raw",
           "raw" : "{}",
@@ -4467,6 +4560,16 @@
             "key" : "statuses",
             "value" : "",
             "description" : "Restrict the listing to these sources, combined with OR: DRAFT for pending contract drafts, ACTIVE for live contracts, EXPIRED for live contracts past their end date, INACTIVE for contracts the client deactivated (ARCHIVED is a deprecated alias). Omit for ACTIVE only; drafts and inactive contracts are returned only when requested explicitly, and a row reads status EXPIRED only when EXPIRED is requested. A draft carries no engagement, so requesting DRAFT together with siteIds, activityIds, contractId or any resource-assignment filter returns no drafts. An inactive contract is returned whether or not it expired, so showExpired does not hide it. A deleted contract is never returned.",
+            "disabled" : true
+          }, {
+            "key" : "groupScope",
+            "value" : "",
+            "description" : "When true, lists the contracts of every company of this holding parent's group where the caller is a member with a contract read permission, each row's `client` being its company. 403 when the caller is not a Holding Manager of this company; 400 when the holding group lists are not available for it.",
+            "disabled" : true
+          }, {
+            "key" : "companyIds",
+            "value" : "",
+            "description" : "With `groupScope=true`, restricts the group list to these companies of the group. Ids outside the caller's group scope match nothing. 400 without `groupScope=true`.",
             "disabled" : true
           }, {
             "key" : "page",
