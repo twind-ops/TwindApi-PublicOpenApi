@@ -7444,13 +7444,15 @@ paths:
         in: query
         description: "Only honoured by the /my-companies endpoint. CONTRACTORS returns\
           \ the companies that work for the caller; CLIENTS returns the companies\
-          \ the caller works for. When omitted, both are returned."
+          \ the caller works for. When omitted, both are returned. When set, the caller's\
+          \ team client visibility does not restrict the result."
         required: false
         schema:
           type: string
           description: "Only honoured by the /my-companies endpoint. CONTRACTORS returns\
             \ the companies that work for the caller; CLIENTS returns the companies\
-            \ the caller works for. When omitted, both are returned."
+            \ the caller works for. When omitted, both are returned. When set, the\
+            \ caller's team client visibility does not restrict the result."
           enum:
           - CONTRACTORS
           - CLIENTS
@@ -7730,12 +7732,11 @@ paths:
         \ the client and readable by the caller are returned; the list is empty when\
         \ none is set. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404. It also returns 404 when the caller's\
-        \ team does not see the company in the client's companies tabs. The private\
-        \ note (`NOTE`) can also be kept about any other company in the client's companies\
-        \ tabs, including the clients it works for and the external companies it created.\
-        \ About those companies, setting or deleting any other property returns 404\
-        \ and listing leaves it out."
+        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
+        \ kept about any other company in the client's companies tabs, including the\
+        \ clients it works for and the external companies it created. About those\
+        \ companies, setting or deleting any other property returns 404 and listing\
+        \ leaves it out."
       operationId: listContractorProperties
       parameters:
       - name: clientId
@@ -7777,12 +7778,11 @@ paths:
         \ the value already stored changes nothing. The property must be enabled for\
         \ the client. The contractor must be linked to the client through a contract\
         \ (directly or down a subcontracting chain) or an invitation the client sent;\
-        \ otherwise the request returns 404. It also returns 404 when the caller's\
-        \ team does not see the company in the client's companies tabs. The private\
-        \ note (`NOTE`) can also be kept about any other company in the client's companies\
-        \ tabs, including the clients it works for and the external companies it created.\
-        \ About those companies, setting or deleting any other property returns 404\
-        \ and listing leaves it out."
+        \ otherwise the request returns 404. The private note (`NOTE`) can also be\
+        \ kept about any other company in the client's companies tabs, including the\
+        \ clients it works for and the external companies it created. About those\
+        \ companies, setting or deleting any other property returns 404 and listing\
+        \ leaves it out."
       operationId: setContractorProperty
       parameters:
       - name: clientId
@@ -7844,12 +7844,10 @@ paths:
         \ and changes nothing. The property must be enabled for the client. The contractor\
         \ must be linked to the client through a contract (directly or down a subcontracting\
         \ chain) or an invitation the client sent; otherwise the request returns 404.\
-        \ It also returns 404 when the caller's team does not see the company in the\
-        \ client's companies tabs. The private note (`NOTE`) can also be kept about\
-        \ any other company in the client's companies tabs, including the clients\
-        \ it works for and the external companies it created. About those companies,\
-        \ setting or deleting any other property returns 404 and listing leaves it\
-        \ out."
+        \ The private note (`NOTE`) can also be kept about any other company in the\
+        \ client's companies tabs, including the clients it works for and the external\
+        \ companies it created. About those companies, setting or deleting any other\
+        \ property returns 404 and listing leaves it out."
       operationId: deleteContractorProperty
       parameters:
       - name: clientId
@@ -7902,12 +7900,11 @@ paths:
         \ and the previous and new text. Returns an empty list when the caller may\
         \ not read the note. The contractor must be linked to the client through a\
         \ contract (directly or down a subcontracting chain) or an invitation the\
-        \ client sent; otherwise the request returns 404. It also returns 404 when\
-        \ the caller's team does not see the company in the client's companies tabs.\
-        \ The private note (`NOTE`) can also be kept about any other company in the\
-        \ client's companies tabs, including the clients it works for and the external\
-        \ companies it created. About those companies, setting or deleting any other\
-        \ property returns 404 and listing leaves it out."
+        \ client sent; otherwise the request returns 404. The private note (`NOTE`)\
+        \ can also be kept about any other company in the client's companies tabs,\
+        \ including the clients it works for and the external companies it created.\
+        \ About those companies, setting or deleting any other property returns 404\
+        \ and listing leaves it out."
       operationId: listContractorNoteHistory
       parameters:
       - name: clientId
