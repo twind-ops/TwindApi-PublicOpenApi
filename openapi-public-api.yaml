@@ -12559,6 +12559,13 @@ components:
     WebServicesCaeConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
+      - type: object
+        properties:
+          siteIds:
+            type: array
+            items:
+              type: string
+              format: uuid
     WorkPermitsConfig:
       allOf:
       - $ref: "#/components/schemas/ProductTypeConfig"
