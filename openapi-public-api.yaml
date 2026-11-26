@@ -8882,6 +8882,18 @@ paths:
           items:
             type: string
             format: uuid
+      - name: includeTree
+        in: query
+        description: "With showSubcontracts=true, groups the rows by main contract:\
+          \ the page holds only main contracts, sorted and paginated as such, each\
+          \ with its chain in subcontracts and its size in subcontractCount. A main\
+          \ contract is returned when any row of its tree passes the filters. Ignored\
+          \ without showSubcontracts=true, when groupScope spans more than one company,\
+          \ and while the contracts-client-table-v2 flag is off."
+        required: false
+        schema:
+          type: boolean
+          default: false
       - name: page
         in: query
         description: Zero-based page index (0..N)
@@ -15984,10 +15996,26 @@ components:
           type: string
         taxId:
           type: string
+        holding:
+          $ref: "#/components/schemas/HoldingSummaryDto"
+          description: "The holding the client belongs to: itself when it is a holding\
+            \ parent, its parent when it is a subsidiary. Absent when the client is\
+            \ in no holding."
       required:
       - id
       - name
       - taxId
+    HoldingSummaryDto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+      required:
+      - id
+      - name
     PagedModelCompanyClientData:
       type: object
       properties:
@@ -19040,6 +19068,12 @@ components:
           format: int32
         hasSubcontracts:
           type: boolean
+        allowSubcontract:
+          type: boolean
+          description: "True when the requesting company can add a subcontract under\
+            \ this contract: subcontracting is allowed, the max subcontracting level\
+            \ is not reached, and either the company is the client or only-client-can-subcontract\
+            \ is off."
         hasUnresolvedMandatoryRiskConflicts:
           type: boolean
         specialWorks:
@@ -19070,6 +19104,25 @@ components:
             \ NOT returned: it stays derived from dateFrom/dateTo by the caller, in\
             \ the viewer's own timezone. Note that `id` is a `subcontract_request`\
             \ id on such an entry, not a contract id."
+        parentId:
+          type: string
+          format: uuid
+          description: "Only on the subcontracts of an includeTree listing: the contract\
+            \ this row hangs off, the contract a pending request was made on for a\
+            \ PENDING entry. Null elsewhere."
+        subcontractCount:
+          type: integer
+          format: int32
+          description: "Only on the main contracts of an includeTree listing: the\
+            \ number of entries in subcontracts."
+        subcontracts:
+          type: array
+          description: "Only on the main contracts of an includeTree listing: the\
+            \ rows the flat showSubcontracts listing returns for this tree, plus the\
+            \ ancestors that connect them to it, depth first with siblings by name,\
+            \ and the pending subcontract requests of the tree when no filter applies."
+          items:
+            $ref: "#/components/schemas/ContractData"
         status:
           type: string
           description: "DRAFT for a `contract_draft` row the client saved before the\
@@ -19106,6 +19159,7 @@ components:
             type: string
             format: uuid
       required:
+      - allowSubcontract
       - archived
       - client
       - contractor

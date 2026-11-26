@@ -4572,6 +4572,11 @@
             "description" : "With `groupScope=true`, restricts the group list to these companies of the group. Ids outside the caller's group scope match nothing. 400 without `groupScope=true`.",
             "disabled" : true
           }, {
+            "key" : "includeTree",
+            "value" : "",
+            "description" : "With showSubcontracts=true, groups the rows by main contract: the page holds only main contracts, sorted and paginated as such, each with its chain in subcontracts and its size in subcontractCount. A main contract is returned when any row of its tree passes the filters. Ignored without showSubcontracts=true, when groupScope spans more than one company, and while the contracts-client-table-v2 flag is off.",
+            "disabled" : true
+          }, {
             "key" : "page",
             "value" : "",
             "description" : "Zero-based page index (0..N)",
