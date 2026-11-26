@@ -3568,12 +3568,12 @@
           }, {
             "key" : "groupScope",
             "value" : "",
-            "description" : "Compact list and export only. When true and the caller is a Holding Manager of this holding parent, lists the requirements of every company of the group where the caller is a member, each row carrying its `company`; the compact response then carries `groupScope: true`. Ignored otherwise, and on the non-compact list: the list stays this company's alone.",
+            "description" : "Compact list and export only. When true, lists the requirements of every company of the holding group where the caller is a member, each row carrying its `company`. Fails with 403 `HOLDING_GROUP_SCOPE_REQUIRES_HOLDING_MANAGER` when the caller is not a Holding Manager of this company, and with 400 `HOLDING_GROUP_SCOPE_UNAVAILABLE` when the group lists are not enabled for it; it never falls back to this company's list. Ignored by the non-compact list.",
             "disabled" : true
           }, {
             "key" : "companyIds",
             "value" : "",
-            "description" : "With `groupScope`, restricts the group list to these companies of the group. Ids outside the group match nothing. Ignored without the group scope.",
+            "description" : "With `groupScope=true`, restricts the group list to these companies of the group. Ids outside the group match nothing. Without `groupScope=true` the compact list and the export fail with 400 `HOLDING_GROUP_FILTER_REQUIRES_GROUP_SCOPE`. Ignored by the non-compact list.",
             "disabled" : true
           }, {
             "key" : "page",
